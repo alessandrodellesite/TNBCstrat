@@ -11,7 +11,7 @@ library(SummarizedExperiment)
 library(MultiAssayExperiment)
 library(GenomeInfoDb)
 library(GenomicRanges)
-source("/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/function_correctBetas.r")
+source("/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/function_correctBetas.R")
 
 # Point to the root mount where the data is stored
 probes <- read.table("/mnt/petasan_ccb/alessandro/SCANB/matched_methyl.tsv", header=TRUE, sep="\t", row.names=1)
