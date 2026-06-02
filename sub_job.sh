@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=TNBC_methyl
 #SBATCH --output=methylation_output_%j.log
-#SBATCH --partition= long
+#SBATCH --partition=long
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8    
