@@ -27,6 +27,7 @@ samples <- intersect(colnames(probes), names(purity_vector))
 probes <- probes[, samples]
 purity_vector <- purity_vector[samples]
 
+print("Starting purity adjustment for every cpg")
 # Apply adjustBeta() on every row (cpg)
 results_list <- apply(probes, MARGIN = 1, FUN = function(cpg_row) {
   adjustBeta(methylation = cpg_row, 
@@ -35,11 +36,14 @@ results_list <- apply(probes, MARGIN = 1, FUN = function(cpg_row) {
              seed = FALSE)
 })
 
+print("Iteration for purity adjustment finished!")
+
 # extract the correct tumor values frm the list (y.tum)
 adjusted_data <- do.call(rbind, lapply(results_list, function(x) x$y.tum))
 colnames(adjusted_data) <- samples
 
-
+print("Purity adjustement finished!")
+                                       
 # Filtering to exclude chrX/Y localization and non-CpG probes
 
 ann <- getAnnotation(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
@@ -136,11 +140,13 @@ mae_promoter <- MultiAssayExperiment(
 # Parameters
 n_probes <- 50000  
 n_permu  <- 1000
-n_cores  <- 8      
+n_cores  <- 30      
 
 
 # ENHANCERS 
 
+print("Enhancers ELMER analysis started")
+                                       
 probe_sd_en <- apply(assay(mae_enhancer, "DNA methylation"), 1, sd)
 top_probes_en <- names(sort(probe_sd_en, decreasing = TRUE))[1:n_probes]
 
@@ -152,7 +158,8 @@ mae_enhancer_top <- mae_enhancer[subset_list_en, , ]
 nearGenes_enhancer <- GetNearGenes(data = mae_enhancer_top, 
                                    probes = top_probes_en, 
                                    numFlankingGenes = 20)
-
+print("Enhancers get.pair analysis started")
+                                       
 pairs_enhancer <- get.pair(
   data = mae_enhancer_top,
   nearGenes = nearGenes_enhancer,
@@ -168,9 +175,10 @@ pairs_enhancer <- get.pair(
 
 saveRDS(pairs_enhancer, "result_pairs_enhancer.rds")
 
-
+print("Enhancers get.pair analysis finished")
 
 # PROMOTERS 
+print("Promoter ELMER analysis started")
 
 probe_sd_pr <- apply(assay(mae_promoter, "DNA methylation"), 1, sd)
 top_probes_pr <- names(sort(probe_sd_pr, decreasing = TRUE))[1:n_probes]
@@ -185,6 +193,8 @@ nearGenes_promoters <- GetNearGenes(data = mae_promoter_top,
                                     probes = top_probes_pr,
                                     numFlankingGenes = 2 
 )
+                                       
+print("Promoters get.pair analysis started")
 
 #get.pair (per le correlazioni)
 pairs_promoter <- get.pair(
@@ -201,3 +211,6 @@ pairs_promoter <- get.pair(
 ) 
 
 saveRDS(pairs_promoter, "result_pairs_promoters.rds")
+
+print("Promoters get.pair analysis finished!")
+print("All done!")
