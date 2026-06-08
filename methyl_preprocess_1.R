@@ -6,7 +6,6 @@ library(lattice)
 library(readxl)
 library(minfi)
 library(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
-library(sesameData)
 library(ELMER)
 library(SummarizedExperiment)
 library(MultiAssayExperiment)
@@ -16,7 +15,6 @@ source("/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/function_correctBetas.
 
 # Point to the root mount where the data is stored
 probes <- read.table("/mnt/petasan_ccb/alessandro/SCANB/matched_methyl.tsv", header=TRUE, sep="\t", row.names=1)
-exp.data <- read.table("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.tsv", header=TRUE, sep="\t", row.names=1)
 dt_metadata <- read_excel("/mnt/petasan_ccb/alessandro/SCANB/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
 
 ## Purity adjustment using ASCAT purity estimates
