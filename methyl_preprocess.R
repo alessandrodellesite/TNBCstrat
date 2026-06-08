@@ -6,6 +6,7 @@ library(lattice)
 library(readxl)
 library(minfi)
 library(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
+library(sesameData)
 library(ELMER)
 library(SummarizedExperiment)
 library(MultiAssayExperiment)
@@ -46,6 +47,7 @@ print("Purity adjustement finished!")
                                        
 # Filtering to exclude chrX/Y localization and non-CpG probes
 
+options(sesameData.offline = TRUE)
 ann <- getAnnotation(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
 
 keep_autosomes <- !(ann$chr %in% c("chrX", "chrY"))
