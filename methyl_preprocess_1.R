@@ -46,4 +46,4 @@ colnames(adjusted_data) <- samples
 print("Purity adjustement finished!")
 
 print("Saving preprocessed data to Petasan...")
-saveRDS(probes_filtered, "/mnt/petasan_ccb/alessandro/SCANB/probes_filtered.rds")    
+saveRDS(adjusted_data, "/mnt/petasan_ccb/alessandro/SCANB/adjusted_data.rds")    
