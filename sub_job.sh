@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=TNBC_methyl
-#SBATCH --output=methylation_output_%j.log
+#SBATCH --job-name=NMF_rnaseq
+#SBATCH --output=nmf_output_%j.log
 #SBATCH --partition=long
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=40    
-#SBATCH --time=96:00:00      
-#SBATCH --mem=64G            
+#SBATCH --cpus-per-task=30    
+#SBATCH --time=24:00:00      
+#SBATCH --mem=40G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/methyl_preprocess_1.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/NMF_RNAseq.R"
 
 # singularity execution
 srun singularity exec \
