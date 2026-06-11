@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=NMF_rnaseq
 #SBATCH --output=nmf_output_%j.log
-#SBATCH --partition=long
+#SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=30    
-#SBATCH --time=24:00:00      
+#SBATCH --time=1:00:00      
 #SBATCH --mem=40G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image_new.sif"
