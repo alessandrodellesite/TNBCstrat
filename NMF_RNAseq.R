@@ -25,8 +25,7 @@ estim.r <- nmfEstimateRank(dt_matrix,
                            range = 2:6, 
                            nrun = 50,          
                            seed = 123456, 
-                           .options = "v",
-                           .pckg = "mclapply") 
+                           .options = "v") 
 
 saveRDS(estim.r, "/mnt/petasan_ccb/alessandro/SCANB/NMF_rank_estimation_RNAseq.rds")
 print("Rank Estimation finished and saved!")
@@ -37,8 +36,7 @@ res <- nmf(dt_matrix,
            rank = 3, 
            nrun = 200,                         
            seed = 123456,
-           .options = "v",
-           .pckg = "mclapply")         
+           .options = "v")         
 
 saveRDS(res, "/mnt/petasan_ccb/alessandro/SCANB/NMF_final_results_RNAseq.rds")
 print("NMF Final execution finished!")
