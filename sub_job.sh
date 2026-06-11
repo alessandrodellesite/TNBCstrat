@@ -10,7 +10,7 @@
 #SBATCH --time=24:00:00      
 #SBATCH --mem=40G            
 
-IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
+IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image_new.sif"
 SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/NMF_RNAseq.R"
 
 # singularity execution
