@@ -18,13 +18,14 @@ exp.data <- read.table("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.tsv
                                        
 # Filtering to exclude chrX/Y localization and non-CpG probes
 
+print("Filtering probes")
 options(sesameData.offline = TRUE)
 ann <- getAnnotation(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
 
 keep_autosomes <- !(ann$chr %in% c("chrX", "chrY"))
 keep_cpg <- grepl("^cg", ann$Name)
 probes_to_keep <- ann$Name[keep_autosomes & keep_cpg]
-probes_filtered <- probes[rownames(adjusted_data) %in% probes_to_keep, ]
+probes_filtered <- adjusted_data[rownames(adjusted_data) %in% probes_to_keep, ]
 
 
 # ELMER
