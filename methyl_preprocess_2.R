@@ -136,7 +136,7 @@ nearGenes_enhancer <- GetNearGenes(data = mae_enhancer_top,
 print("Enhancers get.pair analysis started")
                                        
 pairs_enhancer <- get.pair(
-  data = mae_enhancer_top,
+  data = mae_enhancer,
   nearGenes = nearGenes_enhancer,
   group.col = "group",
   group1 = "Cancer",
