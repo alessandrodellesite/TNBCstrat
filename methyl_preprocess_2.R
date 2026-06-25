@@ -26,7 +26,7 @@ keep_autosomes <- !(ann$chr %in% c("chrX", "chrY"))
 keep_cpg <- grepl("^cg", ann$Name)
 probes_to_keep <- ann$Name[keep_autosomes & keep_cpg]
 probes_filtered <- adjusted_data[rownames(adjusted_data) %in% probes_to_keep, ]
-
+print("Probes filtered")
 
 # ELMER
 
@@ -47,10 +47,12 @@ sample_meta <- data.frame(
   stringsAsFactors = FALSE
 )
 
+print("Get TSS coordinates")
 gene_coords <- getTSS(genome = "hg19")
 # take the TSS from our total gene list
 match_idx <- match(rownames(exp_matrix), gene_coords$ensembl_gene_id)
 valid_genes <- !is.na(match_idx)
+
 
 distal_probe_coords <- get.feature.probe(genome = "hg19", met.platform = "EPIC")
 # take the distal probes from our total CpGs list
@@ -75,6 +77,7 @@ probes_promoter_names <- unique(names(all_probes_gr[queryHits(overlaps)]))
 final_promoter_list <- intersect(rownames(met_filtered), probes_promoter_names)
 
 
+print("Create the multiassaysexperiments")
 # genes summarizedExperiment
 se_exp <- SummarizedExperiment(
   assays = list(exp = exp_matrix[valid_genes, ]),
