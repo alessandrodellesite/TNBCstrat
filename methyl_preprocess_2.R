@@ -136,7 +136,7 @@ mae_promoter <- MultiAssayExperiment(
 # Parameters
 n_probes <- 50000  
 n_permu  <- 1000
-n_cores  <- 30      
+n_cores  <- 15      
 
 
 # ENHANCERS 
