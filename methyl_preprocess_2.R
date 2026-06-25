@@ -54,9 +54,27 @@ match_idx <- match(rownames(exp_matrix), gene_coords$ensembl_gene_id)
 valid_genes <- !is.na(match_idx)
 
 
-distal_probe_coords <- get.feature.probe(genome = "hg19", met.platform = "EPIC")
+# this code creates a library conflit when run on the cluster (need for "ExperimentHub")
+#distal_probe_coords <- get.feature.probe(genome = "hg19", met.platform = "EPIC")
 # take the distal probes from our total CpGs list
-final_distal_probes <- intersect(rownames(met_filtered), names(distal_probe_coords))
+#final_distal_probes <- intersect(rownames(met_filtered), names(distal_probe_coords))
+
+#it's safer to use this:
+
+print("Computing distal probes locally...")
+is_distal <- !(ann$Regulatory_Feature_Group %in% c("Promoter_Associated", "Unclassified")) | 
+             (ann$Relation_to_Island == "OpenSea")
+
+probes_distali_names <- ann$Name[is_distal]
+final_distal_probes <- intersect(rownames(met_filtered), probes_distali_names)
+
+# Creiamo un oggetto GRanges nominato per mantenere la compatibilità con il resto del tuo script
+distal_probe_coords <- GRanges(
+  seqnames = ann$chr[ann$Name %in% final_distal_probes],
+  ranges = IRanges(start = ann$pos[ann$Name %in% final_distal_probes], end = ann$pos[ann$Name %in% final_distal_probes]),
+  strand = ann$strand[ann$Name %in% final_distal_probes]
+)
+names(distal_probe_coords) <- ann$Name[ann$Name %in% final_distal_probes]
 
 
 #exploit complete annotation already done
