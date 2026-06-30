@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=methyl_ELMER
-#SBATCH --output=methyl_ELMER%j.log
+#SBATCH --job-name=icluster_tuning
+#SBATCH --output=icluster_%j.log
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=30    
-#SBATCH --time=1:00:00      
-#SBATCH --mem=120G            
+#SBATCH --cpus-per-task=16   
+#SBATCH --time=10:00:00      
+#SBATCH --mem=64G            
 
-IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image_new.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/methyl_preprocess_2.R"
+IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/iCluster_model_tuning.R"
 
 # singularity execution
 srun singularity exec \
