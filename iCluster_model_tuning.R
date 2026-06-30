@@ -32,13 +32,13 @@ probes_filtered <- adjusted_data[rownames(adjusted_data) %in% probes_to_keep, ]
 met_filtered <- as.matrix(probes_filtered)
 
 # Enhancers results
-enhancers_pairs <- readRDS("result_pairs_enhancer.rds")
+enhancers_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/result_pairs_enhancer.rds")
 en_pairs <- enhancers_pairs[order(enhancers_pairs$Pe), ]
 top_pairs_en <- en_pairs[en_pairs$Raw.p < 1e-9, ]
 top_cpg_en <- unique(top_pairs_en$Probe)
 
 # Promoters results
-promoters_pairs <- readRDS("result_pairs_promoter.rds")
+promoters_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/result_pairs_promoter.rds")
 pr_pairs <- promoters_pairs[order(promoters_pairs$Pe), ]
 top_pairs_pr <- pr_pairs[pr_pairs$Raw.p < 1e-9, ]
 top_cpg_pr <- unique(top_pairs_pr$Probe)
