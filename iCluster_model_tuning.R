@@ -108,7 +108,7 @@ for(k in 1:5){
   )
   
   #saves each K 
-  output_path <- paste0("/mnt/petasan_ccb/alessandro/SCANB/", k, ".rds")
+  output_path <- paste0("/mnt/petasan_ccb/alessandro/SCANB/", "cv_fit_k", k, ".rds")
   saveRDS(cv.fit, file = output_path)
   
   cat("Finished and saved K =", k, "to", output_path, "\n\n")
