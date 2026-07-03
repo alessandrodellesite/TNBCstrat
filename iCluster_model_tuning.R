@@ -103,7 +103,7 @@ for(k in 1:5){
     type = c("gaussian", "gaussian", "gaussian"), 
     K = k, 
     n.lambda = 185,                              
-    scale.lambda = c(1, 1, 1), #datasets already manually Z-scored 
+    scale.lambda = c(1, 1, 0.05), #datasets already manually Z-scored 
     maxiter = 20
   )
   
