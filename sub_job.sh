@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=icluster_tuning
 #SBATCH --output=icluster_%j.log
-#SBATCH --partition=short
+#SBATCH --partition=long
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16   
-#SBATCH --time=10:00:00      
+#SBATCH --time=24:00:00      
 #SBATCH --mem=64G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
