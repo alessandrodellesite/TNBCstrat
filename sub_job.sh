@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=icluster_tuning
-#SBATCH --output=icluster_%j.log
+#SBATCH --job-name=bayes_icluster
+#SBATCH --output=bayes_icluster_%j.log
 #SBATCH --partition=long
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16   
+#SBATCH --cpus-per-task=5  
 #SBATCH --time=24:00:00      
 #SBATCH --mem=64G            
 
