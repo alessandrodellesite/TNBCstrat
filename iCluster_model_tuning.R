@@ -86,30 +86,30 @@ cnv_scaled[is.na(cnv_scaled)]   <- 0
 
 
 
-# iCluster+
+# iCluster Bayes
 
-set.seed(123) #seed for reproducibility
+set.seed(123) 
+cat("Starting Bayesian model tuning at", as.character(Sys.time()), "\n")
 
-# Tuning the Icluster2b model to find optimal k and lambda
-# Run the tuning loop across a range of K latent variables (Clusters = K + 1)
-for(k in 1:5){
-  cat("Starting model tuning for K =", k, "at", as.character(Sys.time()), "\n")
-  
-  cv.fit <- tune.iClusterPlus(
-    cpus = 16, # Matches the cluster cores in .sh
-    dt1 = rna_scaled, 
-    dt2 = meth_scaled, 
-    dt3 = cnv_scaled,
-    type = c("gaussian", "gaussian", "gaussian"), 
-    K = k, 
-    n.lambda = 185,                              
-    scale.lambda = c(1, 1, 0.05), #datasets already manually Z-scored 
-    maxiter = 20
-  )
-  
-  #saves each K 
-  output_path <- paste0("/mnt/petasan_ccb/alessandro/SCANB/", "new_cv_fit_k", k, ".rds")
-  saveRDS(cv.fit, file = output_path)
-  
-  cat("Finished and saved K =", k, "to", output_path, "\n\n")
-}
+bayfit <- tune.iClusterBayes(
+  cpus = 5,                         # Matches our Slurm core count
+  dt1 = rna_scaled, 
+  dt2 = meth_scaled, 
+  dt3 = cnv_scaled,
+  type = c("gaussian", "gaussian", "gaussian"), 
+  K = 1:5,                          # Tests clusters from 2 to 6
+  n.burnin = 18000,                 # Standard MCMC burn-in length
+  n.draw = 12000,                   # Number of MCMC samples to keep
+  prior.gamma = c(0.5, 0.5, 0.5),   # Balanced prior inclusion probability
+  sdev = 0.05, 
+  thin = 3                          # Reduces autocorrelation
+)
+
+cat("Finished model tuning at", as.character(Sys.time()), "\n")
+
+# Save the primary output object safely
+output_path <- "/mnt/petasan_ccb/alessandro/SCANB/bayes_fit_results.rds"
+saveRDS(bayfit, file = output_path)
+cat("Saved results object to:", output_path, "\n")
+
+
