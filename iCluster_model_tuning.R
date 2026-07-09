@@ -101,7 +101,8 @@ bayfit <- tune.iClusterBayes(
   n.burnin = 18000,                 # Standard MCMC burn-in length
   n.draw = 12000,                   # Number of MCMC samples to keep
   prior.gamma = c(0.5, 0.5, 0.5),   # Balanced prior inclusion probability
-  sdev = 0.05, 
+  sdev = 0.15, 
+  beta.var.scale = 5,
   thin = 3                          # Reduces autocorrelation
 )
 
