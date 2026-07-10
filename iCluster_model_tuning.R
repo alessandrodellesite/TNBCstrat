@@ -10,7 +10,7 @@ rna_data <- read.table("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.tsv
 # Feature selection
 gene_mads <- apply(rna_data, 1, mad)
 ordered_mads <- order(gene_mads, decreasing = TRUE)
-top_3000_indices <- ordered_mads[1:3000]
+top_3000_indices <- ordered_mads[1:1000]
 rna_data <- rna_data[top_3000_indices, ]
 rna_matrix <- as.matrix(rna_data)
 #Transpose
@@ -34,13 +34,13 @@ met_filtered <- as.matrix(probes_filtered)
 # Enhancers results
 enhancers_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/result_pairs_enhancer.rds")
 en_pairs <- enhancers_pairs[order(enhancers_pairs$Pe), ]
-top_pairs_en <- en_pairs[en_pairs$Raw.p < 1e-9, ]
+top_pairs_en <- en_pairs[en_pairs$Raw.p < 1e-10, ]
 top_cpg_en <- unique(top_pairs_en$Probe)
 
 # Promoters results
 promoters_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/result_pairs_promoter.rds")
 pr_pairs <- promoters_pairs[order(promoters_pairs$Pe), ]
-top_pairs_pr <- pr_pairs[pr_pairs$Raw.p < 1e-9, ]
+top_pairs_pr <- pr_pairs[pr_pairs$Raw.p < 1e-10, ]
 top_cpg_pr <- unique(top_pairs_pr$Probe)
 
 # Final data
@@ -59,7 +59,7 @@ meth_mat <- t(met_mvals)
 
 ## CNV
 
-dna_matrix_filtered <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/dna_matrix_filtered_2900genes.csv", header = TRUE)
+dna_matrix_filtered <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/dna_matrix_filtered_1900genes.csv", header = TRUE)
 cnv_log_ratio <- dna_matrix_filtered
 # homozygous deletions (0 alleles) to avoid log2(0) = -Inf
 cnv_log_ratio[cnv_log_ratio == 0] <- 0.5  
@@ -101,8 +101,8 @@ bayfit <- tune.iClusterBayes(
   n.burnin = 18000,                 # Standard MCMC burn-in length
   n.draw = 12000,                   # Number of MCMC samples to keep
   prior.gamma = c(0.5, 0.5, 0.5),   # Balanced prior inclusion probability
-  sdev = 0.15, 
-  beta.var.scale = 5,
+  sdev = 0.1, 
+  beta.var.scale = 2,
   thin = 3                          # Reduces autocorrelation
 )
 
