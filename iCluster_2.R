@@ -10,7 +10,7 @@ rna_data <- read.table("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.tsv
 # Feature selection
 gene_mads <- apply(rna_data, 1, mad)
 ordered_mads <- order(gene_mads, decreasing = TRUE)
-top_3000_indices <- ordered_mads[1:1000]
+top_3000_indices <- ordered_mads[1:3000]
 rna_data <- rna_data[top_3000_indices, ]
 rna_matrix <- as.matrix(rna_data)
 #Transpose
@@ -34,13 +34,13 @@ met_filtered <- as.matrix(probes_filtered)
 # Enhancers results
 enhancers_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/result_pairs_enhancer.rds")
 en_pairs <- enhancers_pairs[order(enhancers_pairs$Pe), ]
-top_pairs_en <- en_pairs[en_pairs$Raw.p < 1e-10, ]
+top_pairs_en <- en_pairs[en_pairs$Raw.p < 1e-9, ]
 top_cpg_en <- unique(top_pairs_en$Probe)
 
 # Promoters results
 promoters_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/result_pairs_promoter.rds")
 pr_pairs <- promoters_pairs[order(promoters_pairs$Pe), ]
-top_pairs_pr <- pr_pairs[pr_pairs$Raw.p < 1e-10, ]
+top_pairs_pr <- pr_pairs[pr_pairs$Raw.p < 1e-9, ]
 top_cpg_pr <- unique(top_pairs_pr$Probe)
 
 # Final data
@@ -59,7 +59,7 @@ meth_mat <- t(met_mvals)
 
 ## CNV
 
-dna_matrix_filtered <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/dna_matrix_filtered_1900genes.csv", header = TRUE)
+dna_matrix_filtered <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/dna_matrix_filtered_2900genes.csv", header = TRUE)
 cnv_log_ratio <- dna_matrix_filtered
 # homozygous deletions (0 alleles) to avoid log2(0) = -Inf
 cnv_log_ratio[cnv_log_ratio == 0] <- 0.5  
@@ -86,30 +86,30 @@ cnv_scaled[is.na(cnv_scaled)]   <- 0
 
 
 
-# iCluster Bayes
 
-set.seed(123) 
-cat("Starting Bayesian model tuning at", as.character(Sys.time()), "\n")
+# iCluster+
 
-bayfit <- tune.iClusterBayes(
-  cpus = 5,                         # Matches our Slurm core count
-  dt1 = rna_scaled, 
-  dt2 = meth_scaled, 
-  dt3 = cnv_scaled,
-  type = c("gaussian", "gaussian", "gaussian"), 
-  K = 1:5,                          # Tests clusters from 2 to 6
-  n.burnin = 18000,                 # Standard MCMC burn-in length
-  n.draw = 12000,                   # Number of MCMC samples to keep
-  prior.gamma = c(0.1, 0.05, 0.3),   # Balanced prior inclusion probability
-  sdev = 0.1, 
-  beta.var.scale = 2,
-  thin = 3                          # Reduces autocorrelation
-)
+set.seed(123) #seed for reproducibility
 
-cat("Finished model tuning at", as.character(Sys.time()), "\n")
+# Tuning the Icluster2b model to find optimal k and lambda
+# Run the tuning loop across a range of K latent variables (Clusters = K + 1)
+for(k in 1:5){
+  cat("Starting model tuning for K =", k, "at", as.character(Sys.time()), "\n")
 
-# Save the primary output object safely
-output_path <- "/mnt/petasan_ccb/alessandro/SCANB/bayes_fit_results_lessfeatures.rds"
-saveRDS(bayfit, file = output_path)
-cat("Saved results object to:", output_path, "\n")
+  cv.fit <- tune.iClusterPlus(
+    cpus = 16, # Matches the cluster cores in .sh
+    dt1 = rna_scaled, 
+    dt2 = meth_scaled, 
+    dt3 = cnv_scaled,
+    type = c("gaussian", "gaussian", "gaussian"), 
+    K = k, 
+    n.lambda = 185,                              
+    scale.lambda = c(1, 1, 0.05), #datasets already manually Z-scored 
+    maxiter = 20
+  )
 
+  #saves each K 
+  output_path <- paste0("/mnt/petasan_ccb/alessandro/SCANB/", "new_cv_fit_k", k, ".rds")
+  saveRDS(cv.fit, file = output_path)
+
+  cat("Finished and saved K =", k, "to", output_path, "\n\n")
