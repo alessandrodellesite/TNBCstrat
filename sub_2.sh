@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=bayes_icluster_2
-#SBATCH --output=bayes_icluster_2_%j.log
-#SBATCH --partition=short
+#SBATCH --job-name=icluster_plus
+#SBATCH --output=bayes_icluster_plus_%j.log
+#SBATCH --partition=long
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=5  
-#SBATCH --time=10:00:00      
+#SBATCH --cpus-per-task=16  
+#SBATCH --time=52:00:00      
 #SBATCH --mem=64G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
