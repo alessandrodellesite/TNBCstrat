@@ -59,7 +59,7 @@ meth_mat <- t(met_mvals)
 
 ## CNV
 
-dna_matrix_filtered <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/dna_matrix_filtered_2900genes.csv", header = TRUE)
+dna_matrix_filtered <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/dna_matrix_filtered_2900genes.csv", header = TRUE, row.names = 1)
 cnv_log_ratio <- dna_matrix_filtered
 # homozygous deletions (0 alleles) to avoid log2(0) = -Inf
 cnv_log_ratio[cnv_log_ratio == 0] <- 0.5  
@@ -100,9 +100,8 @@ bayfit <- tune.iClusterBayes(
   K = 1:5,                          # Tests clusters from 2 to 6
   n.burnin = 18000,                 # Standard MCMC burn-in length
   n.draw = 12000,                   # Number of MCMC samples to keep
-  prior.gamma = c(0.1, 0.05, 0.3),   # Balanced prior inclusion probability
-  sdev = 0.1, 
-  beta.var.scale = 2,
+  prior.gamma = c(0.5, 0.5, 0.5),   # Balanced prior inclusion probability
+  sdev = 0.5,
   thin = 3                          # Reduces autocorrelation
 )
 
