@@ -101,8 +101,6 @@ my_data_list <- data_list(
   uid = "patient_id"
 )
 
-
-
 # SLURM Parallelization
 # Automatically grabs the CPUS assigned by SLURM (--cpus-per-task)
 n_cores <- as.numeric(Sys.getenv("SLURM_CPUS_PER_TASK", unset = 4))
@@ -110,20 +108,13 @@ plan(multisession, workers = n_cores)
 cat(sprintf("Running metasnf using %d cores...\n", n_cores))
 
 #Run batch_snf
-
 solutions_df <- batch_snf(
   dl = my_data_list, 
   sc = my_config,
   return_sim_mats = TRUE  # keeps similarity matrices for quality metrics
 )
 
-# Save Output Safely
-# -------------------------------------------------------------------
+# Save Output 
 output_path <- "/mnt/petasan_ccb/alessandro/SCANB/sulutions_metasnf.rds"
-
-# Ensure output directory exists before saving
-dir.create(dirname(output_path), showWarnings = FALSE, recursive = TRUE)
-
 saveRDS(solutions_df, file = output_path)
-cat(sprintf("Success! Results saved to %s\n", output_path))
-
+cat("Saved results object to:", output_path, "\n")
