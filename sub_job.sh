@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=bayes_icluster
-#SBATCH --output=bayes_icluster_%j.log
+#SBATCH --job-name=metasnf_batch
+#SBATCH --output=metasnf_%j.log
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=5  
-#SBATCH --time=10:00:00      
+#SBATCH --cpus-per-task=16 
+#SBATCH --time=08:00:00      
 #SBATCH --mem=64G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/iCluster_model_tuning.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/meta_snf.R"
 
 # singularity execution
 srun singularity exec \
