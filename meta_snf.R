@@ -101,6 +101,17 @@ my_data_list <- data_list(
   uid = "patient_id"
 )
 
+set.seed(42) # Guarantees reproducible random parameter sets
+
+my_config <- snf_config(
+  dl = my_data_list,
+  n_solutions = 50,  # Generate 50 unique mathematical combinations
+  min_k = 15,        # Range for nearest neighbors
+  max_k = 35,
+  min_alpha = 0.3,   # Range for the scaling factor
+  max_alpha = 0.8
+)
+
 # SLURM Parallelization
 # Automatically grabs the CPUS assigned by SLURM (--cpus-per-task)
 n_cores <- as.numeric(Sys.getenv("SLURM_CPUS_PER_TASK", unset = 4))
