@@ -113,16 +113,20 @@ my_config <- snf_config(
 )
 
 # SLURM Parallelization
-# Automatically grabs the CPUS assigned by SLURM (--cpus-per-task)
-n_cores <- as.numeric(Sys.getenv("SLURM_CPUS_PER_TASK", unset = 4))
+# Automatically detect the ACTUAL maximum usable cores (respecting SLURM/cgroups)
+n_cores <- future::availableCores()
+
+# Alternatively, if parallelly still complains, tell it to strictly limit to physical availability:
+# n_cores <- parallelly::availableCores(constraints = "multicore")
+
 plan(multisession, workers = n_cores)
 cat(sprintf("Running metasnf using %d cores...\n", n_cores))
 
-#Run batch_snf
+# Run batch_snf
 solutions_df <- batch_snf(
   dl = my_data_list, 
   sc = my_config,
-  return_sim_mats = TRUE  # keeps similarity matrices for quality metrics
+  return_sim_mats = TRUE
 )
 
 # Save Output 
