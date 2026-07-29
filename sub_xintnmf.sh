@@ -3,15 +3,16 @@
 #SBATCH --output=xintnmf_%j.log
 #SBATCH --partition=long
 #SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
 #SBATCH --time=48:00:00
 #SBATCH --mem=64G
 
-IMAGE_PATH="/mnt/pet/alex/XintNMF/xintnmf_image.sif"
-DATA_DIR="/mnt/pet/alex/XintNMF/data"
-OUT_BASE="/mnt/pet/alex/XintNMF/output"
+IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/xintnmf_image.sif"
+DATA_DIR="/mnt/petasan_ccb/alessandro/XintNMF_inputdata"
+OUT_BASE="/mnt/petasan_ccb/alessandro/SCANB"
 
 MAX_PARALLEL=8      # 32 cpus / 4 cpus-per-run = 8 concurrent runs
 export OMP_NUM_THREADS=4
@@ -26,7 +27,7 @@ run_one () {
   fi
   echo "Running k=${K} run=${RUN}..."
   singularity exec \
-    -B /home/alexdull@prbb.org:/home/alexdull@prbb.org,/mnt/pet/alex:/mnt/pet/alex \
+    -B /home/alessandrodelle@vhio.org:/home/alessandrodelle@vhio.org,/mnt/petasan_ccb/alessandro:/mnt/petasan_ccb/alessandro \
     "$IMAGE_PATH" \
     python /opt/X-intNMF/X-intNMF-run.py \
     --omics_input "${DATA_DIR}/rna_processed.tsv" "${DATA_DIR}/methylation_processed.tsv" "${DATA_DIR}/cnv_processed.tsv" \
