@@ -11,7 +11,7 @@
 #SBATCH --mem=64G
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/xint_image.sif"
-DATA_DIR="/mnt/petasan_ccb/alessandro/XintNMF_inputdata"
+DATA_DIR="/mnt/petasan_ccb/alessandro/SCANB/XintNMF_inputdata"
 OUT_BASE="/mnt/petasan_ccb/alessandro/SCANB"
 
 MAX_PARALLEL=8      # 32 cpus / 4 cpus-per-run = 8 concurrent runs
