@@ -10,7 +10,7 @@
 #SBATCH --time=48:00:00
 #SBATCH --mem=64G
 
-IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/xintnmf_image.sif"
+IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/xint_image.sif"
 DATA_DIR="/mnt/petasan_ccb/alessandro/XintNMF_inputdata"
 OUT_BASE="/mnt/petasan_ccb/alessandro/SCANB"
 
