@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=xintnmf_sweep
+#SBATCH --job-name=xintnmf
 #SBATCH --output=xintnmf_%j.log
-#SBATCH --partition=long
+#SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
-#SBATCH --time=48:00:00
+#SBATCH --cpus-per-task=20
+#SBATCH --time=8:00:00
 #SBATCH --mem=64G
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/xint_image.sif"
 DATA_DIR="/mnt/petasan_ccb/alessandro/SCANB/XintNMF_inputdata"
 OUT_BASE="/mnt/petasan_ccb/alessandro/SCANB"
 
-MAX_PARALLEL=8      # 32 cpus / 4 cpus-per-run = 8 concurrent runs
+
+MAX_PARALLEL=5      # one task per k, 4 cpus each = 20 cpus
 export OMP_NUM_THREADS=4
 
 run_one () {
   local K=$1
-  local RUN=$2
-  local OUT_DIR="${OUT_BASE}/rankselect_k${K}_run${RUN}"
+  local OUT_DIR="${OUT_BASE}/rankselect_k${K}"
   if [ -f "${OUT_DIR}/sample_factor.csv" ]; then
-      echo "k=${K} run=${RUN} already done, skipping."
+      echo "k=${K} already done, skipping."
       return
   fi
-  echo "Running k=${K} run=${RUN}..."
+  echo "Running k=${K}..."
   singularity exec \
     -B /home/alessandrodelle@vhio.org:/home/alessandrodelle@vhio.org,/mnt/petasan_ccb/alessandro:/mnt/petasan_ccb/alessandro \
     "$IMAGE_PATH" \
@@ -35,20 +35,18 @@ run_one () {
     --output_format csv \
     --num_components "$K" \
     --graph_regularization 0 \
-    --max_iter 1500 \
+    --max_iter 5000 \
     --backend numpy \
     --gpu -1
 }
 
 job_count=0
 for K in 2 3 4 5 6; do
-  for RUN in $(seq 1 15); do
-    run_one "$K" "$RUN" &
-    job_count=$((job_count + 1))
-    if [ "$job_count" -ge "$MAX_PARALLEL" ]; then
-      wait
-      job_count=0
-    fi
-  done
+  run_one "$K" &
+  job_count=$((job_count + 1))
+  if [ "$job_count" -ge "$MAX_PARALLEL" ]; then
+    wait
+    job_count=0
+  fi
 done
 wait
