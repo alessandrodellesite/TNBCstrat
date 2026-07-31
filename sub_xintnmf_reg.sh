@@ -14,11 +14,8 @@ IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/xint_image.sif"
 DATA_DIR="/mnt/petasan_ccb/alessandro/SCANB/XintNMF_inputdata"
 OUT_BASE="/mnt/petasan_ccb/alessandro/SCANB"
 
-
 MAX_PARALLEL=5      # one task per k, 4 cpus each = 20 cpus
 export OMP_NUM_THREADS=4
-
-
 
 run_one () {
   local K=$1
@@ -32,8 +29,8 @@ run_one () {
     -B /home/alessandrodelle@vhio.org:/home/alessandrodelle@vhio.org,/mnt/petasan_ccb/alessandro:/mnt/petasan_ccb/alessandro \
     "$IMAGE_PATH" \
     python /opt/X-intNMF/X-intNMF-run.py \
-    --omics_input "${DATA_DIR}/rna_processed.tsv" "${DATA_DIR}/methylation_processed.tsv" "${DATA_DIR}/cnv_processed.tsv" \
-    --interaction_input "${DATA_DIR}/interaction_rna_processed_methylation_processed.tsv" "${DATA_DIR}/interaction_rna_processed_cnv_processed.tsv" \
+    --omics_input "${DATA_DIR}/rna.tsv" "${DATA_DIR}/methylation.tsv" "${DATA_DIR}/cnv.tsv" \
+    --interaction_input "${DATA_DIR}/interaction_rna_methylation.tsv" "${DATA_DIR}/interaction_rna_cnv.tsv" \
     --output_dir "$OUT_DIR" \
     --output_format csv \
     --num_components "$K" \
@@ -42,7 +39,6 @@ run_one () {
     --backend numpy \
     --gpu -1
 }
-
 
 job_count=0
 for K in 2 3 4 5 6; do
@@ -54,6 +50,3 @@ for K in 2 3 4 5 6; do
   fi
 done
 wait
-
-
-
