@@ -18,9 +18,11 @@ OUT_BASE="/mnt/petasan_ccb/alessandro/SCANB"
 MAX_PARALLEL=5      # one task per k, 4 cpus each = 20 cpus
 export OMP_NUM_THREADS=4
 
+
+
 run_one () {
   local K=$1
-  local OUT_DIR="${OUT_BASE}/rankselect_k${K}"
+  local OUT_DIR="${OUT_BASE}/rankselect_k${K}_graphreg"
   if [ -f "${OUT_DIR}/sample_factor.csv" ]; then
       echo "k=${K} already done, skipping."
       return
