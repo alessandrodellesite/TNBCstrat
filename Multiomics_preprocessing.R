@@ -1,7 +1,7 @@
 # Preprocessing of each omic's dataset specific for each multiomics model
 # and loading on ondemand directory
 
-output_dir -> "/mnt/petasan_ccb/alessandro/SCANB/"
+outdir -> "/mnt/petasan_ccb/alessandro/SCANB/"
 
 # RNAseq
 
@@ -18,9 +18,6 @@ rna_matrix <- as.matrix(rna_data)
 
 adjusted_data <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/adjusted_data.rds")
 # Filtering
-library(minfi)
-library(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
-#library(sesameData)
 ann <- getAnnotation(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
 keep_autosomes <- !(ann$chr %in% c("chrX", "chrY"))
 keep_cpg <- grepl("^cg", ann$Name)
@@ -73,19 +70,15 @@ rna_cent <- t(scale(t(rna_matrix), center = TRUE, scale = FALSE))
 met_cent <- t(scale(t(met_mvals), center = TRUE, scale = FALSE))
 cnv_cent <- t(scale(t(cnv_log_ratio), center = TRUE, scale = FALSE))
 
-# save MOFA outputs in Mofa directory 
+# save MOFA outputs in Mofa directory outdir/mofa_inputdata/
+saveRDS(rna_cent, file = file.path(outdir, "mofa_inputdata/", paste0("rna_mofa.rds")))
+saveRDS(met_cent, file = file.path(outdir, "mofa_inputdata/", paste0("met_mofa.rds")))
+saveRDS(cnv_cent, file = file.path(outdir, "mofa_inputdata/", paste0("cnv_mofa.rds")))
 
 # icluster specific -> transpose
 rna_mat <- t(rna_matrix)
 meth_mat <- t(met_mvals)
 cnv_mat <- t(cnv_log_ratio)
-
-#intersecting samples 
-common_samples <- intersect(intersect(rownames(rna_mat), rownames(meth_mat)), rownames(cnv_mat))
-# Subset and match the exact row order for all matrices
-rna_aligned  <- rna_mat[common_samples, ]
-meth_aligned <- meth_mat[common_samples, ]
-cnv_aligned  <- cnv_mat[common_samples, ]
 
 # Z-score standardization across features (columns) ensures equal variance weight
 rna_scaled  <- scale(rna_aligned, center = TRUE, scale = TRUE)
@@ -97,7 +90,7 @@ rna_scaled[is.na(rna_scaled)]   <- 0
 meth_scaled[is.na(meth_scaled)] <- 0
 cnv_scaled[is.na(cnv_scaled)]   <- 0
 
-
+# save in "icluster_inputdata"
 
 # SNF specific preprocessing
 
@@ -106,3 +99,4 @@ data_rna <- t(rna_matrix)
 data_meth <- t(met_mvals)            
 data_cnv <- t(cnv_log_ratio)
 
+# save in "snf_inputdata/"
