@@ -1,6 +1,7 @@
 # Preprocessing of each omic's dataset specific for each multiomics model
 # and loading on ondemand directory
 
+output_dir -> "/mnt/petasan_ccb/alessandro/SCANB/"
 
 # RNAseq
 
@@ -61,12 +62,18 @@ cnv_log_ratio[cnv_log_ratio == 0] <- 0.5
 #  conversion back to log2 scale
 cnv_log_ratio <- log2(cnv_log_ratio / 2)
 
+common_samples <- intersect(colnames(rna_matrix), intersect(colnames(met_mvals), colnames(cnv_log_ratio)))
+rna_matrix <- rna_matrix[, common_samples]
+met_mvals <- met_mvals[, common_samples]
+cnv_log_ratio <- cnv_log_ratio[, common_samples]
 
 
 # MOFA specific preprocessing -> Mean-center the rows (genes) so that each gene's average across samples is 0 (scale = FALSE to not scale the variance)
 rna_cent <- t(scale(t(rna_matrix), center = TRUE, scale = FALSE))
 met_cent <- t(scale(t(met_mvals), center = TRUE, scale = FALSE))
 cnv_cent <- t(scale(t(cnv_log_ratio), center = TRUE, scale = FALSE))
+
+# save MOFA outputs in Mofa directory 
 
 # icluster specific -> transpose
 rna_mat <- t(rna_matrix)
@@ -93,11 +100,6 @@ cnv_scaled[is.na(cnv_scaled)]   <- 0
 
 
 # SNF specific preprocessing
-
-common_samples <- intersect(colnames(rna_matrix), intersect(colnames(met_mvals), colnames(cnv_log_ratio)))
-rna_matrix <- rna_matrix[, common_samples]
-met_mvals <- met_mvals[, common_samples]
-cnv_log_ratio <- cnv_log_ratio[, common_samples]
 
 # transpose all matrices
 data_rna <- t(rna_matrix)      
