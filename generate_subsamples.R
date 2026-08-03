@@ -25,17 +25,5 @@ for (i in seq_len(n_reps)) {
 names(subsample_list) <- as.character(seq_len(n_reps))
 
 saveRDS(subsample_list, file.path(out_dir, "boot_subsamples.rds"))
-saveRDS(common_samples, file.path(out_dir, "boot_master_samples.rds"))
 
-manifest <- list(
-  n_reps = n_reps,
-  frac = frac,
-  n_sub_per_rep = n_sub,
-  n_total_samples = length(common_samples),
-  seed_scheme = "set.seed(i) for i in 1:n_reps, sample() without replacement",
-  master_samples_source = "rna_icluster.rds rownames",
-  generated_on = as.character(Sys.time())
-)
-saveRDS(manifest, file.path(out_dir, "boot_manifest.rds"))
 
-cat("Saved", n_reps, "subsample definitions to", out_dir, "\n")
