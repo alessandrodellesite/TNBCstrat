@@ -9,13 +9,18 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2 
 #SBATCH --time=01:00:00      
-#SBATCH --mem=20G            
+#SBATCH --mem=20G       
+
+mkdir -p logs results
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
 SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/icluster_bootstrap.R"
 
-# singularity execution
+FRAC=0.8
+OUTDIR="results"
+
+# singularity execution - arguments after Rscript $SCRIPT_PATH are passed through to commandArgs() inside icluster_bootstrap.R
 srun singularity exec \
   -B /home/alessandrodelle@vhio.org:/home/alessandrodelle@vhio.org,/mnt/petasan_ccb/alessandro:/mnt/petasan_ccb/alessandro \
   $IMAGE_PATH \
-  Rscript $SCRIPT_PATH
+  Rscript $SCRIPT_PATH "${SLURM_ARRAY_TASK_ID}" "${FRAC}" "${OUTDIR}"
