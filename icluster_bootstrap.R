@@ -26,7 +26,7 @@ library(iClusterPlus)
 ## Data loading -- iCluster-specific preprocessed matrices
 data_dir <- "/mnt/petasan_ccb/alessandro/SCANB/icluster_inputdata/"
 rna_scaled  <- readRDS(file.path(data_dir, "rna_icluster.rds"))
-meth_scaled <- readRDS(file.path(data_dir, "meth_icluster.rds"))
+meth_scaled <- readRDS(file.path(data_dir, "met_icluster.rds"))
 cnv_scaled  <- readRDS(file.path(data_dir, "cnv_icluster.rds"))
 stopifnot(nrow(meth_scaled) == nrow(rna_scaled), nrow(cnv_scaled) == nrow(rna_scaled))
 
