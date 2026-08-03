@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=metasnf_batch
-#SBATCH --output=metasnf_%j.log
+#SBATCH --job-name=multiomic_prepr
+#SBATCH --output=multiomic_prepr_%j.log
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16 
-#SBATCH --time=08:00:00      
-#SBATCH --mem=64G            
+#SBATCH --cpus-per-task=4 
+#SBATCH --time=20:00      
+#SBATCH --mem=16G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/meta_snf.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_preprocessing.R"
 
 # singularity execution
 srun singularity exec \
