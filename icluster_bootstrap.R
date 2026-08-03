@@ -149,7 +149,7 @@ result <- list(
 )
 
 # Save the primary output object safely
-outdir <- "/mnt/petasan_ccb/alessandro/SCANB/bayes_fit_results.rds"
+outdir <- "/mnt/petasan_ccb/alessandro/SCANB/"
 saveRDS(result, file = file.path(outdir, paste0("icluster_boot_", iter_id, ".rds")))
 cat("End time:", as.character(Sys.time()), "\n")
 cat("Done.\n")
