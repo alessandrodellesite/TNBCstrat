@@ -1,12 +1,22 @@
 # Preprocessing of each omic's dataset specific for each multiomics model
-# and loading on ondemand directory
+# and saving into ondemand directories
 
-outdir -> "/mnt/petasan_ccb/alessandro/SCANB/"
+library(minfi)
+library(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
+# library(sesameData)
+
+outdir <- "/mnt/petasan_ccb/alessandro/SCANB/"
+
+# Create the three output subdirectories up front 
+dir.create(file.path(outdir, "mofa_inputdata"),     recursive = TRUE, showWarnings = FALSE)
+dir.create(file.path(outdir, "icluster_inputdata"), recursive = TRUE, showWarnings = FALSE)
+dir.create(file.path(outdir, "snf_inputdata"),      recursive = TRUE, showWarnings = FALSE)
 
 # RNAseq
+rna_data <- read.table("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.tsv",
+                        header = TRUE, sep = "\t", row.names = 1)
 
-rna_data <- read.table("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.tsv", header=TRUE, sep="\t", row.names=1)
-# Feature selection
+# Feature selection: top 3000 most variable genes (by MAD)
 gene_mads <- apply(rna_data, 1, mad)
 ordered_mads <- order(gene_mads, decreasing = TRUE)
 top_3000_indices <- ordered_mads[1:3000]
@@ -14,9 +24,9 @@ rna_data <- rna_data[top_3000_indices, ]
 rna_matrix <- as.matrix(rna_data)
 
 
-## Mehtylation
-
+# Methylation
 adjusted_data <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/adjusted_data.rds")
+
 # Filtering
 ann <- getAnnotation(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
 keep_autosomes <- !(ann$chr %in% c("chrX", "chrY"))
@@ -25,25 +35,25 @@ probes_to_keep <- ann$Name[keep_autosomes & keep_cpg]
 probes_filtered <- adjusted_data[rownames(adjusted_data) %in% probes_to_keep, ]
 met_filtered <- as.matrix(probes_filtered)
 
-# Enhancers results
+# Enhancer results
 enhancers_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/result_pairs_enhancer.rds")
 en_pairs <- enhancers_pairs[order(enhancers_pairs$Pe), ]
 top_pairs_en <- en_pairs[en_pairs$Raw.p < 1e-9, ]
 top_cpg_en <- unique(top_pairs_en$Probe)
 
-# Promoters results
+# Promoter results
 promoters_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/result_pairs_promoter.rds")
 pr_pairs <- promoters_pairs[order(promoters_pairs$Pe), ]
 top_pairs_pr <- pr_pairs[pr_pairs$Raw.p < 1e-9, ]
 top_cpg_pr <- unique(top_pairs_pr$Probe)
 
-# Final data
+# Final CpG set
 top_cpg_combined <- union(top_cpg_en, top_cpg_pr)
 met_matrix_filtered <- met_filtered[rownames(met_filtered) %in% top_cpg_combined, ]
 
-# Transform Beta-values into M-values 
+# Transform Beta-values into M-values
 met_mvals <- met_matrix_filtered
-# to prevent ±Infinity errors
+# prevent +/-Infinity errors
 met_mvals[met_mvals == 0] <- 0.001
 met_mvals[met_mvals == 1] <- 0.999
 # logit transformation to get M-values
@@ -51,52 +61,63 @@ met_mvals <- log2(met_mvals / (1 - met_mvals))
 
 
 # CNV
-
-dna_matrix_filtered <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/dna_matrix_filtered_2900genes.csv", header = TRUE, row.names = 1)
-cnv_log_ratio <- dna_matrix_filtered
+dna_matrix_filtered <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/dna_matrix_filtered_2900genes.csv",
+                                 header = TRUE, row.names = 1)
+cnv_log_ratio <- as.matrix(dna_matrix_filtered)   # FIX: cast to matrix for consistency with rna_matrix/met_mvals
 # homozygous deletions (0 alleles) to avoid log2(0) = -Inf
 cnv_log_ratio[cnv_log_ratio == 0] <- 0.5
-#  conversion back to log2 scale
+# conversion to log2 ratio scale (relative to diploid copy number = 2)
 cnv_log_ratio <- log2(cnv_log_ratio / 2)
 
+
+# Align samples across the three omics
 common_samples <- intersect(colnames(rna_matrix), intersect(colnames(met_mvals), colnames(cnv_log_ratio)))
-rna_matrix <- rna_matrix[, common_samples]
-met_mvals <- met_mvals[, common_samples]
+rna_matrix    <- rna_matrix[, common_samples]
+met_mvals     <- met_mvals[, common_samples]
 cnv_log_ratio <- cnv_log_ratio[, common_samples]
 
 
-# MOFA specific preprocessing -> Mean-center the rows (genes) so that each gene's average across samples is 0 (scale = FALSE to not scale the variance)
-rna_cent <- t(scale(t(rna_matrix), center = TRUE, scale = FALSE))
-met_cent <- t(scale(t(met_mvals), center = TRUE, scale = FALSE))
+# MOFA-specific preprocessing
+# Mean-center the rows (genes/probes) so each feature's average across samples is 0 (scale = FALSE -> do not rescale variance)
+rna_cent <- t(scale(t(rna_matrix),    center = TRUE, scale = FALSE))
+met_cent <- t(scale(t(met_mvals),     center = TRUE, scale = FALSE))
 cnv_cent <- t(scale(t(cnv_log_ratio), center = TRUE, scale = FALSE))
 
-# save MOFA outputs in Mofa directory outdir/mofa_inputdata/
-saveRDS(rna_cent, file = file.path(outdir, "mofa_inputdata/", paste0("rna_mofa.rds")))
-saveRDS(met_cent, file = file.path(outdir, "mofa_inputdata/", paste0("met_mofa.rds")))
-saveRDS(cnv_cent, file = file.path(outdir, "mofa_inputdata/", paste0("cnv_mofa.rds")))
+# save MOFA inputs -> outdir/mofa_inputdata/
+saveRDS(rna_cent, file = file.path(outdir, "mofa_inputdata", "rna_mofa.rds"))
+saveRDS(met_cent, file = file.path(outdir, "mofa_inputdata", "met_mofa.rds"))
+saveRDS(cnv_cent, file = file.path(outdir, "mofa_inputdata", "cnv_mofa.rds"))
 
-# icluster specific -> transpose
-rna_mat <- t(rna_matrix)
+
+# iCluster-specific preprocessing
+# Samples as rows, features as columns (transpose), then Z-score standardize each feature (column) so every feature contributes equal variance weight
+rna_mat  <- t(rna_matrix)
 meth_mat <- t(met_mvals)
-cnv_mat <- t(cnv_log_ratio)
+cnv_mat  <- t(cnv_log_ratio)
 
-# Z-score standardization across features (columns) ensures equal variance weight
-rna_scaled  <- scale(rna_aligned, center = TRUE, scale = TRUE)
-meth_scaled <- scale(meth_aligned, center = TRUE, scale = TRUE)
-cnv_scaled  <- scale(cnv_aligned, center = TRUE, scale = TRUE)
+# standardize rna_mat/meth_mat/cnv_mat 
+rna_scaled  <- scale(rna_mat,  center = TRUE, scale = TRUE)
+meth_scaled <- scale(meth_mat, center = TRUE, scale = TRUE)
+cnv_scaled  <- scale(cnv_mat,  center = TRUE, scale = TRUE)
 
-#replace any NaNs generated by zero-variance columns
+# replace any NaNs generated by zero-variance columns
 rna_scaled[is.na(rna_scaled)]   <- 0
 meth_scaled[is.na(meth_scaled)] <- 0
 cnv_scaled[is.na(cnv_scaled)]   <- 0
 
-# save in "icluster_inputdata"
+# save iCluster inputs -> outdir/icluster_inputdata/   
+saveRDS(rna_scaled,  file = file.path(outdir, "icluster_inputdata", "rna_icluster.rds"))
+saveRDS(meth_scaled, file = file.path(outdir, "icluster_inputdata", "met_icluster.rds"))
+saveRDS(cnv_scaled,  file = file.path(outdir, "icluster_inputdata", "cnv_icluster.rds"))
 
-# SNF specific preprocessing
 
-# transpose all matrices
-data_rna <- t(rna_matrix)      
-data_meth <- t(met_mvals)            
-data_cnv <- t(cnv_log_ratio)
+# SNF-specific preprocessing
+# Samples as rows, features as columns (transpose only, no centering/scaling)
+data_rna  <- t(rna_matrix)
+data_meth <- t(met_mvals)
+data_cnv  <- t(cnv_log_ratio)
 
-# save in "snf_inputdata/"
+# save SNF inputs -> outdir/snf_inputdata/    (FIX: was missing entirely)
+saveRDS(data_rna,  file = file.path(outdir, "snf_inputdata", "rna_snf.rds"))
+saveRDS(data_meth, file = file.path(outdir, "snf_inputdata", "met_snf.rds"))
+saveRDS(data_cnv,  file = file.path(outdir, "snf_inputdata", "cnv_snf.rds"))
