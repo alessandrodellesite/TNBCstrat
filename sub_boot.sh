@@ -8,7 +8,7 @@
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2 
-#SBATCH --time=04:00:00      
+#SBATCH --time=10:00:00      
 #SBATCH --mem=20G       
 
 mkdir -p logs results
