@@ -15,7 +15,7 @@ mkdir -p logs
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
 SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/snf_bootstrap.R"
-OUTDIR="/mnt/petasan_ccb/alessandro/SCANB/snf_bootstrap_k4"
+OUTDIR="/mnt/petasan_ccb/alessandro/SCANB/snf_bootstrap_k2"
 
 # singularity execution - arguments after Rscript $SCRIPT_PATH are passed through to commandArgs() inside icluster_bootstrap.R
 srun singularity exec \
