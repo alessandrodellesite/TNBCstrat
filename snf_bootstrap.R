@@ -56,7 +56,7 @@ meth_sub <- data_meth[sample_ids_sub, , drop = FALSE]
 cnv_sub  <- data_cnv[sample_ids_sub, , drop = FALSE]
 
 ## Fixed hyperparameters from original full-cohort run
-fixed_k_clusters <- 4      # number of clusters 
+fixed_k_clusters <- 2      # number of clusters 
 K_neighbors <- 20
 sigma <- 0.5
 T_iter <- 20
