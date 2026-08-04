@@ -1,6 +1,6 @@
 # Fits a single iClusterPlus model (fixed K, fixed lambda) on a subsample
 # (without replacement) of the full cohort. Intended to be launched once per
-# SLURM array task. Subsample composition is read from a SHARED, pre-generated
+# SLURM array task. Subsample composition is read from a shared, pre-generated
 # subsample list (boot_subsamples.rds) so that replicate #i uses the exact
 # same set of patients across every benchmarked method, not just iCluster.
 #
@@ -23,14 +23,14 @@ cat("Start time:", as.character(Sys.time()), "\n")
 
 library(iClusterPlus)
 
-## Data loading -- iCluster-specific preprocessed matrices
+## Data loading of iCluster-specific preprocessed matrices
 data_dir <- "/mnt/petasan_ccb/alessandro/SCANB/icluster_inputdata/"
 rna_scaled  <- readRDS(file.path(data_dir, "rna_icluster.rds"))
 meth_scaled <- readRDS(file.path(data_dir, "met_icluster.rds"))
 cnv_scaled  <- readRDS(file.path(data_dir, "cnv_icluster.rds"))
 stopifnot(nrow(meth_scaled) == nrow(rna_scaled), nrow(cnv_scaled) == nrow(rna_scaled))
 
-## Load SHARED subsample definition -- same file used by every method
+## Load shared subsample definition 
 shared_dir <- "/mnt/petasan_ccb/alessandro/SCANB/bootstrap_shared/"
 subsample_list <- readRDS(file.path(shared_dir, "boot_subsamples.rds"))
 
@@ -55,7 +55,7 @@ fixed_k      <- 3
 fixed_lambda <- c(0.31081081, 0.14864865, 0.06216216)
 cat("Using K =", fixed_k, "| lambda =", paste(round(fixed_lambda, 4), collapse = ", "), "\n")
 
-## Subset by sample ID (not by re-sampling indices) -- this is the shared draw
+## Subset by sample ID 
 rna_sub  <- rna_scaled[sample_ids_sub, , drop = FALSE]
 meth_sub <- meth_scaled[sample_ids_sub, , drop = FALSE]
 cnv_sub  <- cnv_scaled[sample_ids_sub, , drop = FALSE]
