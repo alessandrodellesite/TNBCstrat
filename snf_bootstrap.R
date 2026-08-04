@@ -24,16 +24,15 @@ cat("Start time:", as.character(Sys.time()), "\n")
 
 library(SNFtool)
 
-## Data loading -- SNF-specific preprocessed matrices (samples x features,
-## pre-normalization -- standardNormalization() runs per-replicate below,
-## since it must be recomputed on each subsample, not reused from the full cohort)
+## Data loading of SNF-specific preprocessed matrices 
+## standardNormalization() runs per-replicate below, since it must be recomputed on each subsample, not reused from the full cohort
 data_dir <- "/mnt/petasan_ccb/alessandro/SCANB/snf_inputdata/"
 data_rna  <- readRDS(file.path(data_dir, "rna_snf.rds"))
 data_meth <- readRDS(file.path(data_dir, "met_snf.rds"))
 data_cnv  <- readRDS(file.path(data_dir, "cnv_snf.rds"))
 stopifnot(nrow(data_meth) == nrow(data_rna), nrow(data_cnv) == nrow(data_rna))
 
-## Load SHARED subsample definition
+## Load shared subsample 
 shared_dir <- "/mnt/petasan_ccb/alessandro/SCANB/bootstrap_shared/"
 subsample_list <- readRDS(file.path(shared_dir, "boot_subsamples.rds"))
 
@@ -51,13 +50,13 @@ if (length(missing_ids) > 0) {
 
 cat("Subsample size:", length(sample_ids_sub), "\n")
 
-## Subset by sample ID (rows), before any normalization
+## Subset by sample ID (rows) before  normalization
 rna_sub  <- data_rna[sample_ids_sub, , drop = FALSE]
 meth_sub <- data_meth[sample_ids_sub, , drop = FALSE]
 cnv_sub  <- data_cnv[sample_ids_sub, , drop = FALSE]
 
 ## Fixed hyperparameters from original full-cohort run
-fixed_k_clusters <- 3      # number of clusters -- set to whichever K you're benchmarking
+fixed_k_clusters <- 4      # number of clusters 
 K_neighbors <- 20
 sigma <- 0.5
 T_iter <- 20
@@ -65,7 +64,7 @@ T_iter <- 20
 cat("Using K_clusters =", fixed_k_clusters,
     "| K_neighbors =", K_neighbors, "| sigma =", sigma, "| T_iter =", T_iter, "\n")
 
-## Standard normalization -- recomputed on THIS subsample, matching original pipeline
+## Standard normalization 
 rna_norm  <- standardNormalization(rna_sub)
 meth_norm <- standardNormalization(meth_sub)
 cnv_norm  <- standardNormalization(cnv_sub)
