@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=mofa_boot
 #SBATCH --output=logs/mofa_boot_k3_%A_%a.out
-#SBATCH --array=1-1000%20
+#SBATCH --array=1-1000%15
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2 
-#SBATCH --time=1:00:00      
+#SBATCH --time=45:00      
 #SBATCH --mem=20G       
 
 mkdir -p logs 
