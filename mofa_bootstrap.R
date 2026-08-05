@@ -7,6 +7,12 @@
 # Usage:
 #   Rscript mofa_bootstrap.R <iter_id> <outdir>
 
+# the code is adjusted to avoid job failure "cannot open the connection" when launching multiple arrays at once:
+# run_mofa()) hands off computation to a Python backend (via the basilisk package), and to do that it first has to 
+# activate that Python/conda environment: it opens a local network socket to check the environment is ready. 
+# When running many array tasks at once, a bunch of them hit this exact activation step at nearly the same instant —> 
+# timing conflicts from too many processes doing the same delicate handshake simultaneously).
+
 ## Parse arguments
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 2) {
@@ -25,7 +31,7 @@ if (file.exists(out_path)) {
   quit(save = "no", status = 0)
 }
 
-## Stagger task start times to reduce basilisk activation collisions
+## inserts a random delay across arrays to prevent them from starting at the same exact time: reduces basilisk activation collisions
 Sys.sleep(runif(1, 0, 30))
 
 cat("Iteration:", iter_id, "| Outdir:", outdir, "\n")
@@ -40,7 +46,7 @@ rna_cent <- readRDS(file.path(data_dir, "rna_mofa.rds"))
 met_cent <- readRDS(file.path(data_dir, "met_mofa.rds"))
 cnv_cent <- readRDS(file.path(data_dir, "cnv_mofa.rds"))
 
-## Load SHARED subsample definition
+## Load shred subsample 
 shared_dir <- "/mnt/petasan_ccb/alessandro/SCANB/bootstrap_shared/"
 subsample_list <- readRDS(file.path(shared_dir, "boot_subsamples.rds"))
 
@@ -99,6 +105,7 @@ MOFAobject <- prepare_mofa(MOFAobject, data_options = data_opts,
 
 
 ## Retry wrapper around run_mofa() to survive transient basilisk socket collisions
+## if a job fails, it will try to launch it again (up to 5 times)
 run_mofa_with_retry <- function(MOFAobject, outfile, max_attempts = 5, wait_seconds = 15) {
   for (attempt in seq_len(max_attempts)) {
     result <- tryCatch({
@@ -119,7 +126,6 @@ run_mofa_with_retry <- function(MOFAobject, outfile, max_attempts = 5, wait_seco
 
 mofa_outfile <- tempfile(fileext = ".hdf5")# per-replicate scratch file, not kept
 MOFAobject <- run_mofa_with_retry(MOFAobject, outfile = mofa_outfile)
-
 
 
 ## Extract factors, cluster with k-means at fixed K
