@@ -7,6 +7,7 @@
 # Usage:
 #   Rscript mofa_bootstrap.R <iter_id> <outdir>
 
+## Parse arguments
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 2) {
   stop("Usage: Rscript mofa_bootstrap.R <iter_id> <outdir>")
@@ -16,6 +17,16 @@ iter_id <- as.integer(args[1])
 outdir  <- args[2]
 
 dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
+
+## Skip if this replicate already completed successfully
+out_path <- file.path(outdir, paste0("mofa_boot_", iter_id, ".rds"))
+if (file.exists(out_path)) {
+  cat("Iteration", iter_id, "already completed, skipping.\n")
+  quit(save = "no", status = 0)
+}
+
+## Stagger task start times to reduce basilisk activation collisions
+Sys.sleep(runif(1, 0, 30))
 
 cat("Iteration:", iter_id, "| Outdir:", outdir, "\n")
 cat("Start time:", as.character(Sys.time()), "\n")
@@ -86,8 +97,30 @@ train_opts$verbose <- FALSE
 MOFAobject <- prepare_mofa(MOFAobject, data_options = data_opts,
                             model_options = model_opts, training_options = train_opts)
 
-mofa_outfile <- tempfile(fileext = ".hdf5")   # per-replicate scratch file, not kept
-MOFAobject <- run_mofa(MOFAobject, outfile = mofa_outfile, use_basilisk = TRUE)
+
+## Retry wrapper around run_mofa() to survive transient basilisk socket collisions
+run_mofa_with_retry <- function(MOFAobject, outfile, max_attempts = 5, wait_seconds = 15) {
+  for (attempt in seq_len(max_attempts)) {
+    result <- tryCatch({
+      run_mofa(MOFAobject, outfile = outfile, use_basilisk = TRUE)
+    }, error = function(e) {
+      cat("Attempt", attempt, "failed:", conditionMessage(e), "\n")
+      NULL
+    })
+    if (!is.null(result)) return(result)
+    if (attempt < max_attempts) {
+      wait <- wait_seconds + runif(1, 0, 15)
+      cat("Retrying in", round(wait, 1), "seconds (attempt", attempt + 1, "of", max_attempts, ")...\n")
+      Sys.sleep(wait)
+    }
+  }
+  stop("run_mofa failed after ", max_attempts, " attempts (iter_id = ", iter_id, ")")
+}
+
+mofa_outfile <- tempfile(fileext = ".hdf5")# per-replicate scratch file, not kept
+MOFAobject <- run_mofa_with_retry(MOFAobject, outfile = mofa_outfile)
+
+
 
 ## Extract factors, cluster with k-means at fixed K
 factors_matrix <- do.call(rbind, get_factors(MOFAobject, factors = "all"))
