@@ -52,7 +52,7 @@ cat("Subsample size:", length(sample_ids_sub), "\n")
 
 ## Fixed K / lambda from original tuning
 fixed_k      <- 3
-fixed_lambda <- c(0.31081081, 0.14864865, 0.06216216)
+fixed_lambda <- c(0.15405405, 0.07297297, 0.02972973)
 cat("Using K =", fixed_k, "| lambda =", paste(round(fixed_lambda, 4), collapse = ", "), "\n")
 
 ## Subset by sample ID 
