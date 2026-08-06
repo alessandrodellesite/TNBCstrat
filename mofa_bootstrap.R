@@ -79,7 +79,7 @@ multiomics_data_sub <- list(
 ## Fixed parameters from original full-cohort tuning
 fixed_num_factors   <- 20    # upper limit for MOFA's factor search, matches original
 fixed_factors_to_use <- 6    # how many top factors feed into k-means -- from your >2.5% variance threshold
-fixed_k_clusters     <- 3    # cluster count being benchmarked
+fixed_k_clusters     <- 2    # cluster count being benchmarked
 
 cat("num_factors =", fixed_num_factors,
     "| factors_to_use =", fixed_factors_to_use,
