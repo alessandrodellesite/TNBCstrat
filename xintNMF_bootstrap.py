@@ -46,7 +46,7 @@ def main():
 
     log(f"Iteration: {iter_id} | k={k} | Outdir: {final_out}")
 
-    # ---- Load shared subsample definition -------------------------------
+    # Load shared subsample 
     subsample_path = os.path.join(shared_dir, "boot_subsamples.json")
     with open(subsample_path) as f:
         subsample_list = json.load(f)
@@ -61,10 +61,7 @@ def main():
     sample_ids_sub = subsample_list[key]
     log(f"Subsample size: {len(sample_ids_sub)}")
 
-    # ---- Subset omics matrices to the shared sample IDs ------------------
-    # ASSUMPTION: tsvs are features (rows) x samples (columns), first column
-    # = feature ID (index_col=0). If your files are samples x features
-    # instead, swap the .loc slicing below (rows instead of columns).
+    # Subset omics matrices to the shared sample ids
     omics_files = {
         "rna": "rna.tsv",
         "methylation": "methylation.tsv",
