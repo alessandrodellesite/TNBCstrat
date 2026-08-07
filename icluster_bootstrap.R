@@ -55,8 +55,8 @@ fixed_lambda_2_cl <- c(0.11621622, 0.08918919, 0.60810811) # output[[1]]$lambda[
 fixed_lambda_3_cl <- c(0.31081081, 0.14864865, 0.06216216) # output[[2]]$lambda[minBICid[2],] -> for k=2 (3 clusters)
 fixed_lambda_4_cl <- c(0.15405405, 0.07297297, 0.02972973) # output[[3]]$lambda[minBICid[3],] -> for k=3 (4 clusters)
 
-fixed_k      <- 2
-fixed_lambda <- fixed_lambda_3_cl
+fixed_k      <- 1
+fixed_lambda <- fixed_lambda_2_cl
 cat("Using K =", fixed_k, "| lambda =", paste(round(fixed_lambda, 4), collapse = ", "), "\n")
 
 ## Subset by sample ID 
