@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #SBATCH --output=logs/xintnmf_boot_%A_%a.out
-#SBATCH --array=1-1000%15
+#SBATCH --array=1-1000%20
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL
 #SBATCH --nodes=1
@@ -21,7 +21,7 @@ fi
 mkdir -p logs
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/xint_image.sif"
-SCRIPT_PATH="/home/alessandro/ondemand/TNBCstrat/xintnmf_bootstrap.py"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/xintnmf_bootstrap.py"
 OUTDIR="/mnt/petasan_ccb/alessandro/SCANB/xintnmf_bootstrap_k${K}"
 
 export OMP_NUM_THREADS=4
