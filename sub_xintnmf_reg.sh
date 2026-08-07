@@ -10,6 +10,8 @@
 #SBATCH --time=3:00:00
 #SBATCH --mem=64G
 
+## xintNMF with regularization 
+
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/xint_image.sif"
 DATA_DIR="/mnt/petasan_ccb/alessandro/SCANB/XintNMF_inputdata"
 OUT_BASE="/mnt/petasan_ccb/alessandro/SCANB"
