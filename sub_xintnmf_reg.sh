@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --time=2:00:00
+#SBATCH --time=3:00:00
 #SBATCH --mem=64G
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/xint_image.sif"
