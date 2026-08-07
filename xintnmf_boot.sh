@@ -29,5 +29,5 @@ export OMP_NUM_THREADS=4
 
 srun singularity exec \
   -B /home/alessandrodelle@vhio.org:/home/alessandrodelle@vhio.org,/mnt/petasan_ccb/alessandro:/mnt/petasan_ccb/alessandro \
-  $IMAGE_PATH \
-  Rscript $SCRIPT_PATH "${SLURM_ARRAY_TASK_ID}" "${K}" "${OUTDIR}"
+  "$IMAGE_PATH" \
+  python "$SCRIPT_PATH" "${SLURM_ARRAY_TASK_ID}" "${K}" "${OUTDIR}"
