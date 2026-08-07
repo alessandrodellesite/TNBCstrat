@@ -6,7 +6,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --time=30:00
+#SBATCH --time=4:00:00
 #SBATCH --mem=20G
 
 # K is passed in at submit time via --export, e.g.:
