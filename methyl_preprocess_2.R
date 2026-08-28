@@ -168,7 +168,7 @@ pairs_enhancer <- get.pair(
   cores = n_cores
 )
 
-saveRDS(pairs_enhancer, "result_pairs_enhancer.rds")
+saveRDS(pairs_enhancer, "/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_enhancer.rds")
 
 print("Enhancers get.pair analysis finished")
 
@@ -205,7 +205,7 @@ pairs_promoter <- get.pair(
   cores = n_cores
 ) 
 
-saveRDS(pairs_promoter, "result_pairs_promoters.rds")
+saveRDS(pairs_promoter, "/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_promoters.rds")
 
 print("Promoters get.pair analysis finished!")
 print("All done!")
