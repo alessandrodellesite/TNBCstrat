@@ -26,14 +26,25 @@ samples <- intersect(colnames(probes), names(purity_vector))
 probes <- probes[, samples]
 purity_vector <- purity_vector[samples]
 
-print("Starting purity adjustment for every cpg")
-# Apply adjustBeta() on every row (cpg)
-results_list <- apply(probes, MARGIN = 1, FUN = function(cpg_row) {
-  adjustBeta(methylation = cpg_row, 
-             purity = purity_vector,
-             snames = samples, 
-             seed = FALSE)
-})
+n_cores <- detectCores()  # or set explicitly, e.g. 64, 128...
+cat("Using", n_cores, "cores\n")
+
+# convert to a list of rows once (apply() does this internally each time, mclapply needs a list)
+row_list <- split(probes, seq(nrow(probes)))
+row_list <- lapply(row_list, function(x) setNames(as.numeric(x), colnames(probes)))
+names(row_list) <- rownames(probes)
+
+results_list <- mclapply(
+  row_list,
+  FUN = function(cpg_row) {
+    adjustBeta(methylation = cpg_row,
+               purity = purity_vector,
+               snames = samples,
+               seed = FALSE)
+  },
+  mc.cores = n_cores,
+  mc.preschedule = FALSE  # dispatches rows one at a time
+)
 
 print("Iteration for purity adjustment finished!")
 
@@ -44,4 +55,4 @@ colnames(adjusted_data) <- samples
 print("Purity adjustement finished!")
 
 print("Saving preprocessed data to Petasan...")
-saveRDS(adjusted_data, "/mnt/petasan_ccb/alessandro/SCANB/adjusted_data.rds")    
+saveRDS(adjusted_data, "/mnt/petasan_ccb/alessandro/SCANB/methylation_data/adjusted_data.rds")    
