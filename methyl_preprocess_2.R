@@ -26,7 +26,9 @@ keep_autosomes <- !(ann$chr %in% c("chrX", "chrY"))
 keep_cpg <- grepl("^cg", ann$Name)
 probes_to_keep <- ann$Name[keep_autosomes & keep_cpg]
 probes_filtered <- adjusted_data[rownames(adjusted_data) %in% probes_to_keep, ]
-print("Probes filtered")
+
+cat("Unfiltered probes:", dim(adjusted_data), "\n")
+cat("Filtered probes:", dim(probes_filtered), "\n")
 
 
 # ELMER
@@ -42,12 +44,15 @@ common_samples <- intersect(colnames(met_filtered), colnames(exp_matrix))
 met_filtered   <- met_filtered[, common_samples]
 exp_matrix     <- exp_matrix[, common_samples]
 
+# Since we have no normal-tissue comparator, everyone is labeled "Cancer" 
+# -> way to do a single-cohort unsupervised analysis
 sample_meta <- data.frame(
   group = rep("Cancer", length(common_samples)),
   row.names = common_samples,
   stringsAsFactors = FALSE
 )
 
+# Recover Transcription Start Sites coordinates
 print("Get TSS coordinates")
 gene_coords <- getTSS(genome = "hg19")
 # take the TSS from our total gene list
