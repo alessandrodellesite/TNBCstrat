@@ -102,7 +102,7 @@ cat("Restricted to matched patient set:", dim(merged_beta), "\n")
 
 
 
-# Remove CpGs not measured in all samples (matches original Python dropna) --
+# Remove CpGs not measured in all samples 
 merged_beta <- na.omit(merged_beta)
 cat("Final matrix after removing incomplete CpGs:", dim(merged_beta), "\n")
 
