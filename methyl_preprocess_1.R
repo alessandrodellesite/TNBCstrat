@@ -18,41 +18,34 @@ probes <- read.table("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/matched
 dt_metadata <- read_excel("/mnt/petasan_ccb/alessandro/SCANB/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
 
 ## Purity adjustment using ASCAT purity estimates
-
 purity_vector <- as.numeric(dt_metadata$ASCAT_TUM_FRAC)
 names(purity_vector) <- dt_metadata$PD_ID
-
 samples <- intersect(colnames(probes), names(purity_vector))
 probes <- probes[, samples]
 purity_vector <- purity_vector[samples]
 
-n_cores <- detectCores()  # or set explicitly, e.g. 64, 128...
-cat("Using", n_cores, "cores\n")
+n_cores <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK"))
+if (is.na(n_cores) || n_cores < 1) n_cores <- 1
+cat("Using", n_cores, "cores (from SLURM_CPUS_PER_TASK)\n")
 
-# convert to a list of rows once (apply() does this internally each time, mclapply needs a list)
-row_list <- split(probes, seq(nrow(probes)))
-row_list <- lapply(row_list, function(x) setNames(as.numeric(x), colnames(probes)))
-names(row_list) <- rownames(probes)
+probes_mat <- as.matrix(probes)  # single copy, no per-row duplication
 
 results_list <- mclapply(
-  row_list,
-  FUN = function(cpg_row) {
-    adjustBeta(methylation = cpg_row,
+  seq_len(nrow(probes_mat)),
+  FUN = function(i) {
+    adjustBeta(methylation = probes_mat[i, ],
                purity = purity_vector,
                snames = samples,
                seed = FALSE)
   },
   mc.cores = n_cores,
-  mc.preschedule = FALSE  # dispatches rows one at a time
+  mc.preschedule = TRUE   # chunks work into n_cores static blocks — far fewer forks
 )
+names(results_list) <- rownames(probes_mat)
 
 print("Iteration for purity adjustment finished!")
-
-# extract the correct tumor values frm the list (y.tum)
 adjusted_data <- do.call(rbind, lapply(results_list, function(x) x$y.tum))
 colnames(adjusted_data) <- samples
-
-print("Purity adjustement finished!")
-
+print("Purity adjustment finished!")
 print("Saving preprocessed data to Petasan...")
 saveRDS(adjusted_data, "/mnt/petasan_ccb/alessandro/SCANB/methylation_data/adjusted_data.rds")    
