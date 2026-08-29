@@ -6,9 +6,9 @@
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=120
+#SBATCH --cpus-per-task=100
 #SBATCH --time=24:00      
-#SBATCH --mem=64G            
+#SBATCH --mem=128G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
 SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/methyl_preprocess_1.R"
