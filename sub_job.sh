@@ -7,8 +7,8 @@
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=100
-#SBATCH --time=24:00      
-#SBATCH --mem=128G            
+#SBATCH --time=2-00:00:00      
+#SBATCH --mem=192G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
 SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/methyl_preprocess_1.R"
