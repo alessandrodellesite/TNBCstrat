@@ -25,7 +25,7 @@ rna_matrix <- as.matrix(rna_data)
 
 
 # Methylation
-adjusted_data <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/adjusted_data.rds")
+adjusted_data <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/adjusted_data.rds")
 
 # Filtering
 ann <- getAnnotation(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
@@ -34,6 +34,9 @@ keep_cpg <- grepl("^cg", ann$Name)
 probes_to_keep <- ann$Name[keep_autosomes & keep_cpg]
 probes_filtered <- adjusted_data[rownames(adjusted_data) %in% probes_to_keep, ]
 met_filtered <- as.matrix(probes_filtered)
+
+
+
 
 # Enhancer results
 enhancers_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/result_pairs_enhancer.rds")
