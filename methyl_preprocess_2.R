@@ -14,7 +14,7 @@ library(GenomicRanges)
 
 # Point to the root mount where the data is stored
 adjusted_data <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/adjusted_data.rds")
-exp.data <- read.table("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.tsv", header=TRUE, sep="\t", row.names=1)
+exp.data <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.rds")
                                        
 # Filtering to exclude chrX/Y localization and non-CpG probes
 
