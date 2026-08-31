@@ -157,7 +157,7 @@ if (nrow(valid_pairs) > 0) {
   A_met_rna[cbind(valid_pairs$Gene_clean, valid_pairs$Probe)] <- 1
 }
 
-write.table(A_met_rna, file = file.path(dir_out, "interaction_rna_processed_methylation_processed.tsv"), sep = "\t", quote = FALSE, col.names = NA, row.names = TRUE)
+write.table(A_met_rna, file = file.path(dir_out, "interaction_rna_methylation.tsv"), sep = "\t", quote = FALSE, col.names = NA, row.names = TRUE)
 
 # CNV x RNA block
 A_cnv_rna <- matrix(
@@ -172,4 +172,4 @@ for (g in shared_genes) {
   A_cnv_rna[g, g] <- 1
 }
 
-write.table(A_cnv_rna, file = file.path(dir_out, "interaction_rna_processed_cnv_processed.tsv"), sep = "\t", quote = FALSE, col.names = NA, row.names = TRUE)
+write.table(A_cnv_rna, file = file.path(dir_out, "interaction_rna_cnv.tsv"), sep = "\t", quote = FALSE, col.names = NA, row.names = TRUE)
