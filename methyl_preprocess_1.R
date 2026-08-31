@@ -15,7 +15,7 @@ source("/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/function_correctBetas.
 
 # Point to the root mount where the data is stored
 probes <- read.table("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/matched_methyl_normalized.tsv", header=TRUE, sep="\t", row.names=1)
-dt_metadata <- read_excel("/mnt/petasan_ccb/alessandro/SCANB/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
+dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
 
 ## Purity adjustment using ASCAT purity estimates
 purity_vector <- as.numeric(dt_metadata$ASCAT_TUM_FRAC)
