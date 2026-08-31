@@ -22,7 +22,7 @@ mkdir -p logs
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/xint_image.sif"
 SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/xintNMF_bootstrap.py"
-OUTDIR="/mnt/petasan_ccb/alessandro/SCANB/xintnmf_bootstrap_k${K}"
+OUTDIR="/mnt/petasan_ccb/alessandro/SCANB/multiomics/bootstrap/xintnmf/xintnmf_bootstrap_k${K}"
 
 export OMP_NUM_THREADS=4
 
