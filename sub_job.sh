@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=methyl_adjust
-#SBATCH --output=methyl_adjust%j.log
+#SBATCH --job-name=methyl_preproc
+#SBATCH --output=methyl_preproc%j.log
 #SBATCH --partition=long
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=100
+#SBATCH --cpus-per-task=60
 #SBATCH --time=2-00:00:00      
-#SBATCH --mem=192G            
+#SBATCH --mem=64G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/methyl_preprocess_1.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/methyl_preprocess_2.R"
 
 # singularity execution
 srun singularity exec \
