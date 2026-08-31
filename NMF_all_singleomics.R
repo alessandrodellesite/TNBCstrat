@@ -54,7 +54,7 @@ export_groups_rna <- data.frame(
   SampleID = names(sample_groups_rna),
   Cluster = as.vector(sample_groups_rna)
 )
-write.csv(export_groups_rna, "/mnt/petasan_ccb/alessandro/SCANB/clustering_results/rna_nmf_clusters.csv", row.names = FALSE)
+write.csv(export_groups_rna, "/mnt/petasan_ccb/alessandro/SCANB/clustering_results/single_omics/rna_nmf_clusters.csv", row.names = FALSE)
 
 
 
@@ -141,7 +141,7 @@ export_groups_meth <- data.frame(
   SampleID = names(sample_groups_meth),
   Cluster = as.vector(sample_groups_meth)
 )
-write.csv(export_groups_meth, "/mnt/petasan_ccb/alessandro/SCANB/clustering_results/methyl_nmf_clusters.csv", row.names = FALSE)
+write.csv(export_groups_meth, "/mnt/petasan_ccb/alessandro/SCANB/clustering_results/single_omics/methyl_nmf_clusters.csv", row.names = FALSE)
 
 
 
@@ -179,6 +179,6 @@ export_groups_cnv <- data.frame(
   SampleID = names(sample_groups_cnv),
   Cluster = as.vector(sample_groups_cnv)
 )
-write.csv(export_groups_cnv, "/mnt/petasan_ccb/alessandro/SCANB/clustering_results/cnv_nmf_clusters.csv", row.names = FALSE)
+write.csv(export_groups_cnv, "/mnt/petasan_ccb/alessandro/SCANB/clustering_results/single_omics/cnv_nmf_clusters.csv", row.names = FALSE)
 
 print("All single omics analyses finished!")
