@@ -42,7 +42,7 @@ top_pairs_en <- top_pairs_en[abs(top_pairs_en$Distance) > 2000, ]
 top_cpg_en <- unique(top_pairs_en$Probe)
 
 # Promoters results
-pr_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_promoter.rds")
+pr_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_promoters.rds")
 top_pairs_pr <- pr_pairs[pr_pairs$Raw.p < 1e-8 & pr_pairs$Pe < 0.001, ]
 top_pairs_en <- top_pairs_en[abs(top_pairs_en$Distance) <= 2000, ]
 top_cpg_pr <- unique(top_pairs_pr$Probe)
