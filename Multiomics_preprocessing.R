@@ -44,7 +44,7 @@ top_cpg_en <- unique(top_pairs_en$Probe)
 # Promoters results
 pr_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_promoters.rds")
 top_pairs_pr <- pr_pairs[pr_pairs$Raw.p < 1e-8 & pr_pairs$Pe < 0.001, ]
-top_pairs_en <- top_pairs_en[abs(top_pairs_en$Distance) <= 2000, ]
+top_pairs_pr <- top_pairs_pr[abs(top_pairs_pr$Distance) <= 2000, ]
 top_cpg_pr <- unique(top_pairs_pr$Probe)
 
 # Final CpG set
@@ -121,3 +121,55 @@ data_cnv  <- t(cnv_log_ratio)
 saveRDS(data_rna,  file = file.path(outdir, "snf_inputdata", "rna_snf.rds"))
 saveRDS(data_meth, file = file.path(outdir, "snf_inputdata", "met_snf.rds"))
 saveRDS(data_cnv,  file = file.path(outdir, "snf_inputdata", "cnv_snf.rds"))
+
+
+#xintNMF - needs .tsv files
+
+dir_out  <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics/input_data/xintnmf_inputdata/"
+
+write.table(rna_matrix, file = file.path(dir_out, "rna.tsv"), sep = "\t", quote = FALSE, col.names = NA, row.names = TRUE)
+write.table(met_matrix_filtered, file = file.path(dir_out, "methylation.tsv"), sep = "\t",quote = FALSE, col.names = NA, row.names = TRUE)
+write.table(cnv_matrix, file = file.path(dir_out, "cnv.tsv"), sep = "\t", quote = FALSE, col.names = NA, row.names = TRUE)
+
+# code to create interaction matrices for graph_regularization
+
+rna_genes <- rownames(rna_matrix)         # must match rna_xintnmf.rds row order exactly
+cpg_features <- rownames(met_matrix_filtered)      # must match met_xintnmf.rds row order
+cnv_genes <- rownames(cnv_matrix)  
+
+# Methylation x RNA block
+top_pairs_combined <- rbind(top_pairs_en, top_pairs_pr)
+top_pairs_combined$Gene_clean <- sub("\\..*", "", top_pairs_combined$GeneID)
+
+A_met_rna <- matrix(
+  0, 
+  nrow = length(rna_genes), 
+  ncol = length(cpg_features),
+  dimnames = list(rna_genes, cpg_features)
+)
+
+valid_pairs <- top_pairs_combined[
+  top_pairs_combined$Gene_clean %in% rna_genes & 
+  top_pairs_combined$Probe %in% cpg_features, 
+]
+
+if (nrow(valid_pairs) > 0) {
+  A_met_rna[cbind(valid_pairs$Gene_clean, valid_pairs$Probe)] <- 1
+}
+
+write.table(A_met_rna, file = file.path(dir_out, "interaction_rna_processed_methylation_processed.tsv"), sep = "\t", quote = FALSE, col.names = NA, row.names = TRUE)
+
+# CNV x RNA block
+A_cnv_rna <- matrix(
+  0, 
+  nrow = length(rna_genes), 
+  ncol = length(cnv_genes),
+  dimnames = list(rna_genes, cnv_genes)
+)
+
+shared_genes <- intersect(rna_genes, cnv_genes)
+for (g in shared_genes) {
+  A_cnv_rna[g, g] <- 1
+}
+
+write.table(A_cnv_rna, file = file.path(dir_out, "interaction_rna_processed_cnv_processed.tsv"), sep = "\t", quote = FALSE, col.names = NA, row.names = TRUE)
