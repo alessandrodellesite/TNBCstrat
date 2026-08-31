@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=methyl_preproc
-#SBATCH --output=methyl_preproc%j.log
-#SBATCH --partition=long
+#SBATCH --job-name=NMF_singleomics
+#SBATCH --output=NMF_singleomics%j.log
+#SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=15
-#SBATCH --time=2-00:00:00      
-#SBATCH --mem=150G            
+#SBATCH --cpus-per-task=30
+#SBATCH --time=2:00:00      
+#SBATCH --mem=90G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/methyl_preprocess_2.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/NMF_all_singleomics.R"
 
 # singularity execution
 srun singularity exec \
