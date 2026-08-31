@@ -161,7 +161,7 @@ saveRDS(estim.r_cnv, "/mnt/petasan_ccb/alessandro/SCANB/plots/NMF_rank_estimatio
 print("Rank Estimation finished and saved!")
 
 
-print("Starting Final NMF Execution on meth data...")
+print("Starting Final NMF Execution on cnv data...")
 res_cnv <- nmf(cnv_matrix, 
            rank = 3, 
            nrun = 200,                         
