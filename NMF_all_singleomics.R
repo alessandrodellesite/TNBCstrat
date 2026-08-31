@@ -80,8 +80,8 @@ met_filtered <- as.matrix(probes_filtered)
 common_samples <- intersect(colnames(met_filtered), colnames(rna_data))
 met_filtered   <- met_filtered[, common_samples]
 
-enhancers_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_enhancer.rds")
-promoters_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_promoters.rds")
+en_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_enhancer.rds")
+pr_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_promoters.rds")
 
 # Enhancers filtering
 # Filter for Pairs with Raw.p < 1e-8)
@@ -98,7 +98,7 @@ cat("Unique enhancer probes", length(top_cpg_en), "\n")
 # Filter for Pairs with Raw.p < 1e-8)
 top_pairs_pr <- pr_pairs[pr_pairs$Raw.p < 1e-8 & pr_pairs$Pe < 0.001, ]
 #select only truly proximal pairs
-top_pairs_en <- top_pairs_en[abs(top_pairs_en$Distance) <= 2000, ]
+top_pairs_pr <- top_pairs_pr[abs(top_pairs_pr$Distance) <= 2000, ]
 cat("Top promoters pairs:", dim(top_pairs_pr), "\n")
 
 # Extract unique probes 
