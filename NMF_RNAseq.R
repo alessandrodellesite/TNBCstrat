@@ -1,24 +1,27 @@
-# NMF on 1000 most variable genes by MAD
+# NMF on feature selected single-omic data
 
-library(NMF)
-
-n_cores <- 30 #DEVE ESSERE UGUALE A SLURM
-options(mc.cores = 30)
-
+#RNAseq feature selection
 rna_data <- read.table("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.tsv", header=TRUE, sep="\t", row.names=1)
 
 gene_mads <- apply(rna_data, 1, mad)
 ordered_mads <- order(gene_mads, decreasing = TRUE)
 
-#Select top 1000 most variable genes
-top_1000_indices <- ordered_mads[1:1000]
-rna_data <- rna_data[top_1000_indices, ]
+#Select top 3000 most variable genes
+top_3000_indices <- ordered_mads[1:3000]
+rna_data <- rna_data[top_3000_indices, ]
 dt_matrix <- as.matrix(rna_data)
 
 if(any(is.na(dt_matrix))) {
   dt_matrix[is.na(dt_matrix)] <- 0 
 }
 
+
+
+
+library(NMF)
+
+n_cores <- 30 #DEVE ESSERE UGUALE A SLURM
+options(mc.cores = 30)
 
 print("Starting NMF Rank Estimation...")
 estim.r <- nmfEstimateRank(dt_matrix, 
