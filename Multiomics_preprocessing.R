@@ -5,7 +5,7 @@ library(minfi)
 library(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
 # library(sesameData)
 
-outdir <- "/mnt/petasan_ccb/alessandro/SCANB/"
+outdir <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics/input_data/"
 
 # Create the three output subdirectories up front 
 dir.create(file.path(outdir, "mofa_inputdata"),     recursive = TRUE, showWarnings = FALSE)
@@ -117,7 +117,7 @@ data_rna  <- t(rna_matrix)
 data_meth <- t(met_mvals)
 data_cnv  <- t(cnv_log_ratio)
 
-# save SNF inputs -> outdir/snf_inputdata/    (FIX: was missing entirely)
+# save SNF inputs -> outdir/snf_inputdata/    
 saveRDS(data_rna,  file = file.path(outdir, "snf_inputdata", "rna_snf.rds"))
 saveRDS(data_meth, file = file.path(outdir, "snf_inputdata", "met_snf.rds"))
 saveRDS(data_cnv,  file = file.path(outdir, "snf_inputdata", "cnv_snf.rds"))
