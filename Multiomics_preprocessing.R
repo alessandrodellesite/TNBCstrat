@@ -62,9 +62,8 @@ met_mvals <- log2(met_mvals / (1 - met_mvals))
 
 
 # CNV
-dna_matrix_filtered <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/dna_matrix_filtered_2900genes.csv",
-                                 header = TRUE, row.names = 1)
-cnv_log_ratio <- as.matrix(dna_matrix_filtered)   # FIX: cast to matrix for consistency with rna_matrix/met_mvals
+cnv_matrix <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/cnv_processed.rds")
+cnv_log_ratio <- as.matrix(cnv_matrix)   
 # homozygous deletions (0 alleles) to avoid log2(0) = -Inf
 cnv_log_ratio[cnv_log_ratio == 0] <- 0.5
 # conversion to log2 ratio scale (relative to diploid copy number = 2)
