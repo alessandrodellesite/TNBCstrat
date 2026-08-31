@@ -32,7 +32,7 @@ estim.r_rna <- nmfEstimateRank(rna_matrix,
                            seed = 123456, 
                            .options = "vp30") 
 
-saveRDS(estim.r_rna, "/mnt/petasan_ccb/alessandro/SCANB/plots/NMF_rank_estimation_RNAseq.rds")
+saveRDS(estim.r_rna, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/NMF_rank_estimation_RNAseq.rds")
 print("Rank Estimation finished and saved!")
 
 
@@ -43,7 +43,7 @@ res_rna <- nmf(rna_matrix,
            seed = 123456,
            .options = "vp30")         
 
-saveRDS(res_rna, "/mnt/petasan_ccb/alessandro/SCANB/plots/NMF_final_results_RNAseq.rds")
+saveRDS(res_rna, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/NMF_final_results_RNAseq.rds")
 print("RNA NMF Final execution finished!")
 
 print("Saving clustering results...")
@@ -54,7 +54,7 @@ export_groups_rna <- data.frame(
   SampleID = names(sample_groups_rna),
   Cluster = as.vector(sample_groups_rna)
 )
-write.csv(export_groups_rna, "/mnt/petasan_ccb/alessandro/SCANB/clustering_results/single_omics/rna_nmf_clusters.csv", row.names = FALSE)
+write.csv(export_groups_rna, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/rna_nmf_clusters.csv", row.names = FALSE)
 
 
 
@@ -119,7 +119,7 @@ estim.r_meth <- nmfEstimateRank(met_matrix_filtered,
                            seed = 123456, 
                            .options = "vp30") 
 
-saveRDS(estim.r_meth, "/mnt/petasan_ccb/alessandro/SCANB/plots/NMF_rank_estimation_meth.rds")
+saveRDS(estim.r_meth, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/NMF_rank_estimation_meth.rds")
 print("Rank Estimation finished and saved!")
 
 
@@ -130,7 +130,7 @@ res_meth <- nmf(met_matrix_filtered,
            seed = 123456,
            .options = "vp30")         
 
-saveRDS(res_meth, "/mnt/petasan_ccb/alessandro/SCANB/plots/NMF_final_results_meth.rds")
+saveRDS(res_meth, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/NMF_final_results_meth.rds")
 print("RNA NMF Final execution finished!")
 
 print("Saving clustering results...")
@@ -141,7 +141,7 @@ export_groups_meth <- data.frame(
   SampleID = names(sample_groups_meth),
   Cluster = as.vector(sample_groups_meth)
 )
-write.csv(export_groups_meth, "/mnt/petasan_ccb/alessandro/SCANB/clustering_results/single_omics/methyl_nmf_clusters.csv", row.names = FALSE)
+write.csv(export_groups_meth, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters.csv", row.names = FALSE)
 
 
 
@@ -157,7 +157,7 @@ estim.r_cnv <- nmfEstimateRank(cnv_matrix,
                            seed = 123456, 
                            .options = "vp30") 
 
-saveRDS(estim.r_cnv, "/mnt/petasan_ccb/alessandro/SCANB/plots/NMF_rank_estimation_cnv.rds")
+saveRDS(estim.r_cnv, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/NMF_rank_estimation_cnv.rds")
 print("Rank Estimation finished and saved!")
 
 
@@ -168,7 +168,7 @@ res_cnv <- nmf(cnv_matrix,
            seed = 123456,
            .options = "vp30")         
 
-saveRDS(res_cnv, "/mnt/petasan_ccb/alessandro/SCANB/plots/NMF_final_results_cnv.rds")
+saveRDS(res_cnv, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/NMF_final_results_cnv.rds")
 print("CNV NMF Final execution finished!")
 
 print("Saving clustering results...")
@@ -179,6 +179,6 @@ export_groups_cnv <- data.frame(
   SampleID = names(sample_groups_cnv),
   Cluster = as.vector(sample_groups_cnv)
 )
-write.csv(export_groups_cnv, "/mnt/petasan_ccb/alessandro/SCANB/clustering_results/single_omics/cnv_nmf_clusters.csv", row.names = FALSE)
+write.csv(export_groups_cnv, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/cnv_nmf_clusters.csv", row.names = FALSE)
 
 print("All single omics analyses finished!")
