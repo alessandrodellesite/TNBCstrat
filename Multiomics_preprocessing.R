@@ -35,24 +35,22 @@ probes_to_keep <- ann$Name[keep_autosomes & keep_cpg]
 probes_filtered <- adjusted_data[rownames(adjusted_data) %in% probes_to_keep, ]
 met_filtered <- as.matrix(probes_filtered)
 
-
-
-
-# Enhancer results
-enhancers_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/result_pairs_enhancer.rds")
-en_pairs <- enhancers_pairs[order(enhancers_pairs$Pe), ]
-top_pairs_en <- en_pairs[en_pairs$Raw.p < 1e-9, ]
+# Enhancers results
+en_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_enhancer.rds")
+top_pairs_en <- en_pairs[en_pairs$Raw.p < 1e-8 & en_pairs$Pe < 0.001, ]
+top_pairs_en <- top_pairs_en[abs(top_pairs_en$Distance) > 2000, ]
 top_cpg_en <- unique(top_pairs_en$Probe)
 
-# Promoter results
-promoters_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/result_pairs_promoter.rds")
-pr_pairs <- promoters_pairs[order(promoters_pairs$Pe), ]
-top_pairs_pr <- pr_pairs[pr_pairs$Raw.p < 1e-9, ]
+# Promoters results
+pr_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_promoter.rds")
+top_pairs_pr <- pr_pairs[pr_pairs$Raw.p < 1e-8 & pr_pairs$Pe < 0.001, ]
+top_pairs_en <- top_pairs_en[abs(top_pairs_en$Distance) <= 2000, ]
 top_cpg_pr <- unique(top_pairs_pr$Probe)
 
 # Final CpG set
 top_cpg_combined <- union(top_cpg_en, top_cpg_pr)
 met_matrix_filtered <- met_filtered[rownames(met_filtered) %in% top_cpg_combined, ]
+
 
 # Transform Beta-values into M-values
 met_mvals <- met_matrix_filtered
