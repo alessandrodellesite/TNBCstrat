@@ -6,7 +6,7 @@
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=60
+#SBATCH --cpus-per-task=15
 #SBATCH --time=2-00:00:00      
 #SBATCH --mem=64G            
 
