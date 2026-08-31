@@ -6,6 +6,8 @@ n_cores <- 30 #DEVE ESSERE UGUALE A SLURM
 options(mc.cores = 30)
 
 
+# RNAseq
+
 #RNAseq feature selection (top 3000 genes by MAD)
 print("Rna preprocessing")
 rna_data <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.rds")
@@ -22,7 +24,7 @@ if(any(is.na(rna_matrix))) {
   rna_matrix[is.na(rna_matrix)] <- 0 
 }
 
-
+#NMF on RNAseq data
 print("Starting NMF Rank Estimation on RNA data...")
 estim.r_rna <- nmfEstimateRank(rna_matrix, 
                            range = 2:6, 
@@ -55,10 +57,9 @@ export_groups_rna <- data.frame(
 write.csv(export_groups_rna, "/mnt/petasan_ccb/alessandro/SCANB/clustering_results/rna_nmf_clusters.csv", row.names = FALSE)
 
 
-# ----
 
 
-# ------
+# Methylation 
 
 # methylation feature selection
 print("Methylation feature selection")
@@ -110,6 +111,7 @@ met_matrix_filtered <- met_filtered[rownames(met_filtered) %in% top_cpg_combined
 cat("Final methylation matrix dimesions:", dim(met_matrix_filtered), "\n")
 
 
+#NMF on methylation data
 print("Starting NMF Rank Estimation on meth data...")
 estim.r_meth <- nmfEstimateRank(met_matrix_filtered, 
                            range = 2:6, 
@@ -142,9 +144,41 @@ export_groups_meth <- data.frame(
 write.csv(export_groups_meth, "/mnt/petasan_ccb/alessandro/SCANB/clustering_results/methyl_nmf_clusters.csv", row.names = FALSE)
 
 
-# ----
 
-#cnv
+# Copy number variants
+
+cnv_matrix <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/cnv_processed.rds")
+
+#NMF on cnv data
+print("Starting NMF Rank Estimation on cnv data...")
+estim.r_cnv <- nmfEstimateRank(cnv_matrix, 
+                           range = 2:6, 
+                           nrun = 50,          
+                           seed = 123456, 
+                           .options = "v") 
+
+saveRDS(estim.r_cnv, "/mnt/petasan_ccb/alessandro/SCANB/plots/NMF_rank_estimation_cnv.rds")
+print("Rank Estimation finished and saved!")
 
 
+print("Starting Final NMF Execution on meth data...")
+res_cnv <- nmf(cnv_matrix, 
+           rank = 3, 
+           nrun = 200,                         
+           seed = 123456,
+           .options = "v")         
 
+saveRDS(res_cnv, "/mnt/petasan_ccb/alessandro/SCANB/plots/NMF_final_results_cnv.rds")
+print("CNV NMF Final execution finished!")
+
+print("Saving clustering results...")
+sample_groups_cnv <- predict(res_cnv)
+table(sample_groups_cnv)
+
+export_groups_cnv <- data.frame(
+  SampleID = names(sample_groups_cnv),
+  Cluster = as.vector(sample_groups_cnv)
+)
+write.csv(export_groups_cnv, "/mnt/petasan_ccb/alessandro/SCANB/clustering_results/cnv_nmf_clusters.csv", row.names = FALSE)
+
+print("All single omics analyses finished!")
