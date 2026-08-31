@@ -50,7 +50,7 @@ print("NMF Final execution finished!")
 
 #methylation data
 
-adjusted_data <- readRDS("adjusted_data.rds")
+adjusted_data <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/adjusted_data.rds")
 # Filtering
 library(minfi)
 library(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
@@ -62,9 +62,8 @@ probes_to_keep <- ann$Name[keep_autosomes & keep_cpg]
 probes_filtered <- adjusted_data[rownames(adjusted_data) %in% probes_to_keep, ]
 met_filtered <- as.matrix(probes_filtered)
 
-common_samples <- intersect(colnames(met_filtered), colnames(exp_matrix))
+common_samples <- intersect(colnames(met_filtered), colnames(rna_data))
 met_filtered   <- met_filtered[, common_samples]
-exp_matrix     <- exp_matrix[, common_samples]
 
 enhancers_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_enhancer.rds")
 promoters_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_promoter.rds")
@@ -72,6 +71,8 @@ promoters_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/r
 # Enhancers filtering
 # Filter for Pairs with Raw.p < 1e-8)
 top_pairs_en <- en_pairs[en_pairs$Raw.p < 1e-8 & en_pairs$Pe < 0.001, ]
+#select only truly distal pairs
+top_pairs_en <- top_pairs_en[abs(top_pairs_en$Distance) > 2000, ]
 dim(top_pairs_en)
 
 # Extract unique probes 
@@ -81,10 +82,15 @@ length(top_cpg_en)
 # Promoters filtering
 # Filter for Pairs with Raw.p < 1e-8)
 top_pairs_pr <- pr_pairs[pr_pairs$Raw.p < 1e-8 & pr_pairs$Pe < 0.001, ]
+#select only truly proximal pairs
+top_pairs_en <- top_pairs_en[abs(top_pairs_en$Distance) <= 2000, ]
 dim(top_pairs_pr)
 
 # Extract unique probes 
 top_cpg_pr <- unique(top_pairs_pr$Probe)
 length(top_cpg_pr)
 
-
+top_cpg_combined <- union(top_cpg_en, top_cpg_pr)
+length(top_cpg_combined)
+met_matrix_filtered <- met_filtered[rownames(met_filtered) %in% top_cpg_combined, ]
+dim(met_matrix_filtered)
