@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#SBATCH --job-name=iclusterplus_tune
+#SBATCH --output=iclusterplus_k%a_%j.log
+#SBATCH --partition=long
+#SBATCH --array=1-5
+#SBATCH --mail-type=END,FAIL  
+#SBATCH --mail-user=alessandrodelle@vhio.net
+#SBATCH --nodes=1      
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --time=1-00:00:00     
+#SBATCH --mem=90G            
+
+Rscript run_tune_iclusterplus.R $SLURM_ARRAY_TASK_ID
+IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_icluster.R"
+
+# singularity execution
+srun singularity exec \
+  -B /home/alessandrodelle@vhio.org:/home/alessandrodelle@vhio.org,/mnt/petasan_ccb/alessandro:/mnt/petasan_ccb/alessandro \
+  $IMAGE_PATH \
+  Rscript $SCRIPT_PATH
+
