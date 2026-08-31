@@ -11,7 +11,6 @@
 #SBATCH --time=1-00:00:00     
 #SBATCH --mem=90G            
 
-Rscript run_tune_iclusterplus.R $SLURM_ARRAY_TASK_ID
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
 SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_icluster.R"
 
