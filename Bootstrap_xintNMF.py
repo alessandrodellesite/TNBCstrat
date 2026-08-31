@@ -33,7 +33,7 @@ def main():
     k = int(sys.argv[2])
     outdir = sys.argv[3]
 
-    data_dir = "/mnt/petasan_ccb/alessandro/SCANB/XintNMF_inputdata"
+    data_dir = "/mnt/petasan_ccb/alessandro/SCANB/multiomics/input_data/xintnmf_inputdata"
     shared_dir = "/mnt/petasan_ccb/alessandro/SCANB/bootstrap_shared"
 
     os.makedirs(outdir, exist_ok=True)
