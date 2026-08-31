@@ -81,7 +81,7 @@ common_samples <- intersect(colnames(met_filtered), colnames(rna_data))
 met_filtered   <- met_filtered[, common_samples]
 
 enhancers_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_enhancer.rds")
-promoters_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_promoter.rds")
+promoters_pairs <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/methylation_data/result_pairs_promoters.rds")
 
 # Enhancers filtering
 # Filter for Pairs with Raw.p < 1e-8)
