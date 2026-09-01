@@ -24,4 +24,4 @@ cv.fit <- tune.iClusterPlus(
   maxiter = 20
 )
 
-save(cv.fit, file = paste0("/mnt/petasan_ccb/alessandro/SCANB/multiomics/icluster_results/cv.fit.k", k, ".Rdata"))
+save(cv.fit, file = paste0("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/cv.fit.k", k, ".Rdata"))
