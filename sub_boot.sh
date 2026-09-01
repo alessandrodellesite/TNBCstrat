@@ -9,7 +9,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2 
 #SBATCH --time=45:00      
-#SBATCH --mem=20G       
+#SBATCH --mem=10G       
 
 mkdir -p logs
 mkdir -p /mnt/petasan_ccb/alessandro/SCANB/basilisk_cache
