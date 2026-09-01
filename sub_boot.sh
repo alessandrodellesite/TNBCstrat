@@ -15,7 +15,7 @@ mkdir -p logs
 mkdir -p /mnt/petasan_ccb/alessandro/SCANB/basilisk_cache
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/mofa_bootstrap.R"
+  SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Bootstrap_mofa.R"
 OUTDIR="/mnt/petasan_ccb/alessandro/SCANB/multiomics/bootstrap/mofa/mofa_bootstrap_k2"
 
 srun singularity exec \
