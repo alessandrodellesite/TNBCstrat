@@ -41,7 +41,7 @@ library(MOFA2)
 
 ## Data loading -- MOFA-specific preprocessed matrices (features x samples,
 ## matching create_mofa()'s expected orientation)
-data_dir <- "/mnt/petasan_ccb/alessandro/SCANB/mofa_inputdata/"
+data_dir <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics/input_data/mofa_inputdata/"
 rna_cent <- readRDS(file.path(data_dir, "rna_mofa.rds"))
 met_cent <- readRDS(file.path(data_dir, "met_mofa.rds"))
 cnv_cent <- readRDS(file.path(data_dir, "cnv_mofa.rds"))
