@@ -13,7 +13,7 @@
 
 mkdir -p logs
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/mnt/petasan_ccb/alessandro/SCANB/scripts/Bootstrap_mofa.R"
+SCRIPT_PATH="/mnt/petasan_ccb/alessandro/SCANB/Bootstrap_mofa.R"
 OUTDIR="/mnt/petasan_ccb/alessandro/SCANB/multiomics/bootstrap/mofa/mofa_bootstrap_k2"
 
 srun singularity exec \
