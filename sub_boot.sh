@@ -11,11 +11,16 @@
 #SBATCH --time=45:00      
 #SBATCH --mem=20G       
 
+mkdir -p logs
 mkdir -p /mnt/petasan_ccb/alessandro/SCANB/basilisk_cache
+
+IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/mofa_bootstrap.R"
+OUTDIR="/mnt/petasan_ccb/alessandro/SCANB/multiomics/bootstrap/mofa/mofa_bootstrap_k2"
 
 srun singularity exec \
   --no-home \
   --env XDG_CACHE_HOME=/mnt/petasan_ccb/alessandro/SCANB/basilisk_cache \
-  -B /mnt/petasan_ccb/alessandro:/mnt/petasan_ccb/alessandro \
+  -B /home/alessandrodelle@vhio.org/ondemand/TNBCstrat:/home/alessandrodelle@vhio.org/ondemand/TNBCstrat,/mnt/petasan_ccb/alessandro:/mnt/petasan_ccb/alessandro \
   $IMAGE_PATH \
   Rscript $SCRIPT_PATH "${SLURM_ARRAY_TASK_ID}" "${OUTDIR}"
