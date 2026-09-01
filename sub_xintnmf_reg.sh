@@ -14,7 +14,7 @@
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/xint_image.sif"
 DATA_DIR="/mnt/petasan_ccb/alessandro/SCANB/multiomics/input_data/xintnmf_inputdata"
-OUT_BASE="/mnt/petasan_ccb/alessandro/SCANB/multiomics/xintnmf_results"
+OUT_BASE="/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf"
 
 MAX_PARALLEL=5      # one task per k, 4 cpus each = 20 cpus
 export OMP_NUM_THREADS=4
