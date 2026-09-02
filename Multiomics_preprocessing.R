@@ -127,6 +127,11 @@ saveRDS(data_cnv,  file = file.path(outdir, "snf_inputdata", "cnv_snf.rds"))
 
 dir_out  <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics/input_data/xintnmf_inputdata/"
 
+common_samples <- intersect(colnames(rna_matrix), intersect(colnames(met_matrix_filtered), colnames(cnv_matrix)))
+rna_matrix           <- rna_matrix[, common_samples]
+met_matrix_filtered  <- met_matrix_filtered[, common_samples]
+cnv_matrix           <- cnv_matrix[, common_samples]
+
 write.table(rna_matrix, file = file.path(dir_out, "rna.tsv"), sep = "\t", quote = FALSE, col.names = NA, row.names = TRUE)
 write.table(met_matrix_filtered, file = file.path(dir_out, "methylation.tsv"), sep = "\t",quote = FALSE, col.names = NA, row.names = TRUE)
 write.table(cnv_matrix, file = file.path(dir_out, "cnv.tsv"), sep = "\t", quote = FALSE, col.names = NA, row.names = TRUE)
