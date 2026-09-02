@@ -9,7 +9,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --time=1-00:00:00     
-#SBATCH --mem=90G            
+#SBATCH --mem=10G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
 SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_icluster.R"
