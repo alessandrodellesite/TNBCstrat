@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --time=4:00:00
-#SBATCH --mem=20G
+#SBATCH --mem=8G
 
 # K is passed in at submit time via --export, e.g.:
 #   sbatch --job-name=xintnmf_boot_k2 --export=ALL,K=2 xintnmf_boot.sh
