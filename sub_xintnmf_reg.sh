@@ -7,8 +7,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --time=9:00:00
-#SBATCH --mem=64G
+#SBATCH --time=6:00:00
+#SBATCH --mem=32G
 
 ## xintNMF with regularization 
 
