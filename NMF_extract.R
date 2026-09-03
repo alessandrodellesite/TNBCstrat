@@ -35,14 +35,14 @@ save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/rna_nmf/coe
 estim.r_meth <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/NMF_rank_estimation_meth.rds")
 res_meth     <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/NMF_final_results_meth.rds")
 
-ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_meth/meth_nmf/estim.png",
+ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/meth_nmf/estim.png",
        plot = plot(estim.r_meth),
        width = 10, height = 5, dpi = 300)
 
-save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_meth/meth_nmf/consensus.png",
+save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/meth_nmf/consensus.png",
              function() consensusmap(res_meth))
 
-save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_meth/meth_nmf/coef.png",
+save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/meth_nmf/coef.png",
              function() coefmap(res_meth))
 
 
@@ -52,12 +52,12 @@ save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_meth/meth_nmf/c
 estim.r_cnv <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/NMF_rank_estimation_cnv.rds")
 res_cnv     <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/NMF_final_results_cnv.rds")
 
-ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_cnv/cnv_nmf/estim.png",
+ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/cnv_nmf/estim.png",
        plot = plot(estim.r_cnv),
        width = 10, height = 5, dpi = 300)
 
-save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_cnv/cnv_nmf/consensus.png",
+save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/cnv_nmf/consensus.png",
              function() consensusmap(res_cnv))
 
-save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_cnv/cnv_nmf/coef.png",
+save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/cnv_nmf/coef.png",
              function() coefmap(res_cnv))
