@@ -1,21 +1,27 @@
 library(NMF)
-dir <- "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna"
-estim.r <- readRDS("NMF_rank_estimation_RNAseq.rds")
-res     <- readRDS("NMF_final_results_RNAseq.rds")
+library(ggplot2)
 
-plot(estim.r)
+dir_rna <- "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna"
+dir_meth <- "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth"
+dir_cnv <- "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv"
 
-consensusmap(res)
-coefmap(res)
+#rna
+estim.r_rna <- readRDS("NMF_rank_estimation_RNAseq.rds")
+res_rna     <- readRDS("NMF_final_results_RNAseq.rds")
 
-sample_groups <- predict(res)
-table(sample_groups)
+ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/rna_nmf/estim.png",
+      plot= plot(estim.r_rna),
+      width=10, height=5, dpi= 300 )
+
+ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/rna_nmf/consensus.png",
+      plot= consensusmap(res_rna),
+      width=10, height=5, dpi= 300 )
+ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/rna_nmf/coef.png",
+      plot= coefmap(res_rna),
+      width=10, height=5, dpi= 300 )
+
+sample_groups_rna <- predict(res_rna)
+table(sample_groups_rna)
 
 
-# Convert to a data frame for saving
-export_groups <- data.frame(
-  SampleID = names(sample_groups),
-  Cluster = as.vector(sample_groups)
-)
-write.csv(export_groups, "rnaseq_nmf_clusters.csv", row.names = FALSE)
 
