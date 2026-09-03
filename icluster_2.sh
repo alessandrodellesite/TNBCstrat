@@ -8,10 +8,10 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --time=30:00      
-#SBATCH --mem=5G            
+#SBATCH --mem=2G            
 
-IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_icluster_2.R"
+IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image_new.sif"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/NMF_extract.R"
 
 # singularity execution
 srun singularity exec \
