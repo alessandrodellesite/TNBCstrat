@@ -51,12 +51,20 @@ if (length(missing_ids) > 0) {
 cat("Subsample size:", length(sample_ids_sub), "\n")
 
 ## Fixed K / lambda from original tuning
-fixed_lambda_2_cl <- c(0.11621622, 0.08918919, 0.60810811) # output[[1]]$lambda[minBICid[1],] -> for k=1 (2 clusters)
-fixed_lambda_3_cl <- c(0.31081081, 0.14864865, 0.06216216) # output[[2]]$lambda[minBICid[2],] -> for k=2 (3 clusters)
-fixed_lambda_4_cl <- c(0.15405405, 0.07297297, 0.02972973) # output[[3]]$lambda[minBICid[3],] -> for k=3 (4 clusters)
 
-fixed_k      <- 1
-fixed_lambda <- fixed_lambda_2_cl
+#old values
+#fixed_lambda_2_cl <- c(0.11621622, 0.08918919, 0.60810811) # output[[1]]$lambda[minBICid[1],] -> for k=1 (2 clusters)
+#fixed_lambda_3_cl <- c(0.31081081, 0.14864865, 0.06216216) # output[[2]]$lambda[minBICid[2],] -> for k=2 (3 clusters)
+#fixed_lambda_4_cl <- c(0.15405405, 0.07297297, 0.02972973) # output[[3]]$lambda[minBICid[3],] -> for k=3 (4 clusters)
+
+#new values
+fixed_lambda_2_cl <- c(0.716216216, 0.689189189, 0.008108108) # output[[1]]$lambda[minBICid[1],] -> for k=1 (2 clusters)
+fixed_lambda_3_cl <- c(0.15405405, 0.07297297, 0.02972973) # output[[2]]$lambda[minBICid[2],] -> for k=2 (3 clusters)
+fixed_lambda_4_cl <- c(0.07837838, 0.10540541, 0.18648649) # output[[3]]$lambda[minBICid[3],] -> for k=3 (4 clusters)
+
+
+fixed_k      <- 2
+fixed_lambda <- fixed_lambda_3_cl
 cat("Using K =", fixed_k, "| lambda =", paste(round(fixed_lambda, 4), collapse = ", "), "\n")
 
 ## Subset by sample ID 
