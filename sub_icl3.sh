@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=icluster3_boot
 #SBATCH --output=logs/icluster2_boot_%A_%a.out
-#SBATCH --array=1-1000%15
+#SBATCH --array=1-100%10
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
@@ -9,7 +9,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2 
 #SBATCH --time=30:00      
-#SBATCH --mem=20G       
+#SBATCH --mem=2G       
 
 mkdir -p logs 
 
