@@ -1,6 +1,7 @@
 # NMF on feature selected single-omic data
 
-
+Sys.unsetenv("_R_CHECK_TIMINGS_")
+Sys.unsetenv("_R_CHECK_CRAN_INCOMING_")
 library(NMF)
 
 
