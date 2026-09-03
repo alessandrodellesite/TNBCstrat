@@ -1,9 +1,8 @@
 library(NMF)
-dir <- ""
+dir <- "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna"
 estim.r <- readRDS("NMF_rank_estimation_RNAseq.rds")
 res     <- readRDS("NMF_final_results_RNAseq.rds")
 
-library(NMF)
 plot(estim.r)
 
 consensusmap(res)
