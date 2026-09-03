@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=NMF_singleomics
 #SBATCH --output=NMF_singleomics%j.log
-#SBATCH --partition=short
+#SBATCH --partition=long
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=30
-#SBATCH --time=8:00:00      
-#SBATCH --mem=90G            
+#SBATCH --time=24:00:00      
+#SBATCH --mem=50G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
 SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/NMF_all_singleomics.R"
