@@ -79,7 +79,7 @@ rownames(annotation_col) <- colnames(plot_matrix)
 
 
 # Caricamento dei file di cluster alternativi (Methyl, CNV, ecc.)
-methyl_probes      <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/meth_nmf_clusters.csv")
+methyl_probes      <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters.csv")
 cnv_data_clusters  <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/cnv_nmf_clusters.csv")
 
 # Caricamento del file Excel dei metadati clinici
