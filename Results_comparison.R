@@ -32,7 +32,7 @@ if(any(is.na(dt_matrix))) {
 # DEA of of genes' expression between NMF clusters from RNAseq 
 
 ```{r}
-cluster_data <- read.csv("rnaseq_nmf_clusters.csv")
+cluster_data <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/rna_nmf_clusters.csv")
 cluster_data <- cluster_data[match(colnames(dt_matrix), cluster_data$SampleID), ]
 # Create the factor and design matrix
 groups <- factor(cluster_data$Cluster) 
