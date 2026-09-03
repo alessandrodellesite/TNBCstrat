@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=icl_2
 #SBATCH --output=icl_2%j.log
-#SBATCH --partition=long
+#SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
@@ -11,7 +11,7 @@
 #SBATCH --mem=2G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image_new.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/NMF_extract.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Results_comparison.R"
 
 # singularity execution
 srun singularity exec \
