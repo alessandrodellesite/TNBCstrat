@@ -38,10 +38,8 @@ for(i in 1:nK){
 #x-axis: k clusters; y-axis: % explained variation by each cluster
 #pick the K after which the curve plateaus (adding an additional cluster doesn't lead to an improvement in % explained variation) 
 
-plot(1:(nK + 1), c(0, devRatMinBIC), type = "b", pch = 19, col = "blue",
-     xlab = "Number of Clusters (K + 1)",
-     ylab = "% Explained Variation",
-     main = "Model Selection")
+
+#plot(1:(nK + 1), c(0, devRatMinBIC), type = "b", pch = 19, col = "blue", xlab = "Number of Clusters (K + 1)", ylab = "% Explained Variation", main = "Model Selection")
 
 #%explained variance table
 var_table <- data.frame(
