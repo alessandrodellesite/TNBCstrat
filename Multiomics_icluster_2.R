@@ -58,20 +58,20 @@ clusters = getClusters(output)
 best_cluster = clusters[, 2]
 best_fit = output[[2]]$fit[[minBICid[2]]]
 cat("fit for 3 clusters (output[[2]]$fit[[minBICid[2]]]):", best_fit)
-lamda_3 <- output[[2]]$lambda[minBICid[2],]
+lambda_3 <- output[[2]]$lambda[minBICid[2],]
 cat("lambda values for 3 clusters:", lambda_3)
 
 #4 clusters
 best_cluster_4 = clusters[, 3] 
 best_fit_4 = output[[3]]$fit[[minBICid[3]]]
 cat("fit for 4 clusters (output[[3]]$fit[[minBICid[3]]])", best_fit_4)
-lamda_4 <- output[[3]]$lambda[minBICid[3],]
+lambda_4 <- output[[3]]$lambda[minBICid[3],]
 cat("lambda values for 3 clusters:", lambda_4)
 
 #2 clusters
 best_cluster_2 = clusters[, 1] 
 best_fit_2 = output[[1]]$fit[[minBICid[1]]]
 cat("fit for 2 clusters (output[[1]]$fit[[minBICid[1]]])", best_fit_2)
-lamda_2 <- output[[1]]$lambda[minBICid[1],]
+lambda_2 <- output[[1]]$lambda[minBICid[1],]
 cat("lambda values for 2 clusters:", lambda_2)
 
