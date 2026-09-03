@@ -84,7 +84,6 @@ cnv_data_clusters  <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf
 
 # Caricamento del file Excel dei metadati clinici
 dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
-
 # METADATA ALIGNMENT & PREPROCESSING
 
 colonna_id_excel <- "PD_ID" 
