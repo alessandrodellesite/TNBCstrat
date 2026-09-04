@@ -108,6 +108,20 @@ print(lambda_5)
 
 # Save clustering results
 
+sample_ids <- rownames(rna_scaled)
+
+export_3 <- data.frame(
+  SampleID = names(km4$cluster),
+  Cluster  = best_cluster
+)
+write.csv(export_3, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_2.csv", row.names = FALSE)
+
+export_3 <- data.frame(
+  SampleID = names(km4$cluster),
+  Cluster  = best_cluster
+)
+write.csv(export_3, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_2.csv", row.names = FALSE)
+
 export_3 <- data.frame(
   SampleID = names(km4$cluster),
   Cluster  = best_cluster
