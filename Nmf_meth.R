@@ -23,6 +23,7 @@ probes_to_keep <- ann$Name[keep_autosomes & keep_cpg]
 probes_filtered <- adjusted_data[rownames(adjusted_data) %in% probes_to_keep, ]
 met_filtered <- as.matrix(probes_filtered)
 
+rna_data <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.rds")
 common_samples <- intersect(colnames(met_filtered), colnames(rna_data))
 met_filtered   <- met_filtered[, common_samples]
 
