@@ -80,6 +80,7 @@ rownames(annotation_col) <- colnames(plot_matrix)
 
 # Caricamento dei file di cluster alternativi (Methyl, CNV, ecc.)
 methyl_probes      <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters.csv")
+methyl_probes_4    <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters_4_clusters.csv")
 cnv_data_clusters  <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/cnv_nmf_clusters.csv")
 
 # Caricamento del file Excel dei metadati clinici
@@ -170,8 +171,10 @@ mofa_clusters_4 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output
 
 
 
+
 # Vectors to map cluster to samples
-methyl_map_probes <- setNames(methyl_probes$Cluster,       methyl_probes$SampleID)
+methyl_map_probes <- setNames(methyl_probes$Cluster, methyl_probes$SampleID)
+                                 #aggiungi map 4 methyl
 cnv_map <- setNames(cnv_data_clusters$Cluster, cnv_data_clusters$SampleID)
 mofa_map_2 <- setNames(mofa_clusters_2$Cluster, mofa_clusters_2$SampleID)
 mofa_map_3 <- setNames(mofa_clusters_3$Cluster, mofa_clusters_3$SampleID)
