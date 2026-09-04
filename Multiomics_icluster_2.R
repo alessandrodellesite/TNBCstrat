@@ -108,22 +108,31 @@ print(lambda_5)
 
 # Save clustering results
 
+data_dir <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics/input_data/icluster_inputdata/"
+rna_scaled  <- readRDS(file.path(data_dir, "rna_icluster.rds"))
 sample_ids <- rownames(rna_scaled)
 
-export_3 <- data.frame(
-  SampleID = names(km4$cluster),
-  Cluster  = best_cluster
+export_2 <- data.frame(
+  SampleID = sample_ids,
+  Cluster  = best_cluster_2
 )
-write.csv(export_3, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_2.csv", row.names = FALSE)
+write.csv(export_2, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_2.csv", row.names = FALSE)
 
 export_3 <- data.frame(
-  SampleID = names(km4$cluster),
+  SampleID = sample_ids,
   Cluster  = best_cluster
 )
-write.csv(export_3, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_2.csv", row.names = FALSE)
+write.csv(export_3, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_3.csv", row.names = FALSE)
 
-export_3 <- data.frame(
-  SampleID = names(km4$cluster),
-  Cluster  = best_cluster
+export_4 <- data.frame(
+  SampleID = sample_ids,
+  Cluster  = best_cluster_4
 )
-write.csv(export_3, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_2.csv", row.names = FALSE)
+write.csv(export_4, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_4.csv", row.names = FALSE)
+
+export_5 <- data.frame(
+  SampleID = sample_ids,
+  Cluster  = best_cluster_5
+)
+write.csv(export_5, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_5.csv", row.names = FALSE)
+
