@@ -169,12 +169,14 @@ mofa_clusters_2 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output
 mofa_clusters_3 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_3.csv")
 mofa_clusters_4 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_4.csv")
 
-
-
+                                 
+XintNMF_clusters_2 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/clusters_results/xintNMF_clusters_k2_reg.csv")                    
+XintNMF_clusters_3 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/clusters_results/xintNMF_clusters_k3_reg.csv")
+XintNMF_clusters_4 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/clusters_results/xintNMF_clusters_k4_reg.csv")                                
 
 # Vectors to map cluster to samples
 methyl_map_probes <- setNames(methyl_probes$Cluster, methyl_probes$SampleID)
-                                 #aggiungi map 4 methyl
+methyl_map_probes_4 <- setNames(methyl_probes_4$Cluster, methyl_probes_4$SampleID)
 cnv_map <- setNames(cnv_data_clusters$Cluster, cnv_data_clusters$SampleID)
 mofa_map_2 <- setNames(mofa_clusters_2$Cluster, mofa_clusters_2$SampleID)
 mofa_map_3 <- setNames(mofa_clusters_3$Cluster, mofa_clusters_3$SampleID)
