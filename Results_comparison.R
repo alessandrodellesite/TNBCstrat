@@ -201,7 +201,7 @@ annotation_col_meth <- data.frame(
   #CNV_rnaseq             = factor(cnv_rnaseq_map[colnames(plot_matrix)]),
   MOFA_2                 = factor(mofa_map_2[colnames(plot_matrix)]),
   MOFA_3                 = factor(mofa_map_3[colnames(plot_matrix)]),
-  MOFA_4                 = factor(mofa_map_4[colnames(plot_matrix)]),
+  MOFA_4                 = factor(mofa_map_4[colnames(plot_matrix)])
   #SNF_2                  = factor(SNF_map_2[colnames(plot_matrix)]),
   #SNF_3                  = factor(SNF_map_3[colnames(plot_matrix)]),
   #SNF_4                  = factor(SNF_map_4[colnames(plot_matrix)]),
