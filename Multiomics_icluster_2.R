@@ -39,7 +39,18 @@ for(i in 1:nK){
 #pick the K after which the curve plateaus (adding an additional cluster doesn't lead to an improvement in % explained variation) 
 
 
-#plot(1:(nK + 1), c(0, devRatMinBIC), type = "b", pch = 19, col = "blue", xlab = "Number of Clusters (K + 1)", ylab = "% Explained Variation", main = "Model Selection")
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/elbow_plot.png",
+    width = 10, height = 5, units = "in", res = 300)
+
+plot(1:(nK + 1), 
+     c(0, devRatMinBIC), 
+     type = "b", pch = 19, 
+     col = "blue", 
+     xlab = "Number of Clusters (K + 1)", 
+     ylab = "% Explained Variation", 
+     main = "Model Selection")
+
+dev.off()
 
 #%explained variance table
 var_table <- data.frame(
@@ -52,13 +63,22 @@ print(var_table)
 
 clusters = getClusters(output)
 
+#2 clusters
+best_cluster_2 = clusters[, 1] 
+best_fit_2 = output[[1]]$fit[[minBICid[1]]]
+#cat("fit for 2 clusters (output[[1]]$fit[[minBICid[1]]]):\n")
+#print(best_fit_2)
+lambda_2 <- output[[1]]$lambda[minBICid[1],]
+print("best lambda values for 2 clusters (lowest BIC):\n")
+print(lambda_2)
+
 #3 clusters
 best_cluster = clusters[, 2]
 best_fit = output[[2]]$fit[[minBICid[2]]]
 #cat("fit for 3 clusters (output[[2]]$fit[[minBICid[2]]]):\n")
 #print(best_fit)
 lambda_3 <- output[[2]]$lambda[minBICid[2],]
-print("lambda values for 3 clusters:\n")
+print("best lambda values for 3 clusters (lowest BIC)")
 print(lambda_3)
 
 #4 clusters
@@ -67,15 +87,29 @@ best_fit_4 = output[[3]]$fit[[minBICid[3]]]
 #cat("fit for 4 clusters (output[[3]]$fit[[minBICid[3]]]):\n")
 #print(best_fit_4)
 lambda_4 <- output[[3]]$lambda[minBICid[3],]
-print("lambda values for 4 clusters:\n")
+print("best lambda values for 4 clusters (lowest BIC)")
 print(lambda_4)
 
-#2 clusters
-best_cluster_2 = clusters[, 1] 
-best_fit_2 = output[[1]]$fit[[minBICid[1]]]
-#cat("fit for 2 clusters (output[[1]]$fit[[minBICid[1]]]):\n")
-#print(best_fit_2)
-lambda_2 <- output[[1]]$lambda[minBICid[1],]
-print("lambda values for 2 clusters:\n")
-print(lambda_2)
+#5 clusters
+best_cluster_5 = clusters[, 4] 
+best_fit_5 = output[[4]]$fit[[minBICid[4]]]
+#cat("fit for 5 clusters (output[[4]]$fit[[minBICid[4]]]):\n")
+#print(best_fit_5)
+lambda_5 <- output[[4]]$lambda[minBICid[4],]
+print("best lambda values for 5 clusters (lowest BIC)")
+print(lambda_5)
 
+
+# HEATMAPS
+
+
+# EXTRACT MATRIX SPACE
+
+
+# Save clustering results
+
+export_3 <- data.frame(
+  SampleID = names(km4$cluster),
+  Cluster  = best_cluster
+)
+write.csv(export_3, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_2.csv", row.names = FALSE)
