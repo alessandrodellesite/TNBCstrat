@@ -11,7 +11,7 @@
 #SBATCH --mem=30G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Nmf_meth.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/extract_meth.R"
 
 # singularity execution
 srun singularity exec \
