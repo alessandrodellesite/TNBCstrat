@@ -10,9 +10,7 @@ save_nmf_map <- function(filename, plot_fun, width = 10, height = 5, res = 300) 
   dev.off()
 }
 
-# ==============================================================================
 # RNA
-# ==============================================================================
 estim.r_rna <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/NMF_rank_estimation_RNAseq.rds")
 res_rna     <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/NMF_final_results_RNAseq.rds")
 
@@ -29,9 +27,7 @@ save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/rna_nmf/coe
              function() coefmap(res_rna))
 
 
-# ==============================================================================
 # METH
-# ==============================================================================
 estim.r_meth <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/NMF_rank_estimation_meth.rds")
 res_meth     <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/NMF_final_results_meth.rds")
 
@@ -46,9 +42,8 @@ save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/meth_nmf/co
              function() coefmap(res_meth))
 
 
-# ==============================================================================
+
 # CNV
-# ==============================================================================
 estim.r_cnv <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/NMF_rank_estimation_cnv.rds")
 res_cnv     <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/NMF_final_results_cnv.rds")
 
