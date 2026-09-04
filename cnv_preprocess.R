@@ -214,7 +214,7 @@ cat("Genes overlapping >1 segment in >10% of samples:",
 
 head(multi_seg_summary, 20)
 
-# How many NAs were introduced by discordance
+# How many NAs were introduced 
 cat("NA values in dna_matrix:", sum(is.na(dna_matrix)), "\n")
 cat("Proportion NA:", round(mean(is.na(dna_matrix)), 4), "\n")
 
