@@ -1,6 +1,7 @@
-library(factoextra)
 library(readxl)
 library(dplyr)
+library(cluster)
+library(ggplot2)
 #reticulate::py_install("mofapy2", pip = TRUE)
 #reticulate::py_module_available("mofapy2")
 library(MOFA2)
@@ -117,30 +118,67 @@ round(factors_r2, 2)
 factors_matrix <- do.call(rbind, get_factors(MOFAobject, factors = "all")) #to compress into a single matrix
 factors_to_use <- factors_matrix[, 1:6] # choose the factors to include based previous chunck (at least one variance over 2.5)
 
+library(cluster)
+library(ggplot2)
 
-set.seed(123) 
-elbow_plot <- factoextra::fviz_nbclust(factors_to_use, kmeans, method = "wss")
-#print(elbow_plot)
-ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/elbow_plot.png",
-       plot = elbow_plot,
-       width = 10, height = 5, dpi = 300)
+out_dir <- "/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa"
 
-
-#Silhouette method on MOFA factors
+# Elbow (WSS) method 
 set.seed(123)
-silhouette_plot <- factoextra::fviz_nbclust(factors_to_use, kmeans, method = "silhouette", nstart = 50, iter.max = 100)
+k_range <- 1:10
+wss <- sapply(k_range, function(k) {
+  kmeans(factors_to_use, centers = k, nstart = 50)$tot.withinss
+})
+elbow_df <- data.frame(k = k_range, wss = wss)
 
-ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/silhouette.png",
-       plot = silhouette_plot,
-       width = 10, height = 5, dpi = 300)
+elbow_plot <- ggplot(elbow_df, aes(x = k, y = wss)) +
+  geom_line() + geom_point() +
+  labs(x = "Number of clusters k",
+       y = "Total Within Sum of Square",
+       title = "Optimal number of clusters") +
+  theme_minimal()
 
-#Gap Statistic method
+ggsave(file.path(out_dir, "elbow_plot.png"),
+       plot = elbow_plot, width = 10, height = 5, dpi = 300)
+
+# Silhouette method
 set.seed(123)
-gap_stat <- factoextra::fviz_nbclust(factors_to_use, kmeans, method = "gap_stat", nstart = 50, nboot = 500)
+k_range_sil <- 2:10  # silhouette undefined for k = 1
+sil_width <- sapply(k_range_sil, function(k) {
+  km <- kmeans(factors_to_use, centers = k, nstart = 50, iter.max = 100)
+  mean(silhouette(km$cluster, dist(factors_to_use))[, "sil_width"])
+})
+sil_df <- data.frame(k = k_range_sil, sil = sil_width)
 
-ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/gap_stat.png",
-       plot = gap_stat,
-       width = 10, height = 5, dpi = 300)
+silhouette_plot <- ggplot(sil_df, aes(x = k, y = sil)) +
+  geom_line() + geom_point() +
+  labs(x = "Number of clusters k",
+       y = "Average silhouette width",
+       title = "Optimal number of clusters") +
+  theme_minimal()
+
+ggsave(file.path(out_dir, "silhouette.png"),
+       plot = silhouette_plot, width = 10, height = 5, dpi = 300)
+
+# Gap Statistic method 
+set.seed(123)
+gap_stat <- clusGap(factors_to_use,
+                     FUN = kmeans, nstart = 50,
+                     K.max = 10, B = 500)
+
+gap_df <- as.data.frame(gap_stat$Tab)
+gap_df$k <- seq_len(nrow(gap_df))
+
+gap_plot <- ggplot(gap_df, aes(x = k, y = gap)) +
+  geom_line() + geom_point() +
+  geom_errorbar(aes(ymin = gap - SE.sim, ymax = gap + SE.sim), width = 0.2) +
+  labs(x = "Number of clusters k",
+       y = "Gap statistic",
+       title = "Optimal number of clusters") +
+  theme_minimal()
+
+ggsave(file.path(out_dir, "gap_stat.png"),
+       plot = gap_plot, width = 10, height = 5, dpi = 300)
 
 saveRDS(factors_to_use, file = "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_factors.rds")
 
