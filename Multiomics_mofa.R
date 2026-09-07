@@ -223,40 +223,6 @@ write.csv(export_mofa_clusters_4, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/
 # Add sample metadata 
 dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
 
-# MOFA strictly requires sample column named 'sample' 
-dt_metadata <- dt_metadata %>% 
-  rename(sample = PD_ID)
-
-# check if all samples in mofa object == metadata file
-mofa_samples <- unlist(samples_names(MOFAobject))
-missing_metadata <- setdiff(mofa_samples, dt_metadata$sample)
-
-# filter the metadata so it only includes the samples present in mofa model
-dt_metadata_cleaned <- dt_metadata %>% 
-  filter(sample %in% mofa_samples)
-
-# inject the metadata into the model
-samples_metadata(MOFAobject) <- as.data.frame(dt_metadata_cleaned)
-
-# Association analysis: test association between MOFA factors and some metadata
-
-png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/association.png",
-    width = 10, height = 8, units = "in", res = 300)
-correlate_factors_with_covariates(MOFAobject, 
-  covariates = c("TMB","TILs","Age","ASCAT_PLOIDY","CibersortX.Tcell", 
-  "CibersortX.Bcell",
-  "CibersortX.macrophage",
-  "CibersortX.stroma", 
-  "CibersortX.endothelial", 
-  "CibersortX.epithelial"), 
-  plot="log_pval"
-)
-dev.off()
-
-
-# Add sample metadata 
-dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
-
 # MOFA strictly requires sample column named 'sample'
 dt_metadata <- dt_metadata %>% 
   rename(sample = PD_ID)
