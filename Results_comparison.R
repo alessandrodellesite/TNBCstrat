@@ -215,7 +215,7 @@ annotation_col_meth <- data.frame(
   CNV                    = factor(cnv_map[colnames(plot_matrix)]),
   MOFA_2                 = factor(mofa_map_2[colnames(plot_matrix)]),
   MOFA_3                 = factor(mofa_map_3[colnames(plot_matrix)]),
-  MOFA_4                 = factor(mofa_map_4[colnames(plot_matrix)])
+  MOFA_4                 = factor(mofa_map_4[colnames(plot_matrix)]),
   SNF_2                  = factor(SNF_map_2[colnames(plot_matrix)]),
   SNF_3                  = factor(SNF_map_3[colnames(plot_matrix)]),
   SNF_4                  = factor(SNF_map_4[colnames(plot_matrix)]),
@@ -241,7 +241,7 @@ ann_colors_meth = list(
   CNV             = c("1" = "#ff7675", "2" = "#74b9ff", "3" = "#fdcb6e"), 
   MOFA_2          = c("1" = "#ffeaa7", "2" = "#0984E3"),
   MOFA_3          = c("1" = "#0984E3", "2" = "#9b59b6", "3" = "#ffeaa7"),
-  MOFA_4          = c("1" = "#9b59b6", "2" = "#ffeaa7", "3" = "#0984E3", "4" = "#ff7f98")
+  MOFA_4          = c("1" = "#9b59b6", "2" = "#ffeaa7", "3" = "#0984E3", "4" = "#ff7f98"),
   icluster_2      = c("1" = "#27ae33", "2" = "#e1b99c"),
   icluster_3      = c("1" = "#27ae33", "2" = "#e1b99c", "3" = "#4c5ce1"),
   icluster_4      = c("1" = "#4c5ce1", "2" = "#e1b99c", "3" = "#ff6f11", "4" = "#27ae33"),
