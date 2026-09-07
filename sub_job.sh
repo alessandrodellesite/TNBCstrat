@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=icl_multiomics
-#SBATCH --output=icl_mult%j.log
+#SBATCH --job-name=xint_multiomics
+#SBATCH --output=xint_mult%j.log
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
@@ -11,7 +11,7 @@
 #SBATCH --mem=5G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image_new.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_icluster_2.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_xintnmf_reg_2.R"
 
 # singularity execution
 srun singularity exec \
