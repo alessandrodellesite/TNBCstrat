@@ -169,10 +169,21 @@ mofa_clusters_2 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output
 mofa_clusters_3 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_3.csv")
 mofa_clusters_4 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_4.csv")
 
+#icluster
+icluster_2 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_2.csv")
+icluster_3 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_3.csv")                                
+icluster_4 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_4.csv")
+icluster_5 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_5.csv")
                                  
-XintNMF_clusters_2 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/clusters_results/xintNMF_clusters_k2_reg.csv")                    
-XintNMF_clusters_3 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/clusters_results/xintNMF_clusters_k3_reg.csv")
-XintNMF_clusters_4 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/clusters_results/xintNMF_clusters_k4_reg.csv")                                
+#snf
+SNF_clusters_2 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_snf/snf_clusters_2.csv")
+SNF_clusters_3 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_snf/snf_clusters_3.csv")                                
+SNF_clusters_4 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_snf/snf_clusters_4.csv")
+                                 
+#xintnmf                                 
+XintNMF_clusters_2 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k2_reg.csv")                    
+XintNMF_clusters_3 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k3_reg.csv")
+XintNMF_clusters_4 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k4_reg.csv")                                
 
 # Vectors to map cluster to samples
 methyl_map_probes <- setNames(methyl_probes$Cluster, methyl_probes$SampleID)
@@ -181,44 +192,43 @@ cnv_map <- setNames(cnv_data_clusters$Cluster, cnv_data_clusters$SampleID)
 mofa_map_2 <- setNames(mofa_clusters_2$Cluster, mofa_clusters_2$SampleID)
 mofa_map_3 <- setNames(mofa_clusters_3$Cluster, mofa_clusters_3$SampleID)
 mofa_map_4 <- setNames(mofa_clusters_4$Cluster, mofa_clusters_4$SampleID)
-#SNF_map_2 <- setNames(SNF_clusters_2$Cluster, SNF_clusters_2$SampleID)
-#SNF_map_3 <- setNames(SNF_clusters_3$Cluster, SNF_clusters_3$SampleID)
-#SNF_map_4 <- setNames(SNF_clusters_4$Cluster, SNF_clusters_4$SampleID)
+SNF_map_2 <- setNames(SNF_clusters_2$Cluster, SNF_clusters_2$SampleID)
+SNF_map_3 <- setNames(SNF_clusters_3$Cluster, SNF_clusters_3$SampleID)
+SNF_map_4 <- setNames(SNF_clusters_4$Cluster, SNF_clusters_4$SampleID)
 #xint_map_2 <- setNames(XintNMF_clusters_2$Cluster, XintNMF_clusters_2$SampleID)
 #xint_map_3 <- setNames(XintNMF_clusters_3$Cluster, XintNMF_clusters_3$SampleID)
 #xint_map_4 <- setNames(XintNMF_clusters_4$Cluster, XintNMF_clusters_4$SampleID)
-#xint_map_2_reg <- setNames(XintNMF_clusters_2_reg$Cluster, XintNMF_clusters_2_reg$SampleID)
-#xint_map_3_reg <- setNames(XintNMF_clusters_3_reg$Cluster, XintNMF_clusters_3_reg$SampleID)
-#xint_map_4_reg <- setNames(XintNMF_clusters_4_reg$Cluster, XintNMF_clusters_4_reg$SampleID)
-#icluster_map_2 <- setNames(icluster_2$Cluster, icluster_2$SampleID)
-#icluster_map_3 <- setNames(icluster_3$Cluster, icluster_3$SampleID)
-#icluster_map_4 <- setNames(icluster_4$Cluster, icluster_4$SampleID)
-
+xint_map_2_reg <- setNames(XintNMF_clusters_2_reg$Cluster, XintNMF_clusters_2_reg$SampleID)
+xint_map_3_reg <- setNames(XintNMF_clusters_3_reg$Cluster, XintNMF_clusters_3_reg$SampleID)
+xint_map_4_reg <- setNames(XintNMF_clusters_4_reg$Cluster, XintNMF_clusters_4_reg$SampleID)
+icluster_map_2 <- setNames(icluster_2$Cluster, icluster_2$SampleID)
+icluster_map_3 <- setNames(icluster_3$Cluster, icluster_3$SampleID)
+icluster_map_4 <- setNames(icluster_4$Cluster, icluster_4$SampleID)
+icluster_map_5 <- setNames(icluster_5$Cluster, icluster_5$SampleID)
+                                 
 # Allineiamo tutti i cluster alle colonne di plot_matrix
 annotation_col_meth <- data.frame(
   RNAseq                 = factor(cluster_data$Cluster[sample_order]),
   #RNAseq_1000            = factor(rna_1000_map[colnames(plot_matrix)]),
-  #Methyl_genes           = factor(methyl_map[colnames(plot_matrix)]),
-  #Methyl_genes_en        = factor(methyl_map_en[colnames(plot_matrix)]),
-  #Methyl_genes_pr        = factor(methyl_map_pr[colnames(plot_matrix)]),
   Methyl_probes          = factor(methyl_map_probes[colnames(plot_matrix)]),
+  Methyl_probes_4          = factor(methyl_map_probes_4[colnames(plot_matrix)]),
   CNV                    = factor(cnv_map[colnames(plot_matrix)]),
-  #CNV_rnaseq             = factor(cnv_rnaseq_map[colnames(plot_matrix)]),
   MOFA_2                 = factor(mofa_map_2[colnames(plot_matrix)]),
   MOFA_3                 = factor(mofa_map_3[colnames(plot_matrix)]),
   MOFA_4                 = factor(mofa_map_4[colnames(plot_matrix)])
-  #SNF_2                  = factor(SNF_map_2[colnames(plot_matrix)]),
-  #SNF_3                  = factor(SNF_map_3[colnames(plot_matrix)]),
-  #SNF_4                  = factor(SNF_map_4[colnames(plot_matrix)]),
-  #icluster_2             = factor(icluster_map_2[colnames(plot_matrix)]),
-  #icluster_3             = factor(icluster_map_3[colnames(plot_matrix)]),
- # icluster_4             = factor(icluster_map_4[colnames(plot_matrix)]),
+  SNF_2                  = factor(SNF_map_2[colnames(plot_matrix)]),
+  SNF_3                  = factor(SNF_map_3[colnames(plot_matrix)]),
+  SNF_4                  = factor(SNF_map_4[colnames(plot_matrix)]),
+  icluster_2             = factor(icluster_map_2[colnames(plot_matrix)]),
+  icluster_3             = factor(icluster_map_3[colnames(plot_matrix)]),
+  icluster_4             = factor(icluster_map_4[colnames(plot_matrix)]),
+  icluster_5             = factor(icluster_map_5[colnames(plot_matrix)]),
   #Xint2                  = factor(xint_map_2[colnames(plot_matrix)]),
  # Xint3                  = factor(xint_map_3[colnames(plot_matrix)]),
  # Xint4                  = factor(xint_map_4[colnames(plot_matrix)]),
- # Xint2_reg                  = factor(xint_map_2_reg[colnames(plot_matrix)]),
-  #Xint3_reg                  = factor(xint_map_3_reg[colnames(plot_matrix)]),
-  #Xint4_reg                  = factor(xint_map_4_reg[colnames(plot_matrix)])
+  Xint2_reg                  = factor(xint_map_2_reg[colnames(plot_matrix)]),
+  Xint3_reg                  = factor(xint_map_3_reg[colnames(plot_matrix)]),
+  Xint4_reg                  = factor(xint_map_4_reg[colnames(plot_matrix)])
   )
 
 
@@ -232,7 +242,17 @@ ann_colors_meth = list(
   MOFA_2          = c("1" = "#ffeaa7", "2" = "#0984E3"),
   MOFA_3          = c("1" = "#0984E3", "2" = "#9b59b6", "3" = "#ffeaa7"),
   MOFA_4          = c("1" = "#9b59b6", "2" = "#ffeaa7", "3" = "#0984E3", "4" = "#ff7f98")
-)
+  icluster_2      = c("1" = "#27ae33", "2" = "#e1b99c"),
+  icluster_3      = c("1" = "#27ae33", "2" = "#e1b99c", "3" = "#4c5ce1"),
+  icluster_4      = c("1" = "#4c5ce1", "2" = "#e1b99c", "3" = "#ff6f11", "4" = "#27ae33"),
+  icluster_5      = c("1" = "#4c5ce1", "2" = "#e1b99c", "3" = "#ff6f11", "4" = "#27ae33", "5" = "#5B8E8A"),
+  SNF_2           = c("1" = "#ff7f50", "2" = "#008080"),
+  SNF_3           = c("1" = "#ff7f50", "2" = "#34495e", "3" = "#008080"),
+  SNF_4           = c("1" = "#ff7f50", "2" = "#008080", "3" = "#34495e", "4" = "#f1c40f"),
+  Xint2_reg           = c("1" = "#27ae60", "2" = "#e1b12c"),
+  Xint3_reg           = c("1" = "#27ae60", "2" = "#e1b12c", "3" = "#6c5ce7"),
+  Xint4_reg           = c("1" = "#27ae60", "2" = "#e1b12c", "3" = "#6c5ce7", "4" = "#ff6f99")
+)                                 
 
 # HEATMAP 
 
