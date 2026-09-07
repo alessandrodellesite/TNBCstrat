@@ -2,7 +2,7 @@ library(factoextra)
 library(readxl)
 library(dplyr)
 #reticulate::py_install("mofapy2", pip = TRUE)
-reticulate::py_module_available("mofapy2")
+#reticulate::py_module_available("mofapy2")
 library(MOFA2)
 
 # load data
