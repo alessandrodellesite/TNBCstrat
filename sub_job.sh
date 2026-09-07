@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=snf_multiomics
-#SBATCH --output=snf_multiomics%j.log
+#SBATCH --job-name=icl_multiomics
+#SBATCH --output=icl_mult%j.log
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=30
-#SBATCH --time=1:00:00      
-#SBATCH --mem=10G            
+#SBATCH --time=10:00      
+#SBATCH --mem=5G            
 
-IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_SNF.R"
+IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image_new.sif"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_icluster_2.R"
 
 # singularity execution
 srun singularity exec \
