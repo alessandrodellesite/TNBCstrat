@@ -125,6 +125,15 @@ dev.off()
 
 # Alluvial plot
 #visualizes the shifting of samples between your K=2 and K=4 solutions
+
+palette_K2 <- c("lightblue", "tomato")          
+palette_K4 <- c("#1b9e77", "#7570b9", "#2b5c8f", "#e7298a") 
+
+colors_K2 <- palette_K2[fused_groups_2]
+colors_K4 <- palette_K4[fused_groups_4]
+
+color_matrix <- cbind(colors_K2, colors_K4)
+colnames(color_matrix) <- c("2 Clusters", "4 Clusters")
 plotAlluvial(W_fused, clust.range = c(2, 4), col = color_matrix[, "2 Clusters"])
 
 png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/snf/alluvional_plot.png",
