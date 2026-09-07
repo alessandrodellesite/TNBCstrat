@@ -197,8 +197,7 @@ write.csv(export_mofa_clusters_4, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/
 
 
 # Add sample metadata 
-
-dt_metadata <- read_excel("ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
+dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
 
 # MOFA strictly requires sample column named 'sample' 
 dt_metadata <- dt_metadata %>% 
