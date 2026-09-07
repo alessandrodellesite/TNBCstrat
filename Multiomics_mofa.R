@@ -127,7 +127,7 @@ out_dir <- "/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa"
 set.seed(123)
 k_range <- 1:10
 wss <- sapply(k_range, function(k) {
-  kmeans(factors_to_use, centers = k, nstart = 50)$tot.withinss
+  kmeans(factors_to_use, centers = k, nstart = 50, iter.max = 100)$tot.withinss
 })
 
 png(file.path(out_dir, "elbow_plot.png"), width = 10, height = 5, units = "in", res = 300)
@@ -152,7 +152,7 @@ dev.off()
 
 # Gap Statistic method
 set.seed(123)
-gap_stat <- clusGap(factors_to_use, FUN = kmeans, nstart = 50, K.max = 10, B = 500)
+gap_stat <- clusGap(factors_to_use, FUN = kmeans, nstart = 50, iter.max = 100, K.max = 10, B = 500)
 gap_df <- as.data.frame(gap_stat$Tab)
 gap_df$k <- seq_len(nrow(gap_df))
 
@@ -171,9 +171,9 @@ saveRDS(factors_to_use, file = "/mnt/petasan_ccb/alessandro/SCANB/multiomics/out
 
 # Run k-means for all 3 options options
 set.seed(123)
-km2 <- kmeans(factors_to_use, centers = 2, nstart = 50)
-km3 <- kmeans(factors_to_use, centers = 3, nstart = 50)
-km4 <- kmeans(factors_to_use, centers = 4, nstart = 50)
+km2 <- kmeans(factors_to_use, centers = 2, nstart = 50, iter.max = 100)
+km3 <- kmeans(factors_to_use, centers = 3, nstart = 50, iter.max = 100)
+km4 <- kmeans(factors_to_use, centers = 4, nstart = 50, iter.max = 100)
 
 # Plot Factor 1 vs Factor 2 colored by the 2/3-cluster solution
 png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/factor1_2_km2.png",
