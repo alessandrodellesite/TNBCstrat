@@ -117,7 +117,10 @@ col.scheme[[2]] = bluered(256) # Methylation
 col.scheme[[3]] = colorpanel(256, low="blue", mid="white", high="red") # CNV
 
 # 2 clusters
-hm2 <- plotHeatmap(
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/heatmap_omics_2.png",
+    width = 10, height = 8, units = "in", res = 300)
+
+plotHeatmap(
   fit = best_fit_2, 
   datasets = list(rna_scaled, meth_scaled, cnv_scaled), 
   type = c("gaussian", "gaussian", "gaussian"),
@@ -128,16 +131,13 @@ hm2 <- plotHeatmap(
   plot.chr = c(FALSE, FALSE, FALSE), 
   cap = c(0, 0.99, 0.99)
 )
-
-png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/heatmap_omics_2.png", width = 10, height = 8, units = "in", res = 300)
-draw(hm2, 
-     heatmap_legend_side = "right", 
-     annotation_legend_side = "right"
-)
 dev.off()
 
 # 3 clusters
-hm3 <- plotHeatmap(
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/heatmap_omics_3.png",
+    width = 10, height = 8, units = "in", res = 300)
+
+plotHeatmap(
   fit = best_fit, 
   datasets = list(rna_scaled, meth_scaled, cnv_scaled), 
   type = c("gaussian", "gaussian", "gaussian"),
@@ -148,16 +148,14 @@ hm3 <- plotHeatmap(
   plot.chr = c(FALSE, FALSE, FALSE), 
   cap = c(0, 0.99, 0.99)
 )
-
-png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/heatmap_omics_3.png", width = 10, height = 8, units = "in", res = 300)
-draw(hm3, 
-     heatmap_legend_side = "right", 
-     annotation_legend_side = "right"
-)
 dev.off()
 
+
 # 4 clusters
-hm4 <- plotHeatmap(
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/heatmap_omics_4.png",
+    width = 10, height = 8, units = "in", res = 300)
+
+plotHeatmap(
   fit = best_fit_4, 
   datasets = list(rna_scaled, meth_scaled, cnv_scaled), 
   type = c("gaussian", "gaussian", "gaussian"),
@@ -168,16 +166,13 @@ hm4 <- plotHeatmap(
   plot.chr = c(FALSE, FALSE, FALSE), 
   cap = c(0, 0.99, 0.99)
 )
-
-png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/heatmap_omics_4.png", width = 10, height = 8, units = "in", res = 300)
-draw(hm4, 
-     heatmap_legend_side = "right", 
-     annotation_legend_side = "right"
-)
 dev.off()
 
 # 5 clusters
-hm5 <- plotHeatmap(
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/heatmap_omics_5.png",
+    width = 10, height = 8, units = "in", res = 300)
+
+plotHeatmap(
   fit = best_fit_5, 
   datasets = list(rna_scaled, meth_scaled, cnv_scaled), 
   type = c("gaussian", "gaussian", "gaussian"),
@@ -188,13 +183,8 @@ hm5 <- plotHeatmap(
   plot.chr = c(FALSE, FALSE, FALSE), 
   cap = c(0, 0.99, 0.99)
 )
-
-png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/heatmap_omics_5.png", width = 10, height = 8, units = "in", res = 300)
-draw(hm5, 
-     heatmap_legend_side = "right", 
-     annotation_legend_side = "right"
-)
 dev.off()
+
 
 
 # Feature extraction for each result
