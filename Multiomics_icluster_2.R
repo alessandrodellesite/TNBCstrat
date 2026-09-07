@@ -196,8 +196,8 @@ features_list <- list(
   CNV         = colnames(cnv_scaled)
 )
 
-# 2-clusters: extract significant features for all 2 layers
-sigfeatures_2 <- lapply(1:2, function(i) {
+# 2-clusters: extract significant features for all 3 layers
+sigfeatures_2 <- lapply(1:3, function(i) {
   # Calculate row sums of absolute lasso coefficients
   rowsum <- apply(abs(best_fit_2$beta[[i]]), 1, sum)
   
@@ -230,8 +230,8 @@ names(sigfeatures_3) <- c("RNAseq", "Methylation", "CNV")
 print("Feature extraction for 3-clusters solution")
 print(sapply(sigfeatures_3, length))
 
-# 4-clusters: extract significant features for all 4 layers
-sigfeatures_4 <- lapply(1:4, function(i) {
+# 4-clusters: extract significant features for all 3 layers
+sigfeatures_4 <- lapply(1:3, function(i) {
   # Calculate row sums of absolute lasso coefficients
   rowsum <- apply(abs(best_fit_4$beta[[i]]), 1, sum)
   
@@ -247,8 +247,8 @@ names(sigfeatures_4) <- c("RNAseq", "Methylation", "CNV")
 print("Feature extraction for 4-clusters solution")
 print(sapply(sigfeatures_4, length))
 
-# 5-clusters: extract significant features for all 5 layers
-sigfeatures_5 <- lapply(1:5, function(i) {
+# 5-clusters: extract significant features for all 3 layers
+sigfeatures_5 <- lapply(1:3, function(i) {
   # Calculate row sums of absolute lasso coefficients
   rowsum <- apply(abs(best_fit_5$beta[[i]]), 1, sum)
   
