@@ -254,3 +254,82 @@ correlate_factors_with_covariates(MOFAobject,
 dev.off()
 
 
+# Add sample metadata 
+dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
+
+# MOFA strictly requires sample column named 'sample'
+dt_metadata <- dt_metadata %>% 
+  rename(sample = PD_ID)
+
+# check if all samples in mofa object == metadata file
+mofa_samples <- unlist(samples_names(MOFAobject))
+missing_metadata <- setdiff(mofa_samples, dt_metadata$sample)
+
+# filter the metadata so it only includes the samples present in mofa model
+dt_metadata_cleaned <- dt_metadata %>% 
+  filter(sample %in% mofa_samples)
+
+# N numeric coercion for covariate columns 
+numeric_cols <- c("TMB", "TILs", "Age", "ASCAT_PLOIDY", "ASCAT_TUM_FRAC",
+                   "CibersortX.Tcell", "CibersortX.Bcell", "CibersortX.macrophage",
+                   "CibersortX.stroma", "CibersortX.endothelial", "CibersortX.epithelial")
+
+log_file <- "/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/covariate_cleaning_log.txt"
+log_lines <- c(paste("Covariate cleaning log -", Sys.time()))
+
+for (col in numeric_cols) {
+  original <- dt_metadata_cleaned[[col]]
+  na_before <- sum(is.na(original))
+
+  # if already numeric, skip cleaning but still record baseline NA count
+  if (is.numeric(original)) {
+    log_lines <- c(log_lines, sprintf("%-25s already numeric | NAs: %d", col, na_before))
+    next
+  }
+
+  cleaned <- original %>%
+    as.character() %>%
+    trimws() %>%
+    gsub(",", ".", ., fixed = TRUE) %>%        # decimal commas -> dots
+    gsub("[><]", "", .) %>%                     # strip stray '>' '<'
+    gsub("%", "", .) %>%                        # strip percent signs
+    { .[. %in% c("", "NA", "N/A", "na", "n/a", "-", "unknown", "Unknown")] <- NA; . }
+
+  numeric_version <- suppressWarnings(as.numeric(cleaned))
+  na_after <- sum(is.na(numeric_version))
+  new_nas <- na_after - na_before
+
+  if (new_nas > 0) {
+    bad_vals <- unique(original[is.na(numeric_version) & !is.na(original)])
+    log_lines <- c(log_lines,
+                    sprintf("%-25s NAs before: %d | after: %d | NEW NAs: %d | unparsed values: %s",
+                            col, na_before, na_after, new_nas, paste(bad_vals, collapse = "; ")))
+  } else {
+    log_lines <- c(log_lines,
+                    sprintf("%-25s NAs before: %d | after: %d | OK (no new NAs)", col, na_before, na_after))
+  }
+
+  dt_metadata_cleaned[[col]] <- numeric_version
+}
+
+writeLines(log_lines, log_file)
+
+# inject the metadata into the model
+samples_metadata(MOFAobject) <- as.data.frame(dt_metadata_cleaned)
+
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/association.png",
+    width = 10, height = 8, units = "in", res = 300)
+
+assoc_result <- tryCatch({
+  correlate_factors_with_covariates(MOFAobject,
+    covariates = numeric_cols,
+    plot = "log_pval"
+  )
+}, error = function(e) {
+  message("correlate_factors_with_covariates failed: ", conditionMessage(e))
+  plot.new()
+  text(0.5, 0.5, paste("Association plot failed:\n", conditionMessage(e)), cex = 0.8)
+  NULL
+})
+
+invisible(dev.off())
