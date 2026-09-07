@@ -181,9 +181,9 @@ SNF_clusters_3 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_
 SNF_clusters_4 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_snf/snf_clusters_4.csv")
                                  
 #xintnmf                                 
-XintNMF_clusters_2 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k2_reg.csv")                    
-XintNMF_clusters_3 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k3_reg.csv")
-XintNMF_clusters_4 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k4_reg.csv")                                
+XintNMF_clusters_2_reg <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k2_reg.csv")                    
+XintNMF_clusters_3_reg <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k3_reg.csv")
+XintNMF_clusters_4_reg <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k4_reg.csv")                                
 
 # Vectors to map cluster to samples
 methyl_map_probes <- setNames(methyl_probes$Cluster, methyl_probes$SampleID)
