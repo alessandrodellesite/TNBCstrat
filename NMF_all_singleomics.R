@@ -1,7 +1,5 @@
 # NMF on feature selected single-omic data
 
-Sys.unsetenv("_R_CHECK_TIMINGS_")
-Sys.unsetenv("_R_CHECK_CRAN_INCOMING_")
 library(NMF)
 
 
@@ -28,8 +26,7 @@ print("Starting NMF Rank Estimation on RNA data...")
 estim.r_rna <- nmfEstimateRank(rna_matrix, 
                            range = 2:6, 
                            nrun = 50,          
-                           seed = 123456, 
-                           .options = "vp30") 
+                           seed = 123456) 
 
 saveRDS(estim.r_rna, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/NMF_rank_estimation_RNAseq.rds")
 print("Rank Estimation finished and saved!")
@@ -40,7 +37,7 @@ res_rna <- nmf(rna_matrix,
            rank = 3, 
            nrun = 200,                         
            seed = 123456,
-           .options = "vp30")         
+           .options = "v")         
 
 saveRDS(res_rna, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/NMF_final_results_RNAseq.rds")
 print("RNA NMF Final execution finished!")
@@ -115,8 +112,7 @@ print("Starting NMF Rank Estimation on meth data...")
 estim.r_meth <- nmfEstimateRank(met_matrix_filtered, 
                            range = 2:6, 
                            nrun = 50,          
-                           seed = 123456, 
-                           .options = "vp30") 
+                           seed = 123456) 
 
 saveRDS(estim.r_meth, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/NMF_rank_estimation_meth.rds")
 print("Rank Estimation finished and saved!")
@@ -127,10 +123,10 @@ res_meth <- nmf(met_matrix_filtered,
            rank = 3, 
            nrun = 200,                         
            seed = 123456,
-           .options = "vp30")         
+           .options = "v")         
 
 saveRDS(res_meth, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/NMF_final_results_meth.rds")
-print("RNA NMF Final execution finished!")
+print("Meth NMF Final execution finished!")
 
 print("Saving clustering results...")
 sample_groups_meth <- predict(res_meth)
@@ -153,8 +149,7 @@ print("Starting NMF Rank Estimation on cnv data...")
 estim.r_cnv <- nmfEstimateRank(cnv_matrix, 
                            range = 2:6, 
                            nrun = 50,          
-                           seed = 123456, 
-                           .options = "vp30") 
+                           seed = 123456) 
 
 saveRDS(estim.r_cnv, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/NMF_rank_estimation_cnv.rds")
 print("Rank Estimation finished and saved!")
@@ -165,7 +160,7 @@ res_cnv <- nmf(cnv_matrix,
            rank = 3, 
            nrun = 200,                         
            seed = 123456,
-           .options = "vp30")         
+           .options = "v")         
 
 saveRDS(res_cnv, "/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/NMF_final_results_cnv.rds")
 print("CNV NMF Final execution finished!")
