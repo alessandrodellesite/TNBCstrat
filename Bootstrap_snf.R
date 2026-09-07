@@ -26,7 +26,7 @@ library(SNFtool)
 
 ## Data loading of SNF-specific preprocessed matrices 
 ## standardNormalization() runs per-replicate below, since it must be recomputed on each subsample, not reused from the full cohort
-data_dir <- "/mnt/petasan_ccb/alessandro/SCANB/snf_inputdata/"
+data_dir <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics/input_data/snf_inputdata/"
 data_rna  <- readRDS(file.path(data_dir, "rna_snf.rds"))
 data_meth <- readRDS(file.path(data_dir, "met_snf.rds"))
 data_cnv  <- readRDS(file.path(data_dir, "cnv_snf.rds"))
