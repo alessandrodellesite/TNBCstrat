@@ -1,4 +1,6 @@
 library(factoextra)
+library(readxl)
+library(dplyr)
 reticulate::py_install("mofapy2", pip = TRUE)
 reticulate::py_module_available("mofapy2")
 library(MOFA2)
@@ -150,64 +152,51 @@ km3 <- kmeans(factors_to_use, centers = 3, nstart = 50)
 km4 <- kmeans(factors_to_use, centers = 4, nstart = 50)
 
 # Plot Factor 1 vs Factor 2 colored by the 2/3-cluster solution
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/factor1_2_km2.png",
+    width = 10, height = 8, units = "in", res = 300)
 plot(factors_to_use[,1], factors_to_use[,2], col = km2$cluster, 
      pch = 19, xlab = "Factor 1", ylab = "Factor 2", 
      main = "K-means with K=2")
+dev.off()
 
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/factor1_2_km3.png",
+    width = 10, height = 8, units = "in", res = 300)
 plot(factors_to_use[,1], factors_to_use[,2], col = km3$cluster, 
      pch = 19, xlab = "Factor 1", ylab = "Factor 2", 
      main = "K-means with K=3")
+dev.off()
 
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/factor1_2_km4.png",
+    width = 10, height = 8, units = "in", res = 300)
 plot(factors_to_use[,1], factors_to_use[,2], col = km4$cluster, 
      pch = 19, xlab = "Factor 1", ylab = "Factor 2", 
      main = "K-means with K=4")
+dev.off()
 
 
 
-
-```{r}
-#k-means clustering on the MOFA factors (3 subtype specified)
-cluster_results_2 <- km2
-
-#sdd cluster assignments to metadata 
-MOFAobject@samples_metadata$Subtype <- as.factor(cluster_results_2$cluster)
-
-#plot factors colored by clusters
-plot_factor(MOFAobject, 
-            factors = c(1:15), 
-            color_by = "Subtype")
-```
-
-#```{r}
 #Convert the k-means cluster vector into data frame
-export_mofa_clusters <- data.frame(
+export_mofa_clusters_2 <- data.frame(
+  SampleID = names(km2$cluster),
+  Cluster  = as.vector(km2$cluster)
+)
+write.csv(export_mofa_clusters_2, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_2.csv", row.names = FALSE)
+
+export_mofa_clusters_3 <- data.frame(
+  SampleID = names(km3$cluster),
+  Cluster  = as.vector(km3$cluster)
+)
+write.csv(export_mofa_clusters_3, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_3.csv", row.names = FALSE)
+
+export_mofa_clusters_4 <- data.frame(
   SampleID = names(km4$cluster),
   Cluster  = as.vector(km4$cluster)
 )
-write.csv(export_mofa_clusters, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_4.csv", row.names = FALSE)
-#```
-
-```{r}
-cluster_results_3 <- km4
-
-#sdd cluster assignments to metadata 
-MOFAobject@samples_metadata$Subtype <- as.factor(cluster_results_3$cluster)
-
-#plot factors colored by clusters
-plot_factor(MOFAobject, 
-            factors = c(1:15), 
-            color_by = "Subtype")
-```
+write.csv(export_mofa_clusters_4, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_4.csv", row.names = FALSE)
 
 
 
-
-
-# Add sample metadata (da ricontrollare se corretto)
-
-```{r}
-library(readxl)
-library(dplyr)
+# Add sample metadata 
 
 dt_metadata <- read_excel("ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
 
@@ -225,12 +214,11 @@ dt_metadata_cleaned <- dt_metadata %>%
 
 # inject the metadata into the model
 samples_metadata(MOFAobject) <- as.data.frame(dt_metadata_cleaned)
-```
 
-# Association analysis
-test association between MOFA factors and some metadata
+# Association analysis: test association between MOFA factors and some metadata
 
-```{r}
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/association.png",
+    width = 10, height = 8, units = "in", res = 300)
 correlate_factors_with_covariates(MOFAobject, 
   covariates = c("TMB","TILs","Age","ASCAT_PLOIDY","CibersortX.Tcell", 
   "CibersortX.Bcell",
@@ -240,6 +228,6 @@ correlate_factors_with_covariates(MOFAobject,
   "CibersortX.epithelial"), 
   plot="log_pval"
 )
-```
+dev.off()
 
-strong association → the factor explains a certain amount of variance that is dependent on the metadata
+
