@@ -5,17 +5,19 @@ library(SNFtool)
 
 #Data loading 
 
-
+data_dir <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics/input_data/snf_inputdata/"
+rna_t  <- readRDS(file.path(data_dir, "rna_snf.rds"))
+meth_t <- readRDS(file.path(data_dir, "met_snf.rds"))
+cnv_t  <- readRDS(file.path(data_dir, "cnv_snf.rds"))
 
 
 #Align samples
 
-```{r}
 common_samples <- intersect(colnames(rna_matrix), intersect(colnames(met_mvals), colnames(cnv_log_ratio)))
 rna_matrix <- rna_matrix[, common_samples]
 met_mvals <- met_mvals[, common_samples]
 cnv_log_ratio <- cnv_log_ratio[, common_samples]
-```
+
 
 #Transpose all matrices 
 
