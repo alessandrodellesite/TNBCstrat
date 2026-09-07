@@ -82,24 +82,24 @@ MOFAobject <- run_mofa(MOFAobject, outfile = "/mnt/petasan_ccb/alessandro/SCANB/
 #saveRDS(MOFAobject, "my_mofa_model.rds")
 
 # Variance decomposition to see how much each factor explains per view
-plot_variance_explained(MOFAobject, max_r2 = 100)
+var_dec <- plot_variance_explained(MOFAobject, max_r2 = 100)
 
 ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/variance_decomposition.png",
-       plot = plot_variance_explained(MOFAobject, max_r2 = 100),
+       plot = var_dec,
        width = 10, height = 5, dpi = 300)
 
 #Factors should be largely uncorrelated (orthogonal): correlation suggests poor model fit
-plot_factor_cor(MOFAobject)
 
-ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/factor_correlation.png",
-       plot = plot_factor_cor(MOFAobject),
-       width = 10, height = 5, dpi = 300)
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/factor_correlation.png",
+    width = 10, height = 5, units = "in", res = 300)
+plot_factor_cor(MOFAobject)
+dev.off()
 
 # Total variance explained per view (using all factors)
-plot_variance_explained(MOFAobject, plot_total = T)[[2]]
+tot_var <- plot_variance_explained(MOFAobject, plot_total = T)[[2]]
 
 ggsave("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/tot_variance_per_view.png",
-       plot = plot_variance_explained(MOFAobject, plot_total = T)[[2]],
+       plot = tot_var,
        width = 10, height = 5, dpi = 300)
 
 #How much variance each factor captures across the different data types, to choose which factors to consider for the k-means. 
