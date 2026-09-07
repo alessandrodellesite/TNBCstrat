@@ -1,8 +1,9 @@
 #Analysis of icluster model tuning
-
-# visualize model tuning results: how many clusters to choose
 #BiocManager::install("iClusterPlus")
 library(iClusterPlus)
+library(gplots)
+
+# visualize model tuning results: how many clusters to choose
 
 # Read output files
 output <- list()
@@ -58,6 +59,7 @@ var_table <- data.frame(
   Percent_EV = devRatMinBIC * 100 #%
 )
 print(var_table)
+write.csv(var_table, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/expl_variance.csv")
 
 #between 3 and 4 clusters there is a 3.2% increase in explained variation (not big but not even negligible). a suggestion for noisy data is to plot heatmaps (in this case for 3 and 4 clusters) to see which one shows clearer patterns.
 
@@ -100,8 +102,25 @@ print("best lambda values for 5 clusters (lowest BIC)")
 print(lambda_5)
 
 
-# HEATMAPS
+# Heatmaps
 
+col.scheme = alist()
+col.scheme[[1]] = bluered(256) # RNA-seq 
+col.scheme[[2]] = bluered(256) # Methylation 
+col.scheme[[3]] = colorpanel(256, low="blue", mid="white", high="red") # CNV
+
+# 3 clusters
+hm1 <- plotHeatmap(
+  fit = best_fit, 
+  datasets = list(rna_scaled, meth_scaled, cnv_scaled), 
+  type = c("gaussian", "gaussian", "gaussian"),
+  sample.order = NULL,               
+  sparse = c(TRUE, TRUE, TRUE),      
+  threshold = c(0.25, 0.25, 0.25), 
+  col.scheme = col.scheme,
+  plot.chr = c(FALSE, FALSE, FALSE), 
+  cap = c(0, 0.99, 0.99)
+)
 
 # EXTRACT MATRIX SPACE
 
