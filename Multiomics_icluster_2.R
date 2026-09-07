@@ -3,6 +3,7 @@
 library(iClusterPlus)
 library(gplots)
 library(lattice)
+library(ComplexHeatmap)
 
 data_dir <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics/input_data/icluster_inputdata/"
 rna_scaled  <- readRDS(file.path(data_dir, "rna_icluster.rds"))
