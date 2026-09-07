@@ -112,7 +112,8 @@ r2_list <- get_variance_explained(MOFAobject)
 factors_r2 <- r2_list$r2_per_factor[[1]]
 
 # View the result
-round(factors_r2, 2)
+fact_file <- round(factors_r2, 2)
+write.csv(fact_file, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/factors_values.csv")
 
 #extract the factor values for each sample 
 factors_matrix <- do.call(rbind, get_factors(MOFAobject, factors = "all")) #to compress into a single matrix
