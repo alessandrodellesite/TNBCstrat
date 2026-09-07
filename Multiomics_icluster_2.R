@@ -115,8 +115,28 @@ col.scheme[[1]] = bluered(256) # RNA-seq
 col.scheme[[2]] = bluered(256) # Methylation 
 col.scheme[[3]] = colorpanel(256, low="blue", mid="white", high="red") # CNV
 
+# 2 clusters
+hm2 <- plotHeatmap(
+  fit = best_fit_2, 
+  datasets = list(rna_scaled, meth_scaled, cnv_scaled), 
+  type = c("gaussian", "gaussian", "gaussian"),
+  sample.order = NULL,               
+  sparse = c(TRUE, TRUE, TRUE),      
+  threshold = c(0.25, 0.25, 0.25), 
+  col.scheme = col.scheme,
+  plot.chr = c(FALSE, FALSE, FALSE), 
+  cap = c(0, 0.99, 0.99)
+)
+
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/heatmap_omics_2.png", width = 10, height = 8, units = "in", res = 300)
+draw(hm2, 
+     heatmap_legend_side = "right", 
+     annotation_legend_side = "right"
+)
+dev.off()
+
 # 3 clusters
-hm1 <- plotHeatmap(
+hm3 <- plotHeatmap(
   fit = best_fit, 
   datasets = list(rna_scaled, meth_scaled, cnv_scaled), 
   type = c("gaussian", "gaussian", "gaussian"),
@@ -128,7 +148,157 @@ hm1 <- plotHeatmap(
   cap = c(0, 0.99, 0.99)
 )
 
-# EXTRACT MATRIX SPACE
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/heatmap_omics_3.png", width = 10, height = 8, units = "in", res = 300)
+draw(hm3, 
+     heatmap_legend_side = "right", 
+     annotation_legend_side = "right"
+)
+dev.off()
+
+# 4 clusters
+hm4 <- plotHeatmap(
+  fit = best_fit_4, 
+  datasets = list(rna_scaled, meth_scaled, cnv_scaled), 
+  type = c("gaussian", "gaussian", "gaussian"),
+  sample.order = NULL,               
+  sparse = c(TRUE, TRUE, TRUE),      
+  threshold = c(0.25, 0.25, 0.25), 
+  col.scheme = col.scheme,
+  plot.chr = c(FALSE, FALSE, FALSE), 
+  cap = c(0, 0.99, 0.99)
+)
+
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/heatmap_omics_4.png", width = 10, height = 8, units = "in", res = 300)
+draw(hm4, 
+     heatmap_legend_side = "right", 
+     annotation_legend_side = "right"
+)
+dev.off()
+
+# 5 clusters
+hm5 <- plotHeatmap(
+  fit = best_fit_5, 
+  datasets = list(rna_scaled, meth_scaled, cnv_scaled), 
+  type = c("gaussian", "gaussian", "gaussian"),
+  sample.order = NULL,               
+  sparse = c(TRUE, TRUE, TRUE),      
+  threshold = c(0.25, 0.25, 0.25), 
+  col.scheme = col.scheme,
+  plot.chr = c(FALSE, FALSE, FALSE), 
+  cap = c(0, 0.99, 0.99)
+)
+
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/icluster/heatmap_omics_5.png", width = 10, height = 8, units = "in", res = 300)
+draw(hm5, 
+     heatmap_legend_side = "right", 
+     annotation_legend_side = "right"
+)
+dev.off()
+
+
+# Feature extraction for each result
+
+# Create a named list of your feature names
+features_list <- list(
+  RNAseq      = colnames(rna_scaled),
+  Methylation = colnames(meth_scaled),
+  CNV         = colnames(cnv_scaled)
+)
+
+# 2-clusters: extract significant features for all 2 layers
+sigfeatures_2 <- lapply(1:2, function(i) {
+  # Calculate row sums of absolute lasso coefficients
+  rowsum <- apply(abs(best_fit_2$beta[[i]]), 1, sum)
+  
+  # Determine the 75th percentile cutoff threshold --> magari si può aggiustare perche potrebbe essere troppo o troppo poco, quindi vdere la distribuzione e prendere l'elbow
+  upper <- quantile(rowsum, prob = 0.75)
+  
+  # Return the names of features exceeding the threshold
+  return(features_list[[i]][which(rowsum > upper)])
+})
+
+# Assign the names directly to the resulting list
+names(sigfeatures_2) <- c("RNAseq", "Methylation", "CNV")
+print("Feature extraction for 2-clusters solution")
+print(sapply(sigfeatures_2, length))
+
+# 3-clusters: extract significant features for all 3 layers
+sigfeatures_3 <- lapply(1:3, function(i) {
+  # Calculate row sums of absolute lasso coefficients
+  rowsum <- apply(abs(best_fit$beta[[i]]), 1, sum)
+  
+  # Determine the 75th percentile cutoff threshold --> magari si può aggiustare perche potrebbe essere troppo o troppo poco, quindi vdere la distribuzione e prendere l'elbow
+  upper <- quantile(rowsum, prob = 0.75)
+  
+  # Return the names of features exceeding the threshold
+  return(features_list[[i]][which(rowsum > upper)])
+})
+
+# Assign the names directly to the resulting list
+names(sigfeatures_3) <- c("RNAseq", "Methylation", "CNV")
+print("Feature extraction for 3-clusters solution")
+print(sapply(sigfeatures_3, length))
+
+# 4-clusters: extract significant features for all 4 layers
+sigfeatures_4 <- lapply(1:4, function(i) {
+  # Calculate row sums of absolute lasso coefficients
+  rowsum <- apply(abs(best_fit_4$beta[[i]]), 1, sum)
+  
+  # Determine the 75th percentile cutoff threshold --> magari si può aggiustare perche potrebbe essere troppo o troppo poco, quindi vdere la distribuzione e prendere l'elbow
+  upper <- quantile(rowsum, prob = 0.75)
+  
+  # Return the names of features exceeding the threshold
+  return(features_list[[i]][which(rowsum > upper)])
+})
+
+# Assign the names directly to the resulting list
+names(sigfeatures_4) <- c("RNAseq", "Methylation", "CNV")
+print("Feature extraction for 4-clusters solution")
+print(sapply(sigfeatures_4, length))
+
+# 5-clusters: extract significant features for all 5 layers
+sigfeatures_5 <- lapply(1:5, function(i) {
+  # Calculate row sums of absolute lasso coefficients
+  rowsum <- apply(abs(best_fit_5$beta[[i]]), 1, sum)
+  
+  # Determine the 75th percentile cutoff threshold --> magari si può aggiustare perche potrebbe essere troppo o troppo poco, quindi vdere la distribuzione e prendere l'elbow
+  upper <- quantile(rowsum, prob = 0.75)
+  
+  # Return the names of features exceeding the threshold
+  return(features_list[[i]][which(rowsum > upper)])
+})
+
+# Assign the names directly to the resulting list
+names(sigfeatures_5) <- c("RNAseq", "Methylation", "CNV")
+print("Feature extraction for 5-clusters solution")
+print(sapply(sigfeatures_5, length))
+
+
+
+# EXTRACT MATRIX SPACE for internal benchmarking
+# for the 3-cluster solutions
+icluster_z <- best_fit$meanZ # Rows = Patients, Columns = Latent Factors (Z1, Z2, ...)
+#assign patient IDs
+rownames(icluster_z) <- rownames(rna_scaled)
+saveRDS(icluster_z, file= "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/icluster_matrix_3.rds")
+
+#for the 2-cluster solutions
+icluster_z2 <- best_fit_2$meanZ # Rows = Patients, Columns = Latent Factors (Z1, Z2, ...)
+#assign patient IDs
+rownames(icluster_z2) <- rownames(rna_scaled)
+saveRDS(icluster_z2, file= "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/icluster_matrix_2.rds")
+
+#for the 4-cluster solutions
+icluster_z4 <- best_fit_4$meanZ # Rows = Patients, Columns = Latent Factors (Z1, Z2, ...)
+#assign patient IDs
+rownames(icluster_z4) <- rownames(rna_scaled)
+saveRDS(icluster_z4, file= "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/icluster_matrix_4.rds")
+
+#for the 5-cluster solutions
+icluster_z5 <- best_fit_5$meanZ # Rows = Patients, Columns = Latent Factors (Z1, Z2, ...)
+#assign patient IDs
+rownames(icluster_z5) <- rownames(rna_scaled)
+saveRDS(icluster_z5, file= "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/icluster_matrix_5.rds")
 
 
 # Save clustering results
