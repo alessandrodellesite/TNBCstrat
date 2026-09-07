@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=icluster3_boot
-#SBATCH --output=logs/icluster3_boot_%A_%a.out
+#SBATCH --job-name=icluster2_boot
+#SBATCH --output=logs/icluster2_boot_%A_%a.out
 #SBATCH --array=101-1000%20
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
