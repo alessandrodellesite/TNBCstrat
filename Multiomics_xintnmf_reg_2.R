@@ -82,6 +82,15 @@ plot(k_range, mean_silhouettes_km_reg, type = "b", pch = 19, col = "royalblue", 
      xlab = "Rank (k)", ylab = "Mean Silhouette Width (correlation-hclust)", main = "Silhouette Profile")
 
 
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/xintnmf/kmeans_rss_silh.png",
+    width = 10, height = 5, units = "in", res = 300)
+par(mfrow = c(1, 2))
+plot(k_range, rss_per_k_reg, type = "b", pch = 19, col = "darkorange", lwd = 2,
+     xlab = "Rank (k)", ylab = "Reconstruction RSS", main = "Reconstruction Error")
+plot(k_range, mean_silhouettes_km_reg, type = "b", pch = 19, col = "royalblue", lwd = 2,
+     xlab = "Rank (k)", ylab = "Mean Silhouette Width (correlation-hclust)", main = "Silhouette Profile")
+dev.off()
+
 #Testing hclust (with euclidian distance) - measure silhouette
 
 set.seed(123)
@@ -104,12 +113,16 @@ for (k in k_range) {
 print("Silhouette for hclust at different k's:")
 print(round(mean_silhouettes_hc_reg, 3))
 
+
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/xintnmf/kmeans_vs_hclust_silh.png",
+    width = 6, height = 5, units = "in", res = 300)
 plot(k_range, mean_silhouettes_km_reg, type = "b", pch = 19, col = "royalblue", lwd = 2,
      ylim = range(c(mean_silhouettes_km_reg, mean_silhouettes_hc_reg)),
      xlab = "Rank (k)", ylab = "Mean Silhouette Width", main = "k-means vs Hierarchical")
 lines(k_range, mean_silhouettes_hc_reg, type = "b", pch = 17, col = "firebrick", lwd = 2)
 legend("topright", legend = c("k-means", "hierarchical (ward.D2)"),
        col = c("royalblue", "firebrick"), pch = c(19, 17))
+dev.off()
 
 
 #Measure ARI: how concordant kmeans and hclust results are (for each k)
@@ -125,13 +138,14 @@ for (k in k_range) {
 print("ARI values comapring kmeans and hclust clusterings")
 print(round(ari_km_hc_reg, 3))
 
-
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/xintnmf/kmeans_vs_hclust_ari.png",
+    width = 6, height = 5, units = "in", res = 300)
 plot(k_range, ari_km_hc_reg, type = "b", pch = 19, col = "darkgreen", lwd = 2,
      ylim = c(-0.1, 1),
      xlab = "Rank (k)", ylab = "Adjusted Rand Index",
      main = "Agreement: k-means vs Hierarchical (Ward.D2)")
 abline(h = 0, lty = 2, col = "gray")
-
+dev.off()
 
 #Final export: only kmeans (consistent with other multiomics approach)
 
