@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=icluster3_boot
-#SBATCH --output=logs/icluster2_boot_%A_%a.out
-#SBATCH --array=1-100%10
+#SBATCH --output=logs/icluster3_boot_%A_%a.out
+#SBATCH --array=1-100%20
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
@@ -15,7 +15,7 @@ mkdir -p logs
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
 SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Bootstrap_icluster.R"
-OUTDIR="/mnt/petasan_ccb/alessandro/SCANB/multiomics/bootstrap/icluster/icluster_bootstrap_k2"
+OUTDIR="/mnt/petasan_ccb/alessandro/SCANB/multiomics/bootstrap/icluster/icluster_bootstrap_k3"
 
 # singularity execution - arguments after Rscript $SCRIPT_PATH are passed through to commandArgs() inside icluster_bootstrap.R
 srun singularity exec \
