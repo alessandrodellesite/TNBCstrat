@@ -55,14 +55,13 @@ head(cluster_results)
 # ----------------------------------------------------------------
 # Benchmarking, separated by k
 # ----------------------------------------------------------------
-# columns other than SampleID, each named "<Method>_<k>"
-all_cols <- colnames(cluster_results)[colnames(cluster_results) != "SampleID"]
+out_dir <- "/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/concordance"
+if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
-# extract the k value from the column name suffix
+all_cols <- colnames(cluster_results)[colnames(cluster_results) != "SampleID"]
 col_k <- str_extract(all_cols, "(?<=_)[0-9]+$")
 k_values <- sort(unique(as.numeric(col_k)))
 
-# containers to keep results for all k, in case you need them later
 ari_matrices <- list()
 nmi_matrices <- list()
 vi_matrices  <- list()
@@ -70,7 +69,6 @@ vi_matrices  <- list()
 for (k in k_values) {
 
   cols_k <- all_cols[col_k == as.character(k)]
-  # relabel columns with just the method name (strip "_k") for readability in plots
   method_names <- str_remove(cols_k, paste0("_", k, "$"))
 
   n_methods <- length(cols_k)
@@ -98,17 +96,14 @@ for (k in k_values) {
         clean_l2  <- labels_2[valid_idx]
 
         if (length(clean_l1) > 0) {
-          # ARI
           ari_val <- mclust::adjustedRandIndex(clean_l1, clean_l2)
           ari_matrix[name1, name2] <- ari_val
           ari_matrix[name2, name1] <- ari_val
 
-          # NMI
           nmi_val <- aricode::NMI(clean_l1, clean_l2)
           nmi_matrix[name1, name2] <- nmi_val
           nmi_matrix[name2, name1] <- nmi_val
 
-          # Normalized VI
           raw_vi <- mcclust::vi.dist(clean_l1, clean_l2, base = exp(1))
           max_possible_entropy <- log(length(clean_l1))
           normalized_vi <- raw_vi / max_possible_entropy
@@ -138,22 +133,33 @@ for (k in k_values) {
   cat("\nNORMALIZED VARIATION OF INFORMATION (VI) \n")
   print(round(vi_matrix, 3))
 
-  # Plots for this k
+  # ---- Save ARI heatmap ----
+  png(file.path(out_dir, paste0("ARI_k", k, ".png")),
+      width = 1200, height = 1000, res = 150)
   pheatmap(ari_matrix,
            main = paste0("Pairwise Cluster Concordance (ARI), k = ", k),
            display_numbers = TRUE,
            color = colorRampPalette(c("white", "#E8F0FE", "#1A73E8"))(50),
            number_color = "black")
+  dev.off()
 
+  # ---- Save NMI heatmap ----
+  png(file.path(out_dir, paste0("NMI_k", k, ".png")),
+      width = 1200, height = 1000, res = 150)
   pheatmap(nmi_matrix,
            main = paste0("Normalized Mutual Information (NMI), k = ", k),
            display_numbers = TRUE,
            color = colorRampPalette(c("white", "#E8F0FE", "#2E6651"))(50),
            number_color = "black")
+  dev.off()
 
+  # ---- Save VI heatmap ----
+  png(file.path(out_dir, paste0("VI_k", k, ".png")),
+      width = 1200, height = 1000, res = 150)
   pheatmap(vi_matrix,
            main = paste0("Normalized Variation of Information (VI), k = ", k),
            display_numbers = TRUE,
            color = colorRampPalette(c("#1A7666", "#E8F0FE", "white"))(50),
            number_color = "black")
+  dev.off()
 }
