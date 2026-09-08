@@ -80,13 +80,13 @@ rownames(annotation_col) <- colnames(plot_matrix)
 
 # Caricamento dei file di cluster alternativi (Methyl, CNV, ecc.)
 methyl_probes      <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters.csv")
-methyl_probes_4    <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters_4_clusters.csv")
+methyl_probes_4    <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters_4.csv")
 cnv_data_clusters  <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/cnv_nmf_clusters.csv")
 
 # Caricamento del file Excel dei metadati clinici
 dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
-# METADATA ALIGNMENT & PREPROCESSING
 
+# METADATA ALIGNMENT & PREPROCESSING
 colonna_id_excel <- "PD_ID" 
 metadata_matched <- dt_metadata[match(cluster_data$SampleID[sample_order], dt_metadata[[colonna_id_excel]]), ]
 
@@ -128,11 +128,11 @@ ann_colors = list(
   TMB                    = colorRamp2(c(0, max(annotation_col$TMB, na.rm = TRUE)), c("#F5F6FA", "#079992")),
   TILs                   = colorRamp2(c(0, max(annotation_col$TILs, na.rm = TRUE)), c("#F5F6FA", "#6C5CE7")),
   CibersortX.epithelial  = colorRamp2(c(0, max(annotation_col$CibersortX.epithelial, na.rm = TRUE)), c("#F5F6FA", "#6C5CE7")),
-  CibersortX.macrophage  = colorRamp2(c(0, max(annotation_col$CibersortX.macrophage, na.rm = TRUE)), c("#F5F6FA", "#6C5CE7")),
-  CibersortX.stroma      = colorRamp2(c(0, max(annotation_col$CibersortX.stroma, na.rm = TRUE)), c("#F5F6FA", "#6C5CE7")),
-  CibersortX.Bcell       = colorRamp2(c(0, max(annotation_col$CibersortX.Bcell, na.rm = TRUE)), c("#F5F6FA", "#6C5CE7")),
-  CibersortX.endothelial = colorRamp2(c(0, max(annotation_col$CibersortX.endothelial, na.rm = TRUE)), c("#F5F6FA", "#6C5CE7")),
-  CibersortX.Tcell       = colorRamp2(c(0, max(annotation_col$CibersortX.Tcell, na.rm = TRUE)), c("#F5F6FA", "#6C5CE7")),
+  CibersortX.macrophage  = colorRamp2(c(0, max(annotation_col$CibersortX.macrophage, na.rm = TRUE)), c("#F5F6FA", "#8154E5")),
+  CibersortX.stroma      = colorRamp2(c(0, max(annotation_col$CibersortX.stroma, na.rm = TRUE)), c("#F5F6FA", "#9B59E0")),
+  CibersortX.Bcell       = colorRamp2(c(0, max(annotation_col$CibersortX.Bcell, na.rm = TRUE)), c("#F5F6FA", "#5B4FCF")),
+  CibersortX.endothelial = colorRamp2(c(0, max(annotation_col$CibersortX.endothelial, na.rm = TRUE)), c("#F5F6FA", "#7C6FE8")),
+  CibersortX.Tcell       = colorRamp2(c(0, max(annotation_col$CibersortX.Tcell, na.rm = TRUE)), c("#F5F6FA", "#4834D4")),
   ASCAT_PLOIDY           = colorRamp2(c(0, max(annotation_col$ASCAT_PLOIDY, na.rm = TRUE)), c("#F5F6FA", "#273C75")),
   ASCAT_TUM_FRAC         = colorRamp2(c(0, max(annotation_col$ASCAT_TUM_FRAC, na.rm = TRUE)), c("#F5F6FA", "#079992"))
 )
@@ -143,7 +143,12 @@ col_ann <- HeatmapAnnotation(
   col = ann_colors,
   show_legend = TRUE
 )
-
+                                 
+ht_opt(legend_title_gset = gpar(fontsize = 8),
+       legend_labels_gset = gpar(fontsize = 7),
+       legend_grid_height = unit(3, "mm"),
+       legend_grid_width = unit(3, "mm"))
+                                 
 # Generazione del Main Heatmap di espressione genica
 ht <- Heatmap(
   plot_matrix, 
@@ -157,9 +162,14 @@ ht <- Heatmap(
   width = unit(12, "cm") 
 )
 
-png("/mnt/petasan_ccb/alessandro/SCANB/plots/comparisons/heatmap_rna_metadata.png", width = 10, height = 8, units = "in", res = 300)
-draw(ht, merge_legends = TRUE)
-dev.off()
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/comparisons/heatmap_rna_metadata.png", 
+    width = 16, height = 8, units = "in", res = 300)  # wider canvas
+draw(ht, 
+     merge_legends = TRUE, 
+     heatmap_legend_side = "right", 
+     annotation_legend_side = "right")
+dev.off()                                 
+
 
 
 
