@@ -12,7 +12,7 @@ save_nmf_map <- function(filename, plot_fun, width = 10, height = 5, res = 300) 
 
 
 # METH
-res_meth     <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/	NMF_final_results_meth_4.rds")
+res_meth     <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/NMF_final_results_meth_4.rds")
 
 save_nmf_map("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/meth_nmf/consensus_4.png",
              function() consensusmap(res_meth))
