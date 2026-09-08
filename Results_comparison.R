@@ -220,7 +220,7 @@ annotation_col_meth <- data.frame(
   icluster_2             = factor(icluster_map_2[colnames(plot_matrix)]),
   icluster_3             = factor(icluster_map_3[colnames(plot_matrix)]),
   icluster_4             = factor(icluster_map_4[colnames(plot_matrix)]),
-  icluster_5             = factor(icluster_map_5[colnames(plot_matrix)]),
+#  icluster_5             = factor(icluster_map_5[colnames(plot_matrix)]),
   XintNMF_2                  = factor(xint_map_2_reg[colnames(plot_matrix)]),
   XintNMF_3                  = factor(xint_map_3_reg[colnames(plot_matrix)]),
   XintNMF_4                  = factor(xint_map_4_reg[colnames(plot_matrix)])
@@ -240,15 +240,15 @@ ann_colors_meth = list(
   MOFA_4          = c("1" = "#ffeaa7", "2" = "#9b59b6", "3" = "#ff7f98", "4" = "#0984E3"),
   icluster_2      = c("1" = "#27ae33", "2" = "#e1b99c"),
   icluster_3      = c("1" = "#e1b99c", "2" = "#4c5ce1", "3" = "#27ae33"),
-  icluster_4      = c("1" = "#27ae33", "2" = "#e1b99c", "3" = "#ff6f11", "4" = "#4c5ce1"),
-  icluster_5      = c("1" = "#ff6f11", "2" = "#e1b99c", "3" = "#27ae33", "4" = "#4c5ce1", "5" = "#5B8E8A"),
+  icluster_4      = c("1" = "#ff6f11", "2" = "#e1b99c", "3" = "#27ae33", "4" = "#4c5ce1"),
+  #icluster_5      = c("1" = "#ff6f11", "2" = "#e1b99c", "3" = "#27ae33", "4" = "#4c5ce1", "5" = "#5B8E8A"),
   SNF_2           = c("1" = "#ff7f50", "2" = "#008080"),
   SNF_3           = c("1" = "#ff7f50", "2" = "#34495e", "3" = "#008080"),
   SNF_4           = c("1" = "#ff7f50", "2" = "#008080", "3" = "#f1c40f", "4" = "#34495e"),
   XintNMF_2           = c("1" = "#27ae60", "2" = "#e1b12c"),
   XintNMF_3           = c("1" = "#27ae60", "2" = "#e1b12c", "3" = "#6c5ce7"),
   XintNMF_4           = c("1" = "#6c5ce7", "2" = "#ff6f99", "3" = "#27ae60", "4" = "#e1b12c")
-)                     
+)                   
 
 # HEATMAP 
 
