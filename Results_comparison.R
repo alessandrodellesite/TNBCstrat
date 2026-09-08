@@ -143,11 +143,7 @@ col_ann <- HeatmapAnnotation(
   col = ann_colors,
   show_legend = TRUE
 )
-                                 
-ht_opt(legend_title_gset = gpar(fontsize = 8),
-       legend_labels_gset = gpar(fontsize = 7),
-       legend_grid_height = unit(3, "mm"),
-       legend_grid_width = unit(3, "mm"))
+
                                  
 # Generazione del Main Heatmap di espressione genica
 ht <- Heatmap(
