@@ -6,26 +6,23 @@ library(ComplexHeatmap)
 library(RColorBrewer)
 library(readxl)
 
-rna <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.rds")
 
+rna <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.rds")
 # Feature selection (top 3000 genes by MAD)
 gene_mads <- apply(rna, 1, mad)
 ordered_mads <- order(gene_mads, decreasing = TRUE)
-
 top_3000_indices <- ordered_mads[1:3000]
 rna <- rna[top_3000_indices, ]
-
 dt_matrix <- as.matrix(rna)
 
-# DEA of of genes' expression between NMF clusters from RNAseq 
-
+# DEA of genes' expression between NMF clusters from RNAseq 
 cluster_data <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/rna_nmf_clusters.csv")
 cluster_data <- cluster_data[match(colnames(dt_matrix), cluster_data$SampleID), ]
+
 # Create the factor and design matrix
 groups <- factor(cluster_data$Cluster) 
 design <- model.matrix(~0 + groups)
 colnames(design) <- c("C1", "C2", "C3")
-
 fit <- lmFit(dt_matrix, design) 
 cont <- makeContrasts(
   C1_vs_others = C1 - (C2 + C3)/2,  
@@ -33,118 +30,114 @@ cont <- makeContrasts(
   C3_vs_others = C3 - (C1 + C2)/2,
   levels = design
 )
-
 fit2 <- contrasts.fit(fit, cont)
 fit2 <- eBayes(fit2, trend = TRUE) 
 
-results_1 <- topTable(fit2, coef="C1_vs_others", number=500, p.value=0.05, sort.by="logFC")
-results_2 <- topTable(fit2, coef="C2_vs_others", number=500, p.value=0.05, sort.by="logFC")
-results_3 <- topTable(fit2, coef="C3_vs_others", number=500, p.value=0.05, sort.by="logFC")
-
 get_cluster_genes <- function(fit_obj, coef_name, n_genes = 500) {
-  top_tab <- topTable(fit_obj, coef = coef_name, number = n_genes, p.value = 0.05, sort.by = "logFC") #sorts by absolute value of log2fc
+  top_tab <- topTable(fit_obj, coef = coef_name, number = n_genes, p.value = 0.05, sort.by = "logFC")
   return(rownames(top_tab)) 
 }
-
 cluster1_genes <- get_cluster_genes(fit2, "C1_vs_others")
 cluster2_genes <- get_cluster_genes(fit2, "C2_vs_others")
 cluster3_genes <- get_cluster_genes(fit2, "C3_vs_others")
 
 ## Heatmap with ordered samples
-
 library(pheatmap)
 c1_markers <- get_cluster_genes(fit2, "C1_vs_others", n_genes = 50)
 c2_markers <- get_cluster_genes(fit2, "C2_vs_others", n_genes = 50)
 c3_markers <- get_cluster_genes(fit2, "C3_vs_others", n_genes = 50)
-
-# ORDER groups
 ordered_genes <- c(c1_markers, c2_markers, c3_markers)
 
-# Sort SAMPLES by their cluster group
+# --- NEW: reorder clusters so cluster "1" (the big one) sits in the middle ---
+# Adjust the order inside levels() if your "big" cluster has a different label
+cluster_data$Cluster <- factor(cluster_data$Cluster, levels = c("2", "1", "3"))
 sample_order <- order(cluster_data$Cluster)
-plot_matrix <- dt_matrix[ordered_genes, sample_order]
 
-# z-score to Center the data  
+plot_matrix <- dt_matrix[ordered_genes, sample_order]
 plot_matrix <- t(scale(t(plot_matrix)))
 
-# Subtract the median of each row: plot_matrix <- plot_matrix - apply(plot_matrix, 1, median)
-
-#Create the sorted annotation
 annotation_col <- data.frame(Cluster = factor(cluster_data$Cluster[sample_order]))
 rownames(annotation_col) <- colnames(plot_matrix)
-
-
-
-
-
 
 # Caricamento dei file di cluster alternativi (Methyl, CNV, ecc.)
 methyl_probes      <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters.csv")
 methyl_probes_4    <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters_4.csv")
 cnv_data_clusters  <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/cnv_nmf_clusters.csv")
 
-# Caricamento del file Excel dei metadati clinici
 dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
 
-# METADATA ALIGNMENT & PREPROCESSING
 colonna_id_excel <- "PD_ID" 
 metadata_matched <- dt_metadata[match(cluster_data$SampleID[sample_order], dt_metadata[[colonna_id_excel]]), ]
 
-# Selezioniamo solo le colonne di interesse dal dataset correttamente allineato
-
-cols_to_keep <- c("TMB", "TILs", "PAM50_Basal_NCN", "PAM50_NCN", "TNBCtype4_n235_notPreCentered", "TNBCtype6_n235_notPreCentered", "CibersortX.Tcell", "CibersortX.endothelial", "CibersortX.Bcell", "CibersortX.stroma", "CibersortX.macrophage", "CibersortX.epithelial", "ASCAT_PLOIDY", "ASCAT_TUM_FRAC")
+cols_to_keep <- c("TMB", "TILs", "PAM50_Basal_NCN", "PAM50_NCN", 
+                   "TNBCtype4_n235_notPreCentered", "TNBCtype6_n235_notPreCentered", 
+                   "CibersortX.Tcell", "CibersortX.endothelial", "CibersortX.Bcell", 
+                   "CibersortX.stroma", "CibersortX.macrophage", "CibersortX.epithelial", 
+                   "ASCAT_PLOIDY", "ASCAT_TUM_FRAC")
 meta_sub <- metadata_matched[, cols_to_keep]
 
-# Colonne numeriche
-numeric_cols <- c("TMB", "TILs", "CibersortX.Tcell", "CibersortX.endothelial", "CibersortX.Bcell", "CibersortX.stroma", "CibersortX.macrophage", "CibersortX.epithelial","ASCAT_PLOIDY",  "ASCAT_TUM_FRAC")
+numeric_cols <- c("TMB", "TILs", "CibersortX.Tcell", "CibersortX.endothelial", 
+                   "CibersortX.Bcell", "CibersortX.stroma", "CibersortX.macrophage", 
+                   "CibersortX.epithelial", "ASCAT_PLOIDY", "ASCAT_TUM_FRAC")
 meta_sub[numeric_cols] <- lapply(meta_sub[numeric_cols], function(x) as.numeric(as.character(x)))
 
-# Colonne categoriali (Factor)
 cat_cols <- setdiff(cols_to_keep, numeric_cols)
 meta_sub[cat_cols] <- lapply(meta_sub[cat_cols], factor)
 
-# Creazione del dataframe finale per le annotazioni dell'heatmap
+# --- NEW: rename the two TNBCtype columns ---
+names(meta_sub)[names(meta_sub) == "TNBCtype4_n235_notPreCentered"] <- "TNBCtype4"
+names(meta_sub)[names(meta_sub) == "TNBCtype6_n235_notPreCentered"] <- "TNBCtype6"
+
 annotation_col <- data.frame(
   Cluster = factor(cluster_data$Cluster[sample_order]),
-  meta_sub  # meta_sub è già allineato e ordinato correttamente
+  meta_sub
 )
-
-# Impostiamo i row names di annotation_col affinché corrispondano al 100% alle colonne di plot_matrix
 rownames(annotation_col) <- colnames(plot_matrix)
 
+# --- NEW: reorder annotation_col columns to match the order you want legends drawn in ---
+desired_order <- c("Cluster", "TNBCtype4", "TNBCtype6", "PAM50_NCN", "PAM50_Basal_NCN",
+                    "TMB", "TILs", 
+                    "CibersortX.epithelial", "CibersortX.macrophage", "CibersortX.stroma",
+                    "CibersortX.Bcell", "CibersortX.endothelial", "CibersortX.Tcell",
+                    "ASCAT_PLOIDY", "ASCAT_TUM_FRAC")
+annotation_col <- annotation_col[, desired_order]
 
 # Definizione dei colori per le annotazioni cliniche e i cluster
 ann_colors = list(
   Cluster = c("1" = "tomato3", "2" = "#0984E3", "3" = "#00B894"),
-  TNBCtype4_n235_notPreCentered = c("BL1" = "#A29BFE", "BL2" = "#74B9FF", 
-                                    "M" = "#55E6C1", "LAR" = "#FDCB6E", "NA" = "#B2BEC3"),
-  TNBCtype6_n235_notPreCentered = c("BL1" = "#A29BFE", "BL2" = "#74B9FF", "M" = "#55E6C1", 
-                                    "LAR" = "#FDCB6E", "NA" = "#B2BEC3", "IM" = "#006266", 
-                                    "MSL" = "#FFEAA7", "UNS" = "#FFADAD"),
+  TNBCtype4 = c("BL1" = "#A29BFE", "BL2" = "#74B9FF", 
+                "M" = "#55E6C1", "LAR" = "#FDCB6E", "NA" = "#B2BEC3"),
+  TNBCtype6 = c("BL1" = "#A29BFE", "BL2" = "#74B9FF", "M" = "#55E6C1", 
+                "LAR" = "#FDCB6E", "NA" = "#B2BEC3", "IM" = "#006266", 
+                "MSL" = "#FFEAA7", "UNS" = "#FFADAD"),
   PAM50_NCN = c(Basal = "#D63031", Her2 = "#A29BFE", LumB = "#0984E3", 
                 LumA = "#74B9FF", Normal = "#00B894", unclassified = "#B2BEC3"),
   PAM50_Basal_NCN = c(Basal = "#D63031", nonBasal = "#E0E0E0"),
   
-  TMB                    = colorRamp2(c(0, max(annotation_col$TMB, na.rm = TRUE)), c("#F5F6FA", "#079992")),
-  TILs                   = colorRamp2(c(0, max(annotation_col$TILs, na.rm = TRUE)), c("#F5F6FA", "#6C5CE7")),
-  CibersortX.epithelial  = colorRamp2(c(0, max(annotation_col$CibersortX.epithelial, na.rm = TRUE)), c("#F5F6FA", "#6C5CE7")),
-  CibersortX.macrophage  = colorRamp2(c(0, max(annotation_col$CibersortX.macrophage, na.rm = TRUE)), c("#F5F6FA", "#8154E5")),
-  CibersortX.stroma      = colorRamp2(c(0, max(annotation_col$CibersortX.stroma, na.rm = TRUE)), c("#F5F6FA", "#9B59E0")),
-  CibersortX.Bcell       = colorRamp2(c(0, max(annotation_col$CibersortX.Bcell, na.rm = TRUE)), c("#F5F6FA", "#5B4FCF")),
-  CibersortX.endothelial = colorRamp2(c(0, max(annotation_col$CibersortX.endothelial, na.rm = TRUE)), c("#F5F6FA", "#7C6FE8")),
-  CibersortX.Tcell       = colorRamp2(c(0, max(annotation_col$CibersortX.Tcell, na.rm = TRUE)), c("#F5F6FA", "#4834D4")),
-  ASCAT_PLOIDY           = colorRamp2(c(0, max(annotation_col$ASCAT_PLOIDY, na.rm = TRUE)), c("#F5F6FA", "#273C75")),
-  ASCAT_TUM_FRAC         = colorRamp2(c(0, max(annotation_col$ASCAT_TUM_FRAC, na.rm = TRUE)), c("#F5F6FA", "#079992"))
+  TMB   = colorRamp2(c(0, max(annotation_col$TMB, na.rm = TRUE)), c("#F5F6FA", "#079992")),
+  TILs  = colorRamp2(c(0, max(annotation_col$TILs, na.rm = TRUE)), c("#F5F6FA", "#6C5CE7")),
+  
+  # --- NEW: genuinely distinct colors for each cell type ---
+  CibersortX.epithelial  = colorRamp2(c(0, max(annotation_col$CibersortX.epithelial, na.rm = TRUE)), c("#F5F6FA", "#0984E3")), # blue
+  CibersortX.macrophage  = colorRamp2(c(0, max(annotation_col$CibersortX.macrophage, na.rm = TRUE)), c("#F5F6FA", "#E17055")), # orange
+  CibersortX.stroma      = colorRamp2(c(0, max(annotation_col$CibersortX.stroma, na.rm = TRUE)), c("#F5F6FA", "#00B894")), # green
+  CibersortX.Bcell       = colorRamp2(c(0, max(annotation_col$CibersortX.Bcell, na.rm = TRUE)), c("#F5F6FA", "#6C5CE7")), # purple
+  CibersortX.endothelial = colorRamp2(c(0, max(annotation_col$CibersortX.endothelial, na.rm = TRUE)), c("#F5F6FA", "#FDCB6E")), # yellow
+  CibersortX.Tcell       = colorRamp2(c(0, max(annotation_col$CibersortX.Tcell, na.rm = TRUE)), c("#F5F6FA", "#D63031")), # red
+  
+  ASCAT_PLOIDY   = colorRamp2(c(0, max(annotation_col$ASCAT_PLOIDY, na.rm = TRUE)), c("#F5F6FA", "#273C75")),
+  ASCAT_TUM_FRAC = colorRamp2(c(0, max(annotation_col$ASCAT_TUM_FRAC, na.rm = TRUE)), c("#F5F6FA", "#079992"))
 )
-                                 
+
 # Costruzione dell'oggetto HeatmapAnnotation (la sidebar superiore)
 col_ann <- HeatmapAnnotation(
   df = annotation_col, 
   col = ann_colors,
-  show_legend = TRUE
+  show_legend = TRUE,
+  annotation_name_side = "left",   # NEW: keeps names away from legend area
+  annotation_name_gp = gpar(fontsize = 8)
 )
 
-                                 
 # Generazione del Main Heatmap di espressione genica
 ht <- Heatmap(
   plot_matrix, 
@@ -152,19 +145,33 @@ ht <- Heatmap(
   top_annotation = col_ann,     
   show_row_names = FALSE,       
   show_column_names = FALSE,    
-  cluster_columns = FALSE,      # I campioni rimangono raggruppati rigidamente per Cluster RNAseq
-  cluster_rows = TRUE,          # I geni (i marker identificati prima) vengono clusterizzati tra loro
+  cluster_columns = FALSE,      
+  cluster_rows = TRUE,          
   col = colorRampPalette(c("blue", "white", "red"))(100),
-  width = unit(12, "cm") 
+  width = unit(14, "cm"),
+  heatmap_legend_param = list(direction = "horizontal")
 )
 
+# Shrink legends a bit so more fit per row (good for A4)
+ht_opt(
+  legend_title_gp = gpar(fontsize = 8, fontface = "bold"),
+  legend_labels_gp = gpar(fontsize = 7),
+  legend_grid_height = unit(3, "mm"),
+  legend_grid_width = unit(3, "mm")
+)
+
+# A4 portrait-friendly: 8.27 x 11.69 in
 png("/mnt/petasan_ccb/alessandro/SCANB/plots/comparisons/heatmap_rna_metadata.png", 
-    width = 16, height = 8, units = "in", res = 300)  # wider canvas
+    width = 8.27, height = 11.69, units = "in", res = 300)
 draw(ht, 
      merge_legends = TRUE, 
-     heatmap_legend_side = "right", 
-     annotation_legend_side = "right")
-dev.off()                                 
+     heatmap_legend_side = "bottom", 
+     annotation_legend_side = "bottom",
+     annotation_legend_list = NULL,
+     legend_grouping = "original")
+dev.off()
+
+ht_opt(RESET = TRUE)  # reset legend options afterward so it doesn't affect other plots
 
 
 
