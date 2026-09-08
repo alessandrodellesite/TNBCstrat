@@ -229,7 +229,7 @@ annotation_col_meth <- data.frame(
 
 # Impostiamo i nomi delle righe per farli coincidere con le colonne della heatmap
 rownames(annotation_col_meth) <- colnames(plot_matrix)
-
+                                 
 ann_colors_meth = list(
   RNAseq          = c("1" = "tomato3", "2" = "#0984E3", "3" = "#00B894"),
   DNAm            = c("1" = "#ffb8b8", "2" = "#95afc0", "3" = "#badc58"), 
@@ -241,14 +241,14 @@ ann_colors_meth = list(
   icluster_2      = c("1" = "#27ae33", "2" = "#e1b99c"),
   icluster_3      = c("1" = "#e1b99c", "2" = "#27ae33", "3" = "#4c5ce1"),
   icluster_4      = c("1" = "#4c5ce1", "2" = "#e1b99c", "3" = "#ff6f11", "4" = "#27ae33"),
-  icluster_5      = c("1" = "#4c5ce1", "2" = "#e1b99c", "3" = "#ff6f11", "4" = "#27ae33", "5" = "#5B8E8A"),
+  icluster_5      = c("1" = "#ff6f11", "2" = "#e1b99c", "3" = "#27ae33", "4" = "#4c5ce1", "5" = "#5B8E8A"),
   SNF_2           = c("1" = "#ff7f50", "2" = "#008080"),
   SNF_3           = c("1" = "#ff7f50", "2" = "#34495e", "3" = "#008080"),
   SNF_4           = c("1" = "#ff7f50", "2" = "#008080", "3" = "#f1c40f", "4" = "#34495e"),
   XintNMF_2           = c("1" = "#27ae60", "2" = "#e1b12c"),
   XintNMF_3           = c("1" = "#27ae60", "2" = "#e1b12c", "3" = "#6c5ce7"),
   XintNMF_4           = c("1" = "#6c5ce7", "2" = "#ff6f99", "3" = "#27ae60", "4" = "#e1b12c")
-)                                 
+)                            
 
 # HEATMAP 
 
