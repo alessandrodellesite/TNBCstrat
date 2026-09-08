@@ -2,7 +2,7 @@
 
 library(NMF)
 
-
+rna_data <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.rds")
 # Methylation 
 
 # methylation feature selection
