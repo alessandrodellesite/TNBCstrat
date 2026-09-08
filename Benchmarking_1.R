@@ -1,55 +1,50 @@
+library(dplyr)
+library(purrr)
+library(mclust) #for Adjusted Rand Index
+library(aricode) #for fast computation of Normalized Mutual Information, and it also computes Normalized Variation of Information
+library(mcclust) #provides the original Variation of Information distance metric
+library(pheatmap)
 
 # load clustering results
 
-mofa2_results <- read.csv("mofa_km_clusters_2.csv")
-mofa3_results <- read.csv("mofa_km_clusters_3.csv")
-mofa4_results <- read.csv("mofa_km_clusters_4.csv")
+#mofa
+mofa2_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_2.csv")
+mofa3_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_3.csv")
+mofa4_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_4.csv")
 
-icluster2_results <- read.csv("iclusters_clusters_2.csv")
-icluster3_results <- read.csv("iclusters_clusters_3.csv")
-icluster4_results <- read.csv("iclusters_clusters_4.csv")
-
-ibayes3_results <- read.csv("iclusters_bayes_3.csv")
-ibayes4_results <- read.csv("iclusters_bayes_4.csv")
-
-snf2_results <- read.csv("SNF_clusters_2.csv")
-snf3_results <- read.csv("SNF_clusters_3.csv")
-snf4_results <- read.csv("SNF_clusters_4.csv")
-
-XintNMF2_results <- read.csv("xintNMF_clusters_k2.csv")
-XintNMF3_results <- read.csv("xintNMF_clusters_k3.csv")
-XintNMF4_results <- read.csv("xintNMF_clusters_k4.csv")
-
-XintNMF2_results_reg <- read.csv("xintNMF_clusters_k2_reg.csv")
-XintNMF3_results_reg <- read.csv("xintNMF_clusters_k3_reg.csv")
-XintNMF4_results_reg <- read.csv("xintNMF_clusters_k4_reg.csv")
+#icluster
+icluster2_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_2.csv")
+icluster3_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_3.csv")                                
+icluster4_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_4.csv")
+#icluster_5 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_5.csv")
+                                 
+#snf
+snf2_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_snf/snf_clusters_2.csv")
+snf3_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_snf/snf_clusters_3.csv")                                
+snf4_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_snf/snf_clusters_4.csv")
+                                 
+#xintnmf                                 
+XintNMF2_results_reg <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k2_reg.csv")                    
+XintNMF3_results_reg <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k3_reg.csv")
+XintNMF4_results_reg <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k4_reg.csv")                                
 
 
 # merge results into one dataframe
 
-
-library(dplyr)
-library(purrr)
-
 # change cluster column name
 lista_dataframe <- list(
-  "MOFA_KM_2"  = mofa2_results,
-  "MOFA_KM_3"  = mofa3_results,
-  "MOFA_KM_4"  = mofa4_results,
+  "MOFA_2"  = mofa2_results,
+  "MOFA_3"  = mofa3_results,
+  "MOFA_4"  = mofa4_results,
   "icluster_2" = icluster2_results,
   "icluster_3" = icluster3_results,
   "icluster_4" = icluster4_results,
-  "ibayes_3"   = ibayes3_results,
-  "ibayes_4"   = ibayes4_results,  
   "SNF_2"      = snf2_results,
   "SNF_3"      = snf3_results,
   "SNF_4"      = snf4_results,
-  "xintNMF_2"  = XintNMF2_results,
-  "xintNMF_3"  = XintNMF3_results,
-  "xintNMF_4"  = XintNMF4_results,
-  "xintNMF_2_reg"  = XintNMF2_results_reg,
-  "xintNMF_3_reg"  = XintNMF3_results_reg,
-  "xintNMF_4_reg"  = XintNMF4_results_reg
+  "xintNMF_2"  = XintNMF2_results_reg,
+  "xintNMF_3"  = XintNMF3_results_reg,
+  "xintNMF_4"  = XintNMF4_results_reg
 )
 
 #full_join using sampleID
@@ -61,26 +56,13 @@ cluster_results <- imap(lista_dataframe, function(df, nuovo_nome) {
   purrr::reduce(dplyr::full_join, by = "SampleID")
 
 head(cluster_results)
-```
 
 # benchmarking
 
 ## Results concordance between different methods 
-Metrics: 
-Adjusted Rand Index (ARI)
-Normalized Mutual information (NMI) 
-Jaccard variation of information
+#Metrics:  Adjusted Rand Index (ARI), Normalized Mutual information (NMI), Jaccard variation of information
 
 
-```{r}
-library(mclust) #for Adjusted Rand Index
-library(aricode) #for fast computation of Normalized Mutual Information, and it also computes Normalized Variation of Information
-library(mcclust) #provides the original Variation of Information distance metric
-library(pheatmap)
-```
-
-
-```{r}
 # exclude the first column to get only the cluster label columns
 clustering_methods <- colnames(cluster_results)[colnames(cluster_results) != "SampleID"]
 n_methods <- length(clustering_methods)
@@ -90,10 +72,8 @@ n_patients <- nrow(cluster_results)
 ari_matrix <- matrix(1, nrow = n_methods, ncol = n_methods, dimnames = list(clustering_methods, clustering_methods))
 nmi_matrix <- matrix(1, nrow = n_methods, ncol = n_methods, dimnames = list(clustering_methods, clustering_methods))
 vi_matrix  <- matrix(0, nrow = n_methods, ncol = n_methods, dimnames = list(clustering_methods, clustering_methods))
-```
 
 
-```{r}
 # compute pairwise metrics
 for (i in 1:(n_methods - 1)) {
   for (j in (i + 1):n_methods) {
@@ -136,11 +116,8 @@ for (i in 1:(n_methods - 1)) {
   }
 }
 
-```
 
-# comparisons are only meaningful/most interpretable at matched k
 
-```{r}
 cat("ADJUSTED RAND INDEX (ARI) \n")
 print(round(ari_matrix, 3))
 
@@ -171,4 +148,4 @@ pheatmap(vi_matrix,
          display_numbers = TRUE, 
          color = colorRampPalette(c("#1A7666", "#E8F0FE", "white"))(50),
          number_color = "black")
-```
+
