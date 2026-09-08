@@ -208,8 +208,8 @@ icluster_map_5 <- setNames(icluster_5$Cluster, icluster_5$SampleID)
 annotation_col_meth <- data.frame(
   RNAseq                 = factor(cluster_data$Cluster[sample_order]),
   #RNAseq_1000            = factor(rna_1000_map[colnames(plot_matrix)]),
-  Methyl_probes          = factor(methyl_map_probes[colnames(plot_matrix)]),
-  Methyl_probes_4          = factor(methyl_map_probes_4[colnames(plot_matrix)]),
+  DNAm          = factor(methyl_map_probes[colnames(plot_matrix)]),
+  DNAm_4          = factor(methyl_map_probes_4[colnames(plot_matrix)]),
   CNV                    = factor(cnv_map[colnames(plot_matrix)]),
   MOFA_2                 = factor(mofa_map_2[colnames(plot_matrix)]),
   MOFA_3                 = factor(mofa_map_3[colnames(plot_matrix)]),
@@ -221,12 +221,9 @@ annotation_col_meth <- data.frame(
   icluster_3             = factor(icluster_map_3[colnames(plot_matrix)]),
   icluster_4             = factor(icluster_map_4[colnames(plot_matrix)]),
   icluster_5             = factor(icluster_map_5[colnames(plot_matrix)]),
-  #Xint2                  = factor(xint_map_2[colnames(plot_matrix)]),
- # Xint3                  = factor(xint_map_3[colnames(plot_matrix)]),
- # Xint4                  = factor(xint_map_4[colnames(plot_matrix)]),
-  Xint2_reg                  = factor(xint_map_2_reg[colnames(plot_matrix)]),
-  Xint3_reg                  = factor(xint_map_3_reg[colnames(plot_matrix)]),
-  Xint4_reg                  = factor(xint_map_4_reg[colnames(plot_matrix)])
+  XintNMF_2                  = factor(xint_map_2_reg[colnames(plot_matrix)]),
+  XintNMF_3                  = factor(xint_map_3_reg[colnames(plot_matrix)]),
+  XintNMF_4                  = factor(xint_map_4_reg[colnames(plot_matrix)])
   )
 
 
@@ -235,7 +232,8 @@ rownames(annotation_col_meth) <- colnames(plot_matrix)
 
 ann_colors_meth = list(
   RNAseq          = c("1" = "tomato3", "2" = "#0984E3", "3" = "#00B894"),
-  Methyl_probes   = c("1" = "#ffb8b8", "2" = "#95afc0", "3" = "#badc58"), 
+  DNAm            = c("1" = "#ffb8b8", "2" = "#95afc0", "3" = "#badc58"), 
+  DNAm_4          = c("1" = "#ffb8b8", "2" = "#95afc0", "3" = "#badc58", "4"= "#34495e"), 
   CNV             = c("1" = "#ff7675", "2" = "#74b9ff", "3" = "#fdcb6e"), 
   MOFA_2          = c("1" = "#ffeaa7", "2" = "#0984E3"),
   MOFA_3          = c("1" = "#0984E3", "2" = "#9b59b6", "3" = "#ffeaa7"),
@@ -247,9 +245,9 @@ ann_colors_meth = list(
   SNF_2           = c("1" = "#ff7f50", "2" = "#008080"),
   SNF_3           = c("1" = "#ff7f50", "2" = "#34495e", "3" = "#008080"),
   SNF_4           = c("1" = "#ff7f50", "2" = "#008080", "3" = "#34495e", "4" = "#f1c40f"),
-  Xint2_reg           = c("1" = "#27ae60", "2" = "#e1b12c"),
-  Xint3_reg           = c("1" = "#27ae60", "2" = "#e1b12c", "3" = "#6c5ce7"),
-  Xint4_reg           = c("1" = "#27ae60", "2" = "#e1b12c", "3" = "#6c5ce7", "4" = "#ff6f99")
+  XintNMF_2           = c("1" = "#27ae60", "2" = "#e1b12c"),
+  XintNMF_3           = c("1" = "#27ae60", "2" = "#e1b12c", "3" = "#6c5ce7"),
+  XintNMF_4           = c("1" = "#27ae60", "2" = "#e1b12c", "3" = "#6c5ce7", "4" = "#ff6f99")
 )                                 
 
 # HEATMAP 
