@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=nmf_meth
-#SBATCH --output=nmf_meth%j.log
+#SBATCH --job-name=benchmarking_1
+#SBATCH --output=benchmarking%j.log
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
@@ -11,7 +11,7 @@
 #SBATCH --mem=3G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image_new.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Results_comparison.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Benchmarking_2.R"
 
 # singularity execution
 srun singularity exec \
