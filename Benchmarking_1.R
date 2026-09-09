@@ -367,6 +367,11 @@ print(round(results_table, 3))
 
 # Plot
 
+plot_data <- results_table %>%
+  tibble::rownames_to_column("Metric") %>%
+  pivot_longer(-Metric, names_to = "Approach", values_to = "Value") %>%
+  mutate(Method_Family = str_extract(Approach, "^[A-Za-z]+"))
+
 p <- ggplot(plot_data, aes(x = Approach, y = Value, fill = Method_Family)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.6) +
   facet_wrap(~Metric, scales = "free_y") +
