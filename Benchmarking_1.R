@@ -221,12 +221,37 @@ snf_w_fused <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_snf/
 snf_idx <- match(cluster_results$SampleID, rownames(snf_w_fused))
 check_matches(snf_idx, cluster_results$SampleID, "SNF")
 snf_w_clean <- snf_w_fused[snf_idx, snf_idx]
-snf_dist_full <- as.dist(1 - snf_w_clean)
 
-# SNF has no native feature-space embedding (only an affinity/distance matrix),
-# but index.DB requires actual coordinates to compute centroid/medoid positions.
-# Classical MDS gives a coordinate embedding that preserves the SNF distances.
-snf_embedding <- cmdscale(snf_dist_full, k = min(10, nrow(snf_w_clean) - 2))
+
+# Replicate the exact embedding SNFtool::spectralClustering() computes internally 
+# : row-normalized eigenvectors of the symmetric
+# normalized graph Laplacian. This (not 1-W) is the space the clusters
+# were actually formed in.
+snf_spectral_embedding <- function(W, K) {
+  d <- rowSums(W)
+  d[d == 0] <- .Machine$double.eps
+  D <- diag(d)
+  L <- D - W
+  Di <- diag(1 / sqrt(d))
+  NL <- Di %*% L %*% Di
+  NL <- (NL + t(NL)) / 2   # guard against floating-point asymmetry before eigen()
+
+  eig <- eigen(NL)
+  ord <- order(abs(eig$values))                      # smallest |eigenvalue| first, same as spectralClustering()
+  U <- eig$vectors[, ord[1:K], drop = FALSE]
+  U <- t(apply(U, 1, function(x) x / sqrt(sum(x^2)))) # row-normalize -- the "type = 3" step
+  rownames(U) <- rownames(W)
+  U
+}
+
+snf_embeddings <- purrr::map(c("2" = 2, "3" = 3, "4" = 4), function(k) {
+  snf_spectral_embedding(snf_w_clean, K = k)
+})
+
+snf_dist_full <- purrr::map(snf_embeddings, function(U) dist(U, method = "euclidean"))
+
+
+
 
 # iCluster 2/3/4
 icluster_z2 <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/icluster_matrix_2.rds")
@@ -334,10 +359,10 @@ approach_configs <- list(
   icluster_3 = list(dist_full = icluster_dist_full3, db_x = icluster_z_clean3, db_d = NULL, centrotypes = "centroids"),
   icluster_4 = list(dist_full = icluster_dist_full4, db_x = icluster_z_clean4, db_d = NULL, centrotypes = "centroids"),
 
-  # SNF: no raw feature space, so index.DB uses the MDS embedding derived from the fused distance, with medoids identified via the actual SNF distance
-  SNF_2 = list(dist_full = snf_dist_full, db_x = snf_embedding, db_d = snf_dist_full, centrotypes = "medoids"),
-  SNF_3 = list(dist_full = snf_dist_full, db_x = snf_embedding, db_d = snf_dist_full, centrotypes = "medoids"),
-  SNF_4 = list(dist_full = snf_dist_full, db_x = snf_embedding, db_d = snf_dist_full, centrotypes = "medoids"),
+  #now we are in the euclidian eigenspace
+  SNF_2 = list(dist_full = snf_dist_full[["2"]], db_x = snf_embeddings[["2"]], db_d = NULL, centrotypes = "centroids"),
+  SNF_3 = list(dist_full = snf_dist_full[["3"]], db_x = snf_embeddings[["3"]], db_d = NULL, centrotypes = "centroids"),
+  SNF_4 = list(dist_full = snf_dist_full[["4"]], db_x = snf_embeddings[["4"]], db_d = NULL, centrotypes = "centroids"),
 
   xintNMF_2 = list(dist_full = xint_dist_full[["2"]], db_x = as.matrix(xint_factors[["2"]]),
                  db_d = NULL, centrotypes = "centroids"),
