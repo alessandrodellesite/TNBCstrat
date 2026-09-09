@@ -378,9 +378,7 @@ dna_matrix_filt[na_idx] <- row_means[na_idx[, 1]]
                    
 # CNV plot
 
-
-
-# --- 1. Build a genomic-position lookup for genes in geni_final ---
+# Build a genomic-position lookup for genes in geni_final 
 
 plot_coords <- gene_coords |>
   filter(ensembl_gene_id %in% geni_final) |>
@@ -399,7 +397,7 @@ plot_coords <- plot_coords |>
   left_join(chr_lengths, by = "chromosome_name") |>
   mutate(genomic_pos = start_position + offset)
 
-# --- 2. Attach recurrence counts (raw counts, not yet thresholded) ---
+#Attach recurrence counts (not thresholded) 
 
 counts_df <- data.frame(
   ensembl_gene_id = names(cont_amp),
@@ -416,15 +414,15 @@ plot_data <- plot_coords |>
   ) |>
   filter(n_samples > 0)   # only plot genes that actually have that event
 
-# --- 3. Chromosome midpoints, for x-axis labels ---
+# Chromosome midpoints, for x-axis labels
 
 chr_midpoints <- plot_coords |>
   group_by(chromosome_name) |>
   summarise(mid = mean(range(genomic_pos)), .groups = "drop")
 
-# --- 4. Plot ---
+#plot
 
-ggplot(plot_data, aes(x = genomic_pos, y = n_samples, color = event_type)) +
+p <- ggplot(plot_data, aes(x = genomic_pos, y = n_samples, color = event_type)) +
   geom_point(alpha = 0.7, size = 1.5) +
   scale_color_manual(values = c(
     amplification    = "#D64550",
@@ -447,3 +445,11 @@ ggplot(plot_data, aes(x = genomic_pos, y = n_samples, color = event_type)) +
     panel.grid.major.x = element_blank(),
     axis.text.x = element_text(angle = 0, size = 8)
   )                   
+
+
+png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/singleomic_nmf/cnv_nmf",
+               "cnv_manhattan_plot.png"),
+    width = 1400, height = 1000, res = 150)
+print(p)
+dev.off()
+                   
