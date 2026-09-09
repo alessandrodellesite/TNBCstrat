@@ -197,9 +197,9 @@ config <- tribble(
   "MOFA",     2,  file.path(boot_base, "bootstrap", "mofa", "mofa_bootstrap_k2"),              file.path(boot_base, "output_mofa", "mofa_km_clusters_2.csv"),        "\\.rds$",
   "MOFA",     3,  file.path(boot_base, "bootstrap", "mofa", "mofa_bootstrap_k3"),              file.path(boot_base, "output_mofa", "mofa_km_clusters_3.csv"),        "\\.rds$",
   "MOFA",     4,  file.path(boot_base, "bootstrap", "mofa", "mofa_bootstrap_k4"),              file.path(boot_base, "output_mofa", "mofa_km_clusters_4.csv"),        "\\.rds$",
-  "SNF",      2,  file.path(boot_base, "bootstrap", "snf", "snf_bootstrap_k2"),                file.path(boot_base, "output_snf", "SNF_clusters_2.csv"),             "\\.rds$",
-  "SNF",      3,  file.path(boot_base, "bootstrap", "snf", "snf_bootstrap_k3"),                file.path(boot_base, "output_snf", "SNF_clusters_3.csv"),             "\\.rds$",
-  "SNF",      4,  file.path(boot_base, "bootstrap", "snf", "snf_bootstrap_k4"),                file.path(boot_base, "output_snf", "SNF_clusters_4.csv"),             "\\.rds$",
+  "SNF",      2,  file.path(boot_base, "bootstrap", "snf", "snf_bootstrap_k2"),                file.path(boot_base, "output_snf", "snf_clusters_2.csv"),             "\\.rds$",
+  "SNF",      3,  file.path(boot_base, "bootstrap", "snf", "snf_bootstrap_k3"),                file.path(boot_base, "output_snf", "snf_clusters_3.csv"),             "\\.rds$",
+  "SNF",      4,  file.path(boot_base, "bootstrap", "snf", "snf_bootstrap_k4"),                file.path(boot_base, "output_snf", "snf_clusters_4.csv"),             "\\.rds$",
   "xintNMF",  2,  file.path(boot_base, "bootstrap", "xintnmf", "xintnmf_bootstrap_k2_clusters"), file.path(boot_base, "output_xintnmf", "xintNMF_clusters_k2_reg.csv"), "\\.rds$",
   "xintNMF",  3,  file.path(boot_base, "bootstrap", "xintnmf", "xintnmf_bootstrap_k3_clusters"), file.path(boot_base, "output_xintnmf", "xintNMF_clusters_k3_reg.csv"), "\\.rds$",
   "xintNMF",  4,  file.path(boot_base, "bootstrap", "xintnmf", "xintnmf_bootstrap_k4_clusters"), file.path(boot_base, "output_xintnmf", "xintNMF_clusters_k4_reg.csv"), "\\.rds$"
