@@ -11,7 +11,7 @@
 #SBATCH --mem=3G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image_new.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Bootstrap_xintnmf_2.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Bootstrap_xintNMF_2.R"
 
 # singularity execution
 srun singularity exec \
