@@ -1,5 +1,7 @@
 library(biomaRt)
 library(GenomicRanges)
+library(dplyr)
+library(ggplot2)
 
 # Data loading and matching samples with rnaseq dataset
 
@@ -366,4 +368,82 @@ na_idx <- which(is.na(dna_matrix_filt), arr.ind = TRUE)
 dna_matrix_filt[na_idx] <- row_means[na_idx[, 1]]
 
 #save
-saveRDS(dna_matrix_filt, "/mnt/petasan_ccb/alessandro/SCANB/cnv_processed.rds")
+#saveRDS(dna_matrix_filt, "/mnt/petasan_ccb/alessandro/SCANB/cnv_processed.rds")
+
+
+
+
+
+
+                   
+# CNV plot
+
+
+
+# --- 1. Build a genomic-position lookup for genes in geni_final ---
+
+plot_coords <- gene_coords |>
+  filter(ensembl_gene_id %in% geni_final) |>
+  # keep only standard chromosomes, drop any scaffolds/patches
+  filter(chromosome_name %in% c(as.character(1:22), "X", "Y")) |>
+  mutate(chromosome_name = factor(chromosome_name, levels = c(as.character(1:22), "X", "Y")))
+
+# chromosome lengths (GRCh37), used to compute cumulative offsets
+chr_lengths <- plot_coords |>
+  group_by(chromosome_name) |>
+  summarise(chr_max = max(end_position), .groups = "drop") |>
+  arrange(chromosome_name) |>
+  mutate(offset = lag(cumsum(as.numeric(chr_max)), default = 0))
+
+plot_coords <- plot_coords |>
+  left_join(chr_lengths, by = "chromosome_name") |>
+  mutate(genomic_pos = start_position + offset)
+
+# --- 2. Attach recurrence counts (raw counts, not yet thresholded) ---
+
+counts_df <- data.frame(
+  ensembl_gene_id = names(cont_amp),
+  amplification   = cont_amp,
+  homozygous_del  = cont_del,
+  single_copy_loss = cont_het
+)
+
+plot_data <- plot_coords |>
+  left_join(counts_df, by = "ensembl_gene_id") |>
+  tidyr::pivot_longer(
+    cols = c(amplification, homozygous_del, single_copy_loss),
+    names_to = "event_type", values_to = "n_samples"
+  ) |>
+  filter(n_samples > 0)   # only plot genes that actually have that event
+
+# --- 3. Chromosome midpoints, for x-axis labels ---
+
+chr_midpoints <- plot_coords |>
+  group_by(chromosome_name) |>
+  summarise(mid = mean(range(genomic_pos)), .groups = "drop")
+
+# --- 4. Plot ---
+
+ggplot(plot_data, aes(x = genomic_pos, y = n_samples, color = event_type)) +
+  geom_point(alpha = 0.7, size = 1.5) +
+  scale_color_manual(values = c(
+    amplification    = "#D64550",
+    homozygous_del   = "#2C6E9B",
+    single_copy_loss = "#4B9B6E"
+  )) +
+  scale_x_continuous(
+    breaks = chr_midpoints$mid,
+    labels = chr_midpoints$chromosome_name,
+    expand = c(0.01, 0.01)
+  ) +
+  labs(
+    x = "Chromosome",
+    y = "Number of samples with concordant CNV/expression alteration",
+    color = "Event type",
+    title = "Genomic distribution of recurrent CNV-expression concordant alterations"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    axis.text.x = element_text(angle = 0, size = 8)
+  )                   
