@@ -435,13 +435,13 @@ print(unstable_summary)
 
 
 
-"""
+
 #4 — Paired test between methods (exploiting the shared-subsample design)
-Since ari_per_rep inside compute_bootstrap_stability isn't tagged with iter_id, pairing purely by vector 
-position risks silently misaligning replicates if file listing order differs between methods. I wrote a small 
-standalone extractor that re-derives ARI values explicitly keyed by iter_id, so the pairing is guaranteed correct 
-regardless of file ordering:
-"""
+# Since ari_per_rep inside compute_bootstrap_stability isn't tagged with iter_id, pairing purely by vector 
+# position risks silently misaligning replicates if file listing order differs between methods. I wrote a small 
+# standalone extractor that re-derives ARI values explicitly keyed by iter_id, so the pairing is guaranteed correct 
+# regardless of file ordering:
+
 ## --- Extract ARI per replicate, named by iter_id (for safe pairing) ---
 get_named_ari <- function(boot_dir, reference_clusters, file_pattern = "\\.rds$") {
   files <- list.files(boot_dir, pattern = file_pattern, full.names = TRUE)
