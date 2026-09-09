@@ -16,6 +16,8 @@ library(mclust)
 library(pheatmap)
 library(dplyr)
 library(tibble)
+library(ggplot2)
+library(tidyr)
 
 
 # function to compute all metrics
@@ -174,7 +176,7 @@ compute_bootstrap_stability <- function(boot_dir,
     per_sample_stability = per_sample_stability
   )
 }
-```
+
 
 ref_dir <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics_clusters_results"
 boot_base <- "/mnt/petasan_ccb/alessandro/SCANB"
@@ -197,6 +199,7 @@ config <- tribble(
   "iCluster", 4,  file.path(boot_base, "icluster_bootstrap_k4"),          "icluster_clusters_k4.csv",        "\\.rds$",
   "MOFA",     2,  file.path(boot_base, "mofa_bootstrap_k2"),              "mofa_km_clusters_k2.csv",         "\\.rds$",
   "MOFA",     3,  file.path(boot_base, "mofa_bootstrap_k3"),              "mofa_km_clusters_k3.csv",         "\\.rds$",
+  "MOFA",     4,  file.path(boot_base, "mofa_bootstrap_k4"),              "mofa_km_clusters_k4.csv",         "\\.rds$",
   "SNF",      2,  file.path(boot_base, "snf_bootstrap_k2"),               "SNF_clusters_k2.csv",             "\\.rds$",
   "SNF",      3,  file.path(boot_base, "snf_bootstrap_k3"),               "SNF_clusters_k3.csv",             "\\.rds$",
   "SNF",      4,  file.path(boot_base, "snf_bootstrap_k4"),               "SNF_clusters_k4.csv",             "\\.rds$",
@@ -229,6 +232,7 @@ all_stability <- purrr::pmap(config, function(method, k, boot_dir, ref_file, fil
 ## from the SAME shared subsamples (as intended) -- i.e. that the
 ## *sample sets* per iter_id match across methods, since that's what
 ## the shared boot_subsamples.rds is supposed to guarantee.
+
 check_shared_subsamples <- function(config_subset) {
   file_lists <- purrr::pmap(config_subset, function(method, k, boot_dir, ref_file, file_pattern) {
     files <- list.files(boot_dir, pattern = file_pattern, full.names = TRUE)
@@ -274,15 +278,14 @@ print(summary_table)
 
 ## Optional: write out for reporting
 #write.csv(summary_table, file.path(boot_base, "bootstrap_stability_summary.csv"),  row.names = FALSE)
-```
 
 
-```{r}
+
 ## PLOTS
-library(ggplot2)
-library(tidyr)
 
-## --- 3. Boxplots of the FULL per-replicate ARI distribution ---
+
+# Boxplots of the full per-replicate ARI distribution 
+
 ari_long <- purrr::map_dfr(all_stability, function(s) {
   data.frame(Method = s$method_base, K = s$K, ARI = s$ari_per_rep)
 })
@@ -294,11 +297,13 @@ p_box_ari <- ggplot(ari_long, aes(x = Method, y = ARI, fill = Method)) +
   theme_minimal() +
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
 print(p_box_ari)
+                                      
 
-## --- 4. Boxplots of per-cluster Jaccard values (pooled across clusters) ---
+# Boxplots of per-cluster Jaccard values (pooled across clusters) 
 ## Each point here is one (bootstrap replicate x reference cluster) best-match
 ## Jaccard value, so this shows the spread Hennig's method is meant to reveal:
 ## whether instability is concentrated in one or two clusters or spread evenly.
+                                      
 jaccard_long <- purrr::map_dfr(all_stability, function(s) {
   jm <- s$jaccard_matrix
   df <- as.data.frame(jm)
@@ -337,3 +342,166 @@ p_cluster_detail <- ggplot(jaccard_long, aes(x = RefCluster, y = Jaccard, fill =
   theme_minimal() +
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
 print(p_cluster_detail)
+
+
+
+
+#2 — Visualizing cophenetic correlation, dispersion, and per-sample stability                                 
+
+## --- 6. Cophenetic correlation & dispersion score, by method x K ---
+## These summarize consensus-matrix "cleanliness" (how tree-like/polarized
+## the pairwise co-clustering structure is) but were previously only in
+## the summary table as numbers. Plotting them alongside ARI/Jaccard makes
+## it possible to spot cases where these three lines of evidence disagree
+## (e.g. high ARI but low dispersion -- consensus is polarized but the
+## dendrogram doesn't reflect it cleanly).
+diag_long <- summary_table %>%
+  select(Method, K, Cophenetic_Corr, Dispersion) %>%
+  tidyr::pivot_longer(cols = c(Cophenetic_Corr, Dispersion),
+                       names_to = "Metric", values_to = "Value")
+
+p_diag <- ggplot(diag_long, aes(x = Method, y = Value, fill = Method)) +
+  geom_col(width = 0.7) +
+  facet_grid(Metric ~ K, labeller = labeller(K = function(x) paste0("K = ", x))) +
+  ylim(0, 1) +
+  labs(title = "Consensus matrix diagnostics: cophenetic correlation & dispersion",
+       y = NULL, x = NULL) +
+  theme_minimal() +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
+print(p_diag)
+
+## --- 7. Per-sample stability: full distribution, by method x K ---
+per_sample_long <- purrr::map_dfr(all_stability, function(s) {
+  data.frame(Method = s$method_base, K = s$K,
+             SampleID = names(s$per_sample_stability),
+             Stability = s$per_sample_stability)
+})
+
+p_per_sample <- ggplot(per_sample_long, aes(x = Method, y = Stability, fill = Method)) +
+  geom_violin(trim = TRUE, alpha = 0.7) +
+  geom_boxplot(width = 0.12, outlier.size = 0.5, fill = "white") +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "grey40") +
+  facet_wrap(~ K, labeller = labeller(K = function(x) paste0("K = ", x))) +
+  ylim(0, 1) +
+  labs(title = "Per-sample stability distribution",
+       subtitle = "Dashed line at 0.5: samples below this are ambiguous/boundary cases",
+       y = "Mean consensus with own cluster", x = NULL) +
+  theme_minimal() +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
+print(p_per_sample)
+
+## --- 8. Summary: fraction of "unstable" samples per method x K ---
+## Complements the violin plot with a single interpretable number:
+## how many samples are borderline/unreliable cluster members.
+unstable_summary <- per_sample_long %>%
+  group_by(Method, K) %>%
+  summarise(
+    n_samples          = n(),
+    frac_below_0.5     = mean(Stability < 0.5, na.rm = TRUE),
+    frac_below_0.7     = mean(Stability < 0.7, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(K, Method)
+print(unstable_summary)
+
+
+
+
+"""
+#4 — Paired test between methods (exploiting the shared-subsample design)
+Since ari_per_rep inside compute_bootstrap_stability isn't tagged with iter_id, pairing purely by vector 
+position risks silently misaligning replicates if file listing order differs between methods. I wrote a small 
+standalone extractor that re-derives ARI values explicitly keyed by iter_id, so the pairing is guaranteed correct 
+regardless of file ordering:
+"""
+## --- Extract ARI per replicate, named by iter_id (for safe pairing) ---
+get_named_ari <- function(boot_dir, reference_clusters, file_pattern = "\\.rds$") {
+  files <- list.files(boot_dir, pattern = file_pattern, full.names = TRUE)
+  boot_results <- purrr::map(files, readRDS)
+  master_samples <- names(reference_clusters)
+
+  ari_vec <- purrr::map_dbl(boot_results, function(res) {
+    ids <- intersect(res$sample_ids, master_samples)
+    if (length(ids) < 2) return(NA_real_)
+    ref_sub  <- reference_clusters[ids]
+    boot_sub <- res$cluster
+    names(boot_sub) <- res$sample_ids
+    mclust::adjustedRandIndex(ref_sub, boot_sub[ids])
+  })
+  names(ari_vec) <- purrr::map_chr(boot_results, ~ as.character(.x$iter_id))
+  ari_vec
+}
+
+## --- Build named-ARI vectors for every method x K combination ---
+ari_by_config <- purrr::pmap(config, function(method, k, boot_dir, ref_file, file_pattern) {
+  reference_clusters <- load_reference(file.path(ref_dir, ref_file))
+  list(method = method, K = k,
+       ari = get_named_ari(boot_dir, reference_clusters, file_pattern))
+})
+
+## --- Pairwise paired Wilcoxon signed-rank test, within each K ---
+## Valid because every method was run on the SAME 1000 subsamples (verified
+## earlier by check_shared_subsamples), so ARI values at matching iter_id
+## are naturally paired -- a paired test is more powerful here than an
+## unpaired comparison of the two ARI distributions.
+pairwise_results <- list()
+
+for (k_val in unique(config$k)) {
+  methods_here <- purrr::keep(ari_by_config, ~ .x$K == k_val)
+  if (length(methods_here) < 2) next
+
+  combos <- combn(seq_along(methods_here), 2, simplify = FALSE)
+  for (pair in combos) {
+    a <- methods_here[[pair[1]]]
+    b <- methods_here[[pair[2]]]
+
+    common_iters <- intersect(names(a$ari), names(b$ari))
+    valid <- !is.na(a$ari[common_iters]) & !is.na(b$ari[common_iters])
+    common_iters <- common_iters[valid]
+    if (length(common_iters) < 10) next   # not enough paired replicates to test
+
+    x <- a$ari[common_iters]
+    y <- b$ari[common_iters]
+    wt <- suppressWarnings(wilcox.test(x, y, paired = TRUE))
+
+    pairwise_results[[length(pairwise_results) + 1]] <- data.frame(
+      K            = k_val,
+      Method_A     = a$method,
+      Method_B     = b$method,
+      n_paired     = length(common_iters),
+      median_ARI_A = median(x),
+      median_ARI_B = median(y),
+      median_diff  = median(x - y),
+      W_statistic  = unname(wt$statistic),
+      p_value      = wt$p.value
+    )
+  }
+}
+
+pairwise_df <- dplyr::bind_rows(pairwise_results)
+
+## Multiple-testing correction, applied within each K (each K is treated
+## as its own family of comparisons rather than pooling corrections globally)
+pairwise_df <- pairwise_df %>%
+  group_by(K) %>%
+  mutate(p_adj = p.adjust(p_value, method = "BH")) %>%
+  ungroup() %>%
+  arrange(K, p_adj)
+
+print(pairwise_df)
+
+## --- Visualize: heatmap of adjusted p-values per K ---
+p_pairwise <- ggplot(pairwise_df, aes(x = Method_A, y = Method_B, fill = p_adj)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = signif(p_adj, 2)), size = 3) +
+  scale_fill_gradient(low = "#D62828", high = "#F0F0F0", limits = c(0, 1),
+                       name = "BH-adj. p") +
+  facet_wrap(~ K, labeller = labeller(K = function(x) paste0("K = ", x))) +
+  labs(title = "Paired Wilcoxon test: pairwise ARI stability comparisons",
+       subtitle = "Red = significant difference in stability between methods (BH-adjusted p < 0.05)",
+       x = NULL, y = NULL) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+print(p_pairwise)
+                                      
+                                      
