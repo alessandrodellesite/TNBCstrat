@@ -177,9 +177,8 @@ compute_bootstrap_stability <- function(boot_dir,
   )
 }
 
-
 ref_dir <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics_clusters_results"
-boot_base <- "/mnt/petasan_ccb/alessandro/SCANB"
+boot_base <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics"
 
 ## --- Helper: load a reference CSV into a named vector (sample_id -> cluster) ---
 load_reference <- function(path) {
@@ -193,20 +192,21 @@ load_reference <- function(path) {
 ## --- Config grid: one row per method x K combination that actually exists ---
 ## (mofa only has k2/k3; everything else has k2/k3/k4)
 config <- tribble(
-  ~method,    ~k, ~boot_dir,                                              ~ref_file,                        ~file_pattern,
-  "iCluster", 2,  file.path(boot_base, "icluster_bootstrap_k2"),          "icluster_clusters_k2.csv",        "\\.rds$",
-  "iCluster", 3,  file.path(boot_base, "icluster_bootstrap_k3"),          "icluster_clusters_k3.csv",        "\\.rds$",
-  "iCluster", 4,  file.path(boot_base, "icluster_bootstrap_k4"),          "icluster_clusters_k4.csv",        "\\.rds$",
-  "MOFA",     2,  file.path(boot_base, "mofa_bootstrap_k2"),              "mofa_km_clusters_k2.csv",         "\\.rds$",
-  "MOFA",     3,  file.path(boot_base, "mofa_bootstrap_k3"),              "mofa_km_clusters_k3.csv",         "\\.rds$",
-  "MOFA",     4,  file.path(boot_base, "mofa_bootstrap_k4"),              "mofa_km_clusters_k4.csv",         "\\.rds$",
-  "SNF",      2,  file.path(boot_base, "snf_bootstrap_k2"),               "SNF_clusters_k2.csv",             "\\.rds$",
-  "SNF",      3,  file.path(boot_base, "snf_bootstrap_k3"),               "SNF_clusters_k3.csv",             "\\.rds$",
-  "SNF",      4,  file.path(boot_base, "snf_bootstrap_k4"),               "SNF_clusters_k4.csv",             "\\.rds$",
-  "xintNMF",  2,  file.path(boot_base, "xintnmf_bootstrap_k2_clusters"),  "xintNMF_clusters_k2_reg.csv",     "\\.rds$",
-  "xintNMF",  3,  file.path(boot_base, "xintnmf_bootstrap_k3_clusters"),  "xintNMF_clusters_k3_reg.csv",     "\\.rds$",
-  "xintNMF",  4,  file.path(boot_base, "xintnmf_bootstrap_k4_clusters"),  "xintNMF_clusters_k4_reg.csv",     "\\.rds$"
+  ~method,    ~k, ~boot_dir,                                                          ~ref_file,                        ~file_pattern,
+  "iCluster", 2,  file.path(boot_base, "output_icluster", "icluster_bootstrap_k2"),   "icluster_clusters_k2.csv",        "\\.rds$",
+  "iCluster", 3,  file.path(boot_base, "output_icluster", "icluster_bootstrap_k3"),   "icluster_clusters_k3.csv",        "\\.rds$",
+  "iCluster", 4,  file.path(boot_base, "output_icluster", "icluster_bootstrap_k4"),   "icluster_clusters_k4.csv",        "\\.rds$",
+  "MOFA",     2,  file.path(boot_base, "output_mofa", "mofa_bootstrap_k2"),           "mofa_km_clusters_k2.csv",         "\\.rds$",
+  "MOFA",     3,  file.path(boot_base, "output_mofa", "mofa_bootstrap_k3"),           "mofa_km_clusters_k3.csv",         "\\.rds$",
+  "MOFA",     4,  file.path(boot_base, "output_mofa", "mofa_bootstrap_k4"),           "mofa_km_clusters_k4.csv",         "\\.rds$",
+  "SNF",      2,  file.path(boot_base, "output_snf", "snf_bootstrap_k2"),             "SNF_clusters_k2.csv",             "\\.rds$",
+  "SNF",      3,  file.path(boot_base, "output_snf", "snf_bootstrap_k3"),             "SNF_clusters_k3.csv",             "\\.rds$",
+  "SNF",      4,  file.path(boot_base, "output_snf", "snf_bootstrap_k4"),             "SNF_clusters_k4.csv",             "\\.rds$",
+  "xintNMF",  2,  file.path(boot_base, "output_xintnmf", "xintnmf_bootstrap_k2_clusters"), "xintNMF_clusters_k2_reg.csv", "\\.rds$",
+  "xintNMF",  3,  file.path(boot_base, "output_xintnmf", "xintnmf_bootstrap_k3_clusters"), "xintNMF_clusters_k3_reg.csv", "\\.rds$",
+  "xintNMF",  4,  file.path(boot_base, "output_xintnmf", "xintnmf_bootstrap_k4_clusters"), "xintNMF_clusters_k4_reg.csv", "\\.rds$"
 )
+
 
 ## --- Run stability analysis for every row in the config grid ---
 all_stability <- purrr::pmap(config, function(method, k, boot_dir, ref_file, file_pattern) {
