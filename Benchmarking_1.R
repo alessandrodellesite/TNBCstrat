@@ -401,7 +401,7 @@ p <- ggplot(plot_data, aes(x = Approach, y = Value, fill = Method_Family)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.6) +
   facet_wrap(~Metric, scales = "free_y") +
   theme_minimal() +
-  labs(title = "Multi-Omics Internal Validation Comparison",
+  labs(title = "Multi-omics internal validation comparison",
        x = NULL, y = "Metric Value", fill = "Method") +
   scale_fill_brewer(palette = "Set2") +
   theme(strip.text = element_text(face = "bold", size = 11),
@@ -413,3 +413,44 @@ png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/internal_val
 print(p)
 dev.off()
 
+
+
+
+
+# plot by number of clusters
+
+plot_data <- results_table %>%
+  tibble::rownames_to_column("Metric") %>%
+  pivot_longer(-Metric, names_to = "Approach", values_to = "Value") %>%
+  mutate(
+    Method_Family   = str_extract(Approach, "^[A-Za-z]+"),
+    Cluster_Version = str_extract(Approach, "\\d+")
+  )
+
+# one plot per cluster solution (2, 3, 4)
+plots_by_k <- plot_data %>%
+  group_split(Cluster_Version) %>%
+  set_names(purrr::map_chr(., ~ unique(.x$Cluster_Version))) %>%
+  purrr::map(function(df) {
+    k <- unique(df$Cluster_Version)
+    ggplot(df, aes(x = Method_Family, y = Value, fill = Method_Family)) +
+      geom_bar(stat = "identity", position = "dodge", width = 0.6) +
+      facet_wrap(~ Metric, scales = "free_y") +
+      theme_minimal() +
+      labs(title = paste0("Internal validation (", k, " clusters)"),
+           x = NULL, y = "Metric Value", fill = "Method") +
+      scale_fill_brewer(palette = "Set2") +
+      theme(strip.text = element_text(face = "bold", size = 11),
+            axis.text.x = element_text(angle = 45, hjust = 1))
+  })
+                            
+                            
+out_dir_internal <- "/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/internal_validation"
+if (!dir.exists(out_dir_internal)) dir.create(out_dir_internal, recursive = TRUE)
+
+purrr::iwalk(plots_by_k, function(p, k) {
+  png(file.path(out_dir_internal, paste0("internal_validation_k", k, ".png")),
+      width = 1400, height = 1000, res = 150)
+  print(p)
+  dev.off()
+})
