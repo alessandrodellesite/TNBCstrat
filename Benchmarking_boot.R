@@ -296,7 +296,12 @@ p_box_ari <- ggplot(ari_long, aes(x = Method, y = ARI, fill = Method)) +
        y = "ARI", x = NULL) +
   theme_minimal() +
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
+
+png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/bootstrapping",
+               "boxplots_ari.png"),
+    width = 1400, height = 1000, res = 150)
 print(p_box_ari)
+dev.off()                                         
                                       
 
 # Boxplots of per-cluster Jaccard values (pooled across clusters) 
@@ -323,7 +328,13 @@ p_box_jaccard <- ggplot(jaccard_long, aes(x = Method, y = Jaccard, fill = Method
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
 print(p_box_jaccard)
 
-## --- 5. Per-cluster Jaccard breakdown (which SPECIFIC clusters are unstable) ---
+png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/bootstrapping",
+               "boxplots_jaccard.png"),
+    width = 1400, height = 1000, res = 150)
+print(p_box_jaccard)
+dev.off()                                        
+
+## Per-cluster Jaccard breakdown (which SPECIFIC clusters are unstable) ---
 ## This is the plot that actually answers "which cluster is the problem".
 ## IMPORTANT: cluster labels (cluster_1, cluster_2, ...) are arbitrary,
 ## method-specific indices with NO cross-method correspondence -- iCluster's
@@ -331,6 +342,7 @@ print(p_box_jaccard)
 ## methods are put in SEPARATE facet panels (facet_grid) rather than dodged
 ## side-by-side at the same x-position, which would visually (and wrongly)
 ## imply the labels line up across methods.
+                                      
 p_cluster_detail <- ggplot(jaccard_long, aes(x = RefCluster, y = Jaccard, fill = RefCluster)) +
   geom_boxplot(outlier.size = 0.6, na.rm = TRUE) +
   geom_hline(yintercept = c(0.6, 0.85), linetype = "dashed", color = "grey40") +
@@ -343,10 +355,14 @@ p_cluster_detail <- ggplot(jaccard_long, aes(x = RefCluster, y = Jaccard, fill =
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
 print(p_cluster_detail)
 
+png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/bootstrapping",
+               "boxplots_jaccard_percluster.png"),
+    width = 1400, height = 1000, res = 150)
+print(p_cluster_detail)
+dev.off()    
 
 
-
-#2 — Visualizing cophenetic correlation, dispersion, and per-sample stability                                 
+#2  Visualizing cophenetic correlation, dispersion, and per-sample stability                                 
 
 ## --- 6. Cophenetic correlation & dispersion score, by method x K ---
 ## These summarize consensus-matrix "cleanliness" (how tree-like/polarized
@@ -370,6 +386,13 @@ p_diag <- ggplot(diag_long, aes(x = Method, y = Value, fill = Method)) +
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
 print(p_diag)
 
+png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/bootstrapping",
+               "cophenetic_dispersion.png"),
+    width = 1400, height = 1000, res = 150)
+print(p_diag)
+dev.off()  
+                                             
+
 ## --- 7. Per-sample stability: full distribution, by method x K ---
 per_sample_long <- purrr::map_dfr(all_stability, function(s) {
   data.frame(Method = s$method_base, K = s$K,
@@ -389,6 +412,13 @@ p_per_sample <- ggplot(per_sample_long, aes(x = Method, y = Stability, fill = Me
   theme_minimal() +
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
 print(p_per_sample)
+
+png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/bootstrapping",
+               "persample_stability.png"),
+    width = 1400, height = 1000, res = 150)
+print(p_per_sample)
+dev.off()  
+                                      
 
 ## --- 8. Summary: fraction of "unstable" samples per method x K ---
 ## Complements the violin plot with a single interpretable number:
@@ -504,4 +534,8 @@ p_pairwise <- ggplot(pairwise_df, aes(x = Method_A, y = Method_B, fill = p_adj))
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 print(p_pairwise)
                                       
-                                      
+png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/bootstrapping",
+               "pairwise_test.png"),
+    width = 1400, height = 1000, res = 150)
+print(p_pairwise)
+dev.off()                                      
