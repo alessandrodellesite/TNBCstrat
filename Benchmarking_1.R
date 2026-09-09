@@ -277,19 +277,11 @@ for (k in c(2, 3, 4)) {
   xint_factors[[as.character(k)]] <- mat[match_idx, , drop = FALSE]
 }
 
-# IMPORTANT: use the SAME distance metric that actually produced the xintNMF clusters
-# (corr_hclust_cluster used 1 - abs(cor(t(H))), not Euclidean -- keep consistent here)
+# use the SAME distance metric that  produced the xintNMF clusters
 
------
 xint_dist_full <- purrr::map(xint_factors, function(H) {
-  as.dist(1 - abs(cor(t(as.matrix(H)))))
+  dist(as.matrix(H), method = "euclidean")
 })
-
-xint_embeddings <- purrr::map(xint_dist_full, function(d) {
-  cmdscale(d, k = min(10, attr(d, "Size") - 2))
-})
-
-----
 
 
 
@@ -338,22 +330,21 @@ approach_configs <- list(
   MOFA_3 = list(dist_full = mofa_dist_full, db_x = mofa_factors_clean, db_d = NULL, centrotypes = "centroids"),
   MOFA_4 = list(dist_full = mofa_dist_full, db_x = mofa_factors_clean, db_d = NULL, centrotypes = "centroids"),
 
-  # icluster_2 = list(dist_full = icluster_dist_full2, db_x = icluster_z_clean2, db_d = NULL, centrotypes = "centroids"),
+  icluster_2 = list(dist_full = icluster_dist_full2, db_x = icluster_z_clean2, db_d = NULL, centrotypes = "centroids"),
   icluster_3 = list(dist_full = icluster_dist_full3, db_x = icluster_z_clean3, db_d = NULL, centrotypes = "centroids"),
   icluster_4 = list(dist_full = icluster_dist_full4, db_x = icluster_z_clean4, db_d = NULL, centrotypes = "centroids"),
 
-  # SNF: no raw feature space, so index.DB uses the MDS embedding derived from
-  # the fused distance, with medoids identified via the actual SNF distance
+  # SNF: no raw feature space, so index.DB uses the MDS embedding derived from the fused distance, with medoids identified via the actual SNF distance
   SNF_2 = list(dist_full = snf_dist_full, db_x = snf_embedding, db_d = snf_dist_full, centrotypes = "medoids"),
   SNF_3 = list(dist_full = snf_dist_full, db_x = snf_embedding, db_d = snf_dist_full, centrotypes = "medoids"),
   SNF_4 = list(dist_full = snf_dist_full, db_x = snf_embedding, db_d = snf_dist_full, centrotypes = "medoids"),
 
-  xintNMF_2 = list(dist_full = xint_dist_full[["2"]], db_x = xint_embeddings[["2"]],
-                  db_d = xint_dist_full[["2"]], centrotypes = "medoids"),
-  xintNMF_3 = list(dist_full = xint_dist_full[["3"]], db_x = xint_embeddings[["3"]],
-                  db_d = xint_dist_full[["3"]], centrotypes = "medoids"),
-  xintNMF_4 = list(dist_full = xint_dist_full[["4"]], db_x = xint_embeddings[["4"]],
-                  db_d = xint_dist_full[["4"]], centrotypes = "medoids")
+  xintNMF_2 = list(dist_full = xint_dist_full[["2"]], db_x = as.matrix(xint_factors[["2"]]),
+                 db_d = NULL, centrotypes = "centroids"),
+  xintNMF_3 = list(dist_full = xint_dist_full[["3"]], db_x = as.matrix(xint_factors[["3"]]),
+                 db_d = NULL, centrotypes = "centroids"),
+  xintNMF_4 = list(dist_full = xint_dist_full[["4"]], db_x = as.matrix(xint_factors[["4"]]),
+                 db_d = NULL, centrotypes = "centroids")
 )
 
 
@@ -374,19 +365,9 @@ rownames(results_table) <- c("Avg_Silhouette", "Calinski_Harabasz", "Davies_Boul
 print(round(results_table, 3))
 
 
-----
+# Plot
 
-### Plot
-
-
-
-
-plot_data <- results_table %>%
-  tibble::rownames_to_column("Metric") %>%
-  pivot_longer(-Metric, names_to = "Approach", values_to = "Value") %>%
-  mutate(Method_Family = str_extract(Approach, "^[A-Za-z]+"))
-
-ggplot(plot_data, aes(x = Approach, y = Value, fill = Method_Family)) +
+p <- ggplot(plot_data, aes(x = Approach, y = Value, fill = Method_Family)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.6) +
   facet_wrap(~Metric, scales = "free_y") +
   theme_minimal() +
@@ -395,4 +376,10 @@ ggplot(plot_data, aes(x = Approach, y = Value, fill = Method_Family)) +
   scale_fill_brewer(palette = "Set2") +
   theme(strip.text = element_text(face = "bold", size = 11),
         axis.text.x = element_text(angle = 45, hjust = 1))
+
+png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/internal_validation",
+               "internal_validation_comparison.png"),
+    width = 1400, height = 1000, res = 150)
+print(p)
+dev.off()
 
