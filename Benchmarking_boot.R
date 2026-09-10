@@ -331,7 +331,6 @@ p_box_jaccard <- ggplot(jaccard_long, aes(x = Method, y = Jaccard, fill = Method
   geom_hline(yintercept = c(0.6, 0.85), linetype = "dashed", color = "grey40") +
   facet_wrap(~ K, labeller = labeller(K = function(x) paste0("K = ", x))) +
   labs(title = "Distribution of per-cluster Jaccard stability",
-       subtitle = "One point per (replicate x reference cluster); dashed lines = Hennig thresholds",
        y = "Best-match Jaccard", x = NULL) +
   theme_minimal() +
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
@@ -360,8 +359,7 @@ p_cluster_detail <- ggplot(jaccard_long, aes(x = RefCluster, y = Jaccard, fill =
   facet_grid(K ~ Method, scales = "free_x", space = "free_x",
              labeller = labeller(K = function(x) paste0("K = ", x))) +
   labs(title = "Per-cluster Jaccard stability, by method and reference cluster",
-       #subtitle = "Cluster labels are method-specific and not comparable across panels",
-       y = "Jaccard score" +
+       y = "Best-match Jaccard" +
   theme_minimal() +
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
 print(p_cluster_detail)
