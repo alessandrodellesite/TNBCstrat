@@ -166,6 +166,10 @@ arrows(gap_df$k, gap_df$gap - gap_df$SE.sim,
        angle = 90, code = 3, length = 0.05)
 dev.off()
 
+optimal_k <- maxSE(gap_df$gap, gap_df$SE.sim, method = "Tibs2001SE")
+print("Optimal k according to gap stat: ")
+print(optimal_k)
+
 saveRDS(factors_to_use, file = "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_factors.rds")
 
 
