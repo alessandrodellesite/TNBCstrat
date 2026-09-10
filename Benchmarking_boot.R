@@ -207,11 +207,15 @@ config <- tribble(
 
 
 ## --- Run stability analysis for every row in the config grid ---
-all_stability <- purrr::pmap(config, function(method, k, boot_dir, ref_file, file_pattern) {
-  ref_path <- ref_file
-  reference_clusters <- load_reference(ref_path)
+consensus_dir <- "/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/bootstrapping/consensus_matrices"
+dir.create(consensus_dir, showWarnings = FALSE, recursive = TRUE)
 
+all_stability <- purrr::pmap(config, function(method, k, boot_dir, ref_file, file_pattern) {
+  reference_clusters <- load_reference(ref_file)
   message(sprintf("Running %s k=%d ...", method, k))
+
+  png_path <- file.path(consensus_dir, sprintf("consensus_%s_k%d.png", method, k))
+  png(png_path, width = 1200, height = 1000, res = 150)
 
   res <- compute_bootstrap_stability(
     boot_dir           = boot_dir,
@@ -220,10 +224,17 @@ all_stability <- purrr::pmap(config, function(method, k, boot_dir, ref_file, fil
     file_pattern       = file_pattern,
     plot               = TRUE
   )
-  res$K <- k          # tag with K for downstream faceting
+
+  dev.off()   
+
+  res$K <- k
   res$method_base <- method
   res
 })
+
+
+
+
 
 ## --- Cross-method replicate-alignment sanity check ---
 ## Confirms that, for a given K, all methods' bootstrap files were built
@@ -341,14 +352,16 @@ dev.off()
 ## side-by-side at the same x-position, which would visually (and wrongly)
 ## imply the labels line up across methods.
                                       
+# not useful to make comparisons across methods, more to see within each method which clusters are most conserved                                     
+                                      
 p_cluster_detail <- ggplot(jaccard_long, aes(x = RefCluster, y = Jaccard, fill = RefCluster)) +
   geom_boxplot(outlier.size = 0.6, na.rm = TRUE) +
   geom_hline(yintercept = c(0.6, 0.85), linetype = "dashed", color = "grey40") +
   facet_grid(K ~ Method, scales = "free_x", space = "free_x",
              labeller = labeller(K = function(x) paste0("K = ", x))) +
   labs(title = "Per-cluster Jaccard stability, by method and reference cluster",
-       subtitle = "Cluster labels are method-specific and not comparable across panels",
-       y = "Best-match Jaccard", x = "Reference cluster (method-specific label)") +
+       #subtitle = "Cluster labels are method-specific and not comparable across panels",
+       y = "Jaccard score", x = "Reference cluster (method-specific label)") +
   theme_minimal() +
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
 print(p_cluster_detail)
@@ -360,25 +373,28 @@ print(p_cluster_detail)
 dev.off()    
 
 
-#2  Visualizing cophenetic correlation, dispersion, and per-sample stability                                 
+# Visualizing cophenetic correlation, dispersion, and per-sample stability                                 
 
-## --- 6. Cophenetic correlation & dispersion score, by method x K ---
+## Cophenetic correlation & dispersion score, by method x K 
 ## These summarize consensus-matrix "cleanliness" (how tree-like/polarized
 ## the pairwise co-clustering structure is) but were previously only in
 ## the summary table as numbers. Plotting them alongside ARI/Jaccard makes
 ## it possible to spot cases where these three lines of evidence disagree
 ## (e.g. high ARI but low dispersion -- consensus is polarized but the
 ## dendrogram doesn't reflect it cleanly).
+                                 
 diag_long <- summary_table %>%
   select(Method, K, Cophenetic_Corr, Dispersion) %>%
   tidyr::pivot_longer(cols = c(Cophenetic_Corr, Dispersion),
                        names_to = "Metric", values_to = "Value")
 
+
 p_diag <- ggplot(diag_long, aes(x = Method, y = Value, fill = Method)) +
-  geom_col(width = 0.7) +
+  geom_col(width = 0.5) +
+  geom_text(aes(label = round(Value, 2)), vjust = -0.4, size = 3.2) +
   facet_grid(Metric ~ K, labeller = labeller(K = function(x) paste0("K = ", x))) +
-  ylim(0, 1) +
-  labs(title = "Consensus matrix diagnostics: cophenetic correlation & dispersion",
+  ylim(0, 1.08) +
+  labs(title = "Cophenetic correlation & dispersion scores by method and k",
        y = NULL, x = NULL) +
   theme_minimal() +
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
@@ -388,9 +404,12 @@ png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/bootstrappin
                "cophenetic_dispersion.png"),
     width = 1400, height = 1000, res = 150)
 print(p_diag)
-dev.off()  
+dev.off()
                                              
-
+                                             
+                                             
+# QUESTO NON SO SE HA SENSO
+                                             
 ## --- 7. Per-sample stability: full distribution, by method x K ---
 per_sample_long <- purrr::map_dfr(all_stability, function(s) {
   data.frame(Method = s$method_base, K = s$K,
@@ -433,7 +452,7 @@ unstable_summary <- per_sample_long %>%
 print(unstable_summary)
 
 
-
+# QUESTO SOTTO NON MI PIACE MOLTO 
 
 
 #4 — Paired test between methods (exploiting the shared-subsample design)
