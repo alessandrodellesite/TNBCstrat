@@ -191,9 +191,9 @@ load_reference <- function(path) {
 ## --- Config grid: one row per method x K combination that actually exists ---
 config <- tribble(
   ~method,    ~k, ~boot_dir,                                                                  ~ref_file,                                                              ~file_pattern,
-  "iCluster", 2,  file.path(boot_base, "bootstrap", "icluster", "icluster_bootstrap_k2"),      file.path(boot_base, "output_icluster", "iclusters_clusters_2.csv"),   "\\.rds$",
-  "iCluster", 3,  file.path(boot_base, "bootstrap", "icluster", "icluster_bootstrap_k3"),      file.path(boot_base, "output_icluster", "iclusters_clusters_3.csv"),   "\\.rds$",
-  "iCluster", 4,  file.path(boot_base, "bootstrap", "icluster", "icluster_bootstrap_k4"),      file.path(boot_base, "output_icluster", "iclusters_clusters_4.csv"),   "\\.rds$",
+  "iCluster+", 2,  file.path(boot_base, "bootstrap", "icluster", "icluster_bootstrap_k2"),      file.path(boot_base, "output_icluster", "iclusters_clusters_2.csv"),   "\\.rds$",
+  "iCluster+", 3,  file.path(boot_base, "bootstrap", "icluster", "icluster_bootstrap_k3"),      file.path(boot_base, "output_icluster", "iclusters_clusters_3.csv"),   "\\.rds$",
+  "iCluster+", 4,  file.path(boot_base, "bootstrap", "icluster", "icluster_bootstrap_k4"),      file.path(boot_base, "output_icluster", "iclusters_clusters_4.csv"),   "\\.rds$",
   "MOFA",     2,  file.path(boot_base, "bootstrap", "mofa", "mofa_bootstrap_k2"),              file.path(boot_base, "output_mofa", "mofa_km_clusters_2.csv"),        "\\.rds$",
   "MOFA",     3,  file.path(boot_base, "bootstrap", "mofa", "mofa_bootstrap_k3"),              file.path(boot_base, "output_mofa", "mofa_km_clusters_3.csv"),        "\\.rds$",
   "MOFA",     4,  file.path(boot_base, "bootstrap", "mofa", "mofa_bootstrap_k4"),              file.path(boot_base, "output_mofa", "mofa_km_clusters_4.csv"),        "\\.rds$",
@@ -361,7 +361,7 @@ p_cluster_detail <- ggplot(jaccard_long, aes(x = RefCluster, y = Jaccard, fill =
              labeller = labeller(K = function(x) paste0("K = ", x))) +
   labs(title = "Per-cluster Jaccard stability, by method and reference cluster",
        #subtitle = "Cluster labels are method-specific and not comparable across panels",
-       y = "Jaccard score", x = "Reference cluster (method-specific label)") +
+       y = "Jaccard score" +
   theme_minimal() +
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
 print(p_cluster_detail)
