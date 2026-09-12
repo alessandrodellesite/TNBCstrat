@@ -89,7 +89,7 @@ png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/xintnmf/kmeans_ch_silh.p
     width = 10, height = 5, units = "in", res = 300)
 par(mfrow = c(1, 2))
 plot(k_range, ch_per_k, type = "b", pch = 19, col = "darkorange", lwd = 2,
-     xlab = "Rank (k)", ylab = "Within-cluster sum of squares", main = "WSS profile")
+     xlab = "Rank (k)", ylab = "Calinski-Harabasz index", main = "Calinski-Harabasz profile")
 plot(k_range, mean_silhouettes_km_reg, type = "b", pch = 19, col = "royalblue", lwd = 2,
      xlab = "Rank (k)", ylab = "Mean Silhouette Width", main = "Silhouette profile")
 dev.off()
