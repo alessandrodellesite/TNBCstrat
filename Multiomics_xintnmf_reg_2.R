@@ -1,5 +1,6 @@
 library(cluster)
 library(mclust)
+library(fpc) 
 
 # Load and extract matrices for each k (2:6) 
 
