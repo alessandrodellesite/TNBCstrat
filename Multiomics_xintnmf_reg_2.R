@@ -30,14 +30,15 @@ for (k in k_range) {
   }
 }
 
-# Kmeans on H matrices + silhouette and WSS evaluation
+# Kmeans on H matrices + silhouette and Calinski-Harabasz index evaluation
 
 set.seed(123)  # reproducibility
 cluster_assignments_km_reg <- list()
 mean_silhouettes_km_reg <- numeric(length(k_range))
 names(mean_silhouettes_km_reg) <- k_range
-wss_per_k <- numeric(length(k_range))
-names(wss_per_k) <- k_range
+ch_per_k <- numeric(length(k_range))
+names(ch_per_k) <- k_range
+
 
 
 for (k in k_range) {
@@ -50,14 +51,14 @@ for (k in k_range) {
   sil <- silhouette(km$cluster, dist_mat)
   mean_silhouettes_km_reg[as.character(k)] <- mean(sil[, "sil_width"])
 
-  #wss
-  wss_per_k[as.character(k)] <- km$tot.withinss
+  #ch index
+  ch_per_k[as.character(k)] <- calinhara(H, km$cluster)
 }
 
 print("Silhouette for kmeans at different k's:")
 print(round(mean_silhouettes_km_reg, 3))
-print("WSS for kmeans at different k's:")
-print(round(wss_per_k, 3))
+print("CH index for kmeans at different k's:")
+print(round(ch_per_k, 1))
 
 #RSS (requires the input matrices, Reconstruction is W %*% t(H), compared against the real data)
 
@@ -83,10 +84,10 @@ for (k in k_range) {
 print("RSS values per k:")
 print(round(rss_per_k_reg, 1))
 
-png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/xintnmf/kmeans_wss_silh.png",
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/xintnmf/kmeans_ch_silh.png",
     width = 10, height = 5, units = "in", res = 300)
 par(mfrow = c(1, 2))
-plot(k_range, wss_per_k, type = "b", pch = 19, col = "darkorange", lwd = 2,
+plot(k_range, ch_per_k, type = "b", pch = 19, col = "darkorange", lwd = 2,
      xlab = "Rank (k)", ylab = "Within-cluster sum of squares", main = "WSS profile")
 plot(k_range, mean_silhouettes_km_reg, type = "b", pch = 19, col = "royalblue", lwd = 2,
      xlab = "Rank (k)", ylab = "Mean Silhouette Width", main = "Silhouette profile")
