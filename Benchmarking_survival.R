@@ -187,10 +187,24 @@ summary_single_omic <- build_summary(results_single_omic)
 
 summary_k2 <- build_summary(results_by_k$k2)
 summary_k3 <- build_summary(results_by_k$k3)
-summary_k4 <- build_summary(results_by_k$k4)
-
-summary_single_omic
-summary_k2
-summary_k3
-summary_k4                        
+summary_k4 <- build_summary(results_by_k$k4)           
                         
+out_dir <- "/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/survival"
+
+write.csv(summary_single_omic, file.path(out_dir, "summary_single_omic.csv"), row.names = FALSE)
+write.csv(summary_k2,          file.path(out_dir, "summary_k2.csv"),          row.names = FALSE)
+write.csv(summary_k3,          file.path(out_dir, "summary_k3.csv"),          row.names = FALSE)
+write.csv(summary_k4,          file.path(out_dir, "summary_k4.csv"),          row.names = FALSE)
+
+
+summary_all <- bind_rows(
+  summary_single_omic %>% mutate(group = "single_omic"),
+  summary_k2 %>% mutate(group = "k2"),
+  summary_k3 %>% mutate(group = "k3"),
+  summary_k4 %>% mutate(group = "k4")
+)
+
+write.csv(summary_all, file.path(out_dir, "summary_all.csv"), row.names = FALSE)
+
+saveRDS(results_single_omic, file.path(out_dir, "results_single_omic.rds"))
+saveRDS(results_by_k,        file.path(out_dir, "results_by_k.rds"))                        
