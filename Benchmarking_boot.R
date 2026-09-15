@@ -276,7 +276,7 @@ summary_table <- purrr::map_dfr(all_stability, function(s) {
     Mean_ARI          = round(s$mean_ari, 3),
     Median_ARI        = round(s$median_ari, 3),
     SD_ARI            = round(s$sd_ari, 3),
-    Mean_Jaccard      = round(s$mean_jaccard, 3),
+    #Mean_Jaccard      = round(s$mean_jaccard, 3),
     Cophenetic        = round(s$cophenetic_corr, 3),
     Dispersion        = round(s$dispersion_score, 3)
   )
@@ -286,7 +286,7 @@ summary_table <- summary_table[order(summary_table$K, summary_table$Method), ]
 print(summary_table)
 
 ## Optional: write out for reporting
-#write.csv(summary_table, file.path(boot_base, "bootstrap_stability_summary.csv"),  row.names = FALSE)
+write.csv(summary_table, file.path(boot_base, "bootstrap_stability_summary.csv"),  row.names = FALSE)
 
 
 
@@ -359,10 +359,11 @@ p_cluster_detail <- ggplot(jaccard_long, aes(x = RefCluster, y = Jaccard, fill =
   facet_grid(K ~ Method, scales = "free_x", space = "free_x",
              labeller = labeller(K = function(x) paste0("K = ", x))) +
   labs(title = "Per-cluster Jaccard stability, by method and reference cluster",
-       y = "Best-match Jaccard" +
+       y = "Best-match Jaccard") +
   theme_minimal() +
   theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
 print(p_cluster_detail)
+       
 
 png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/bootstrapping",
                "boxplots_jaccard_percluster.png"),
