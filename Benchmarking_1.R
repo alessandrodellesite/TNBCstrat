@@ -388,7 +388,8 @@ all_metrics <- imap(approach_configs, function(cfg, name) {
 results_table <- as.data.frame(all_metrics)
 rownames(results_table) <- c("Avg_Silhouette", "Calinski_Harabasz", "Davies_Bouldin", "Dunn_Index", "Connectivity")
 print(round(results_table, 3))
-
+val_dir <- "/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/internal_validation"
+write.csv(round(results_table, 3), file.path(val_dir, "internal_validation.csv"), row.names = FALSE)
 
 # Plot
 
