@@ -7,14 +7,15 @@ library(survminer)
 dt_metadata <- read_excel("ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery") 
 
 #load clustering solutions
-rna_clusters   <- read.csv("rnaseq_nmf_clusters.csv")
-met_clusters   <- read.csv("rnaseq_nmf_clusters.csv")
-cnv_clusters   <- read.csv("rnaseq_nmf_clusters.csv")
+rna_results   <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/rnaseq_nmf_clusters.csv")
+met_results   <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters.csv")
+cnv_results   <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/cnv_nmf_clusters.csv")
 
 #mofa
 mofa2_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_2.csv")
 mofa3_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_3.csv")
 mofa4_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_4.csv")
+
 #icluster
 icluster2_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_2.csv")
 icluster3_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_icluster/iclusters_clusters_3.csv")
