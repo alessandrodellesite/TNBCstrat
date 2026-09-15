@@ -277,7 +277,7 @@ summary_table <- purrr::map_dfr(all_stability, function(s) {
     Median_ARI        = round(s$median_ari, 3),
     SD_ARI            = round(s$sd_ari, 3),
     #Mean_Jaccard      = round(s$mean_jaccard, 3),
-    Cophenetic        = round(s$cophenetic_corr, 3),
+    Cophenetic_Corr    = round(s$cophenetic_corr, 3),
     Dispersion        = round(s$dispersion_score, 3)
   )
 })
