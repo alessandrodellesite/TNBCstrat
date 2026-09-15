@@ -44,9 +44,9 @@ lista_dataframe <- list(
   "SNF_2"       = snf2_results,
   "SNF_3"       = snf3_results,
   "SNF_4"       = snf4_results,
-  "xintNMF_2"   = XintNMF2_results_reg,
-  "xintNMF_3"   = XintNMF3_results_reg,
-  "xintNMF_4"   = XintNMF4_results_reg
+  "X-intNMF_2"   = XintNMF2_results_reg,
+  "X-intNMF_3"   = XintNMF3_results_reg,
+  "X-intNMF_4"   = XintNMF4_results_reg
 )
 
 cluster_results <- imap(lista_dataframe, function(df, nuovo_nome) {
