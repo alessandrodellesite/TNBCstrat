@@ -7,11 +7,11 @@
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --time=20:00      
+#SBATCH --time=40:00      
 #SBATCH --mem=3G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image_new.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_xintnmf_reg_2.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Bootstrap_xintNMF_2.R"
 
 # singularity execution
 srun singularity exec \
