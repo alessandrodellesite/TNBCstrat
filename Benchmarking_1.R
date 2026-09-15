@@ -38,9 +38,9 @@ lista_dataframe <- list(
   "MOFA_2"      = mofa2_results,
   "MOFA_3"      = mofa3_results,
   "MOFA_4"      = mofa4_results,
-  "icluster_2"  = icluster2_results,
-  "icluster_3"  = icluster3_results,
-  "icluster_4"  = icluster4_results,
+  "iCluster+_2"  = icluster2_results,
+  "iCluster+_3"  = icluster3_results,
+  "iCluster+_4"  = icluster4_results,
   "SNF_2"       = snf2_results,
   "SNF_3"       = snf3_results,
   "SNF_4"       = snf4_results,
@@ -412,7 +412,6 @@ png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/internal_val
     width = 1400, height = 1000, res = 150)
 print(p)
 dev.off()
-
 
 
 
