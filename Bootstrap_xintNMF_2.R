@@ -16,7 +16,7 @@
 library(purrr)
 
 convert_xintnmf_bootstrap <- function(k,
-                                       n_iter = 200,
+                                       n_iter = 500,
                                        raw_base = "/mnt/petasan_ccb/alessandro/SCANB/multiomics/bootstrap/xintnmf",
                                        subsamples_path = "/mnt/petasan_ccb/alessandro/SCANB/bootstrap_shared/boot_subsamples.rds",
                                        out_dir = NULL,
