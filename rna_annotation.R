@@ -2,11 +2,14 @@
 
 library(limma)
 library(pheatmap)
+library(clusterProfiler)
+library(org.Hs.eg.db)
+library(ggplot2)
 
-library(circlize)
-library(ComplexHeatmap)
-library(RColorBrewer)
-library(readxl)
+#library(circlize)
+#library(ComplexHeatmap)
+#library(RColorBrewer)
+#library(readxl)
 
 rna <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.rds")
 gene_mads <- apply(rna, 1, mad)
@@ -36,6 +39,10 @@ cont <- makeContrasts(
 fit2 <- contrasts.fit(fit, cont)
 fit2 <- eBayes(fit2, trend = TRUE) 
 
+results_1 <- topTable(fit2, coef="C1_vs_others", number=500, p.value=0.05, sort.by="logFC")
+results_2 <- topTable(fit2, coef="C2_vs_others", number=500, p.value=0.05, sort.by="logFC")
+results_3 <- topTable(fit2, coef="C3_vs_others", number=500, p.value=0.05, sort.by="logFC")
+
 #function to pull the top significant genes
 get_cluster_genes <- function(fit_obj, coef_name, n_genes = 500) {
   top_tab <- topTable(fit_obj, coef = coef_name, number = n_genes, p.value = 0.05, sort.by = "logFC")
@@ -62,7 +69,7 @@ plot_matrix <- t(scale(t(plot_matrix)))
 annotation_col <- data.frame(RNAseq = cluster_data$Cluster_relabelled[sample_order])
 rownames(annotation_col) <- colnames(plot_matrix)
 
-pheatmap(plot_matrix, 
+ph <- pheatmap(plot_matrix, 
          annotation_col = annotation_col, 
          cluster_rows = TRUE,  # Keep genes grouped by cluster
          cluster_cols = FALSE,  # Keep samples grouped by cluster
@@ -73,4 +80,145 @@ pheatmap(plot_matrix,
          #breaks = seq(-2, 2, length.out = 101)
          ) 
 
+png("/mnt/petasan_ccb/alessandro/SCANB/plots/comparisons/heatmap_rna.png", 
+    width = 11.69, height = 8.27, units = "in", res = 300)
+draw(ph, 
+     merge_legends = TRUE, 
+     heatmap_legend_side = "right", 
+     annotation_legend_side = "right")
+dev.off()
 
+
+
+
+# Annotation
+
+annotate_with_stats <- function(results_df) {
+  clean_ids <- gsub("\\..*", "", rownames(results_df))
+  
+  tryCatch({
+    #Add ENTREZID back to the toType list
+    anno <- bitr(clean_ids, 
+                 fromType = "ENSEMBL", 
+                 toType = c("SYMBOL", "GENENAME", "ENTREZID"), 
+                 OrgDb = org.Hs.eg.db,
+                 drop = TRUE)
+    
+    results_df$ENSEMBL <- clean_ids
+    merged <- merge(anno, results_df, by = "ENSEMBL")
+    
+    # Sort by absolute logFC
+    merged$absLogFC <- abs(merged$logFC) #PRENDE ABS VALUES
+    final_table <- merged[order(-merged$absLogFC), ]
+    
+    # Reset indices
+    rownames(final_table) <- NULL
+    
+    #keep ENTREZID in the dataframe now so enrichGO can use it
+    final_table <- final_table[, c("SYMBOL", "GENENAME", "logFC", "adj.P.Val", "ENSEMBL", "ENTREZID")]
+    
+    return(final_table)
+  }, error = function(e) {
+    message("Error during annotation: ", e)
+    return(NULL)
+  })
+}
+
+#Run the annotation for clusters
+anno_c1 <- annotate_with_stats(results_1)
+anno_c2 <- annotate_with_stats(results_2)
+anno_c3 <- annotate_with_stats(results_3)
+
+print(anno_c1[1:20,])
+print(anno_c2[1:20,])
+print(anno_c3[1:20,])
+
+
+
+# Enrichment of each cluster with gene ontology
+
+#POSITIVE
+ego1_up <- enrichGO(gene          = anno_c1$ENTREZID[anno_c1$logFC > 0],
+                     OrgDb         = org.Hs.eg.db,
+                     ont           = "BP",
+                     pAdjustMethod = "BH",
+                     pvalueCutoff  = 0.05,
+                     qvalueCutoff  = 0.05,
+                     readable      = TRUE) #converts IDs back to Symbols in the results
+
+ego2_up <- enrichGO(gene          = anno_c2$ENTREZID[anno_c2$logFC > 0],
+                 OrgDb         = org.Hs.eg.db,
+                 ont           = "BP",
+                 pAdjustMethod = "BH",
+                 pvalueCutoff  = 0.05,
+                 qvalueCutoff  = 0.05,
+                 readable      = TRUE)
+
+ego3_up <- enrichGO(gene          = anno_c3$ENTREZID[anno_c3$logFC > 0],
+                     OrgDb         = org.Hs.eg.db,
+                     ont           = "BP",
+                     pAdjustMethod = "BH",
+                     pvalueCutoff  = 0.05,
+                     qvalueCutoff  = 0.05,
+                     readable      = TRUE)
+
+#NEGATIVE
+
+ego1_down <- enrichGO(gene          = anno_c1$ENTREZID[anno_c1$logFC < 0],
+                      OrgDb         = org.Hs.eg.db,
+                      keyType       = "ENTREZID", 
+                      ont           = "BP",
+                      pAdjustMethod = "BH",
+                      pvalueCutoff  = 0.05, 
+                      qvalueCutoff  = 0.05,
+                      readable      = TRUE)
+
+ego2_down <- enrichGO(gene          = anno_c2$ENTREZID[anno_c2$logFC < 0],
+                      OrgDb         = org.Hs.eg.db,
+                      keyType       = "ENTREZID", 
+                      ont           = "BP",
+                      pAdjustMethod = "BH",
+                      pvalueCutoff  = 0.05, 
+                      qvalueCutoff  = 0.05,
+                      readable      = TRUE)
+
+ego3_down <- enrichGO(gene          = anno_c3$ENTREZID[anno_c3$logFC < 0],
+                      OrgDb         = org.Hs.eg.db,
+                      keyType       = "ENTREZID", 
+                      ont           = "BP",
+                      pAdjustMethod = "BH",
+                      pvalueCutoff  = 0.05, 
+                      qvalueCutoff  = 0.05,
+                      readable      = TRUE)
+
+merged_ego1 <- merge_result(list(Upregulated = ego1_up, Downregulated = ego1_down))
+merged_ego2 <- merge_result(list(Upregulated = ego2_up, Downregulated = ego2_down))
+merged_ego3 <- merge_result(list(Upregulated = ego3_up, Downregulated = ego3_down))
+
+# plot
+
+cl1 <- dotplot(merged_ego1, x = "Cluster", showCategory = 10) + 
+  ggtitle("Cluster 1: Directional Pathways") +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 7) 
+  )+
+  scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 50))
+
+cl2 <- dotplot(merged_ego2, x = "Cluster", showCategory = 10) + 
+  ggtitle("Cluster 2: Directional Pathways") +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 7) 
+  )+
+  scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 50))
+
+cl3 <- dotplot(merged_ego3, x = "Cluster", showCategory = 10) + 
+  ggtitle("Cluster 3: Directional Pathways") +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 7) 
+  )+
+  scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 50))
+
+                   
