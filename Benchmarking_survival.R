@@ -4,7 +4,7 @@ library(survival)
 library(survminer)
 
 # load file with survival scores
-dt_metadata <- read_excel("ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery") 
+dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
 
 #load clustering solutions
 rna_results   <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/rnaseq_nmf_clusters.csv")
