@@ -82,10 +82,7 @@ ph <- pheatmap(plot_matrix,
 
 png("/mnt/petasan_ccb/alessandro/SCANB/plots/comparisons/heatmap_rna.png", 
     width = 11.69, height = 8.27, units = "in", res = 300)
-draw(ph, 
-     merge_legends = TRUE, 
-     heatmap_legend_side = "right", 
-     annotation_legend_side = "right")
+print(ph)
 dev.off()
 
 
