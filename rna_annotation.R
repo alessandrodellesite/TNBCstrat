@@ -222,3 +222,20 @@ cl3 <- dotplot(merged_ego3, x = "Cluster", showCategory = 10) +
   scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 50))
 
                    
+png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/comparisons",
+               "rna_enrichment_cl1.png"),
+    width = 1400, height = 1000, res = 150)
+print(cl1)
+dev.off()
+
+png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/comparisons",
+               "rna_enrichment_cl2.png"),
+    width = 1400, height = 1000, res = 150)
+print(cl2)
+dev.off()
+
+png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/comparisons",
+               "rna_enrichment_cl3.png"),
+    width = 1400, height = 1000, res = 150)
+print(cl3)
+dev.off()                   
