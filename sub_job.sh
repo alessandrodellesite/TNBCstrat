@@ -10,8 +10,8 @@
 #SBATCH --time=30:00      
 #SBATCH --mem=3G            
 
-IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image_new.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Benchmarking_boot.R"
+IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Benchmarking_survival.R"
 
 # singularity execution
 srun singularity exec \
