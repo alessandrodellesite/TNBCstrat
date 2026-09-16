@@ -387,7 +387,7 @@ boxplot_stats_simple <- jaccard_long %>%
   ) %>%
   mutate(across(where(is.numeric) & !c(n), ~round(.x, 3)))
 
-write.csv(boxplot_stats_simple, file.path(/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/bootstrapping", "jaccard_boxplot_stats.csv"),
+write.csv(boxplot_stats_simple, file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/bootstrapping", "jaccard_boxplot_stats.csv"),
           row.names = FALSE)                                 
 
 
