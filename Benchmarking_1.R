@@ -355,23 +355,18 @@ approach_configs <- list(
   MOFA_3 = list(dist_full = mofa_dist_full, db_x = mofa_factors_clean, db_d = NULL, centrotypes = "centroids"),
   MOFA_4 = list(dist_full = mofa_dist_full, db_x = mofa_factors_clean, db_d = NULL, centrotypes = "centroids"),
 
-  icluster_2 = list(dist_full = icluster_dist_full2, db_x = icluster_z_clean2, db_d = NULL, centrotypes = "centroids"),
-  icluster_3 = list(dist_full = icluster_dist_full3, db_x = icluster_z_clean3, db_d = NULL, centrotypes = "centroids"),
-  icluster_4 = list(dist_full = icluster_dist_full4, db_x = icluster_z_clean4, db_d = NULL, centrotypes = "centroids"),
+  "iCluster+_2" = list(dist_full = icluster_dist_full2, db_x = icluster_z_clean2, db_d = NULL, centrotypes = "centroids"),
+  "iCluster+_3" = list(dist_full = icluster_dist_full3, db_x = icluster_z_clean3, db_d = NULL, centrotypes = "centroids"),
+  "iCluster+_4" = list(dist_full = icluster_dist_full4, db_x = icluster_z_clean4, db_d = NULL, centrotypes = "centroids"),
 
-  #now we are in the euclidian eigenspace
   SNF_2 = list(dist_full = snf_dist_full[["2"]], db_x = snf_embeddings[["2"]], db_d = NULL, centrotypes = "centroids"),
   SNF_3 = list(dist_full = snf_dist_full[["3"]], db_x = snf_embeddings[["3"]], db_d = NULL, centrotypes = "centroids"),
   SNF_4 = list(dist_full = snf_dist_full[["4"]], db_x = snf_embeddings[["4"]], db_d = NULL, centrotypes = "centroids"),
 
-  xintNMF_2 = list(dist_full = xint_dist_full[["2"]], db_x = as.matrix(xint_factors[["2"]]),
-                 db_d = NULL, centrotypes = "centroids"),
-  xintNMF_3 = list(dist_full = xint_dist_full[["3"]], db_x = as.matrix(xint_factors[["3"]]),
-                 db_d = NULL, centrotypes = "centroids"),
-  xintNMF_4 = list(dist_full = xint_dist_full[["4"]], db_x = as.matrix(xint_factors[["4"]]),
-                 db_d = NULL, centrotypes = "centroids")
+  "X-intNMF_2" = list(dist_full = xint_dist_full[["2"]], db_x = as.matrix(xint_factors[["2"]]), db_d = NULL, centrotypes = "centroids"),
+  "X-intNMF_3" = list(dist_full = xint_dist_full[["3"]], db_x = as.matrix(xint_factors[["3"]]), db_d = NULL, centrotypes = "centroids"),
+  "X-intNMF_4" = list(dist_full = xint_dist_full[["4"]], db_x = as.matrix(xint_factors[["4"]]), db_d = NULL, centrotypes = "centroids")
 )
-
 
 ### Run all metrics in one loop
 
