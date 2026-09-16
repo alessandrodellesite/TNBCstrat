@@ -372,6 +372,25 @@ print(p_cluster_detail)
 dev.off()    
 
 
+boxplot_stats_simple <- jaccard_long %>%
+  group_by(Method, K, RefCluster) %>%
+  summarise(
+    n        = sum(!is.na(Jaccard)),
+    mean     = mean(Jaccard, na.rm = TRUE),
+    median   = median(Jaccard, na.rm = TRUE),
+    sd       = sd(Jaccard, na.rm = TRUE),
+    min      = min(Jaccard, na.rm = TRUE),
+    Q1       = quantile(Jaccard, 0.25, na.rm = TRUE),
+    Q3       = quantile(Jaccard, 0.75, na.rm = TRUE),
+    max      = max(Jaccard, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(across(where(is.numeric) & !c(n), ~round(.x, 3)))
+
+write.csv(boxplot_stats_simple, file.path(/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/bootstrapping", "jaccard_boxplot_stats.csv"),
+          row.names = FALSE)                                 
+
+
 # Visualizing cophenetic correlation, dispersion, and per-sample stability                                 
 
 ## Cophenetic correlation & dispersion score, by method x K 
