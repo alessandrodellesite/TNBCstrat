@@ -391,7 +391,7 @@ write.csv(round(results_table, 3), file.path(val_dir, "internal_validation.csv")
 plot_data <- results_table %>%
   tibble::rownames_to_column("Metric") %>%
   pivot_longer(-Metric, names_to = "Approach", values_to = "Value") %>%
-  mutate(Method_Family = str_extract(Approach, "^[A-Za-z]+"))
+  mutate(Method_Family = str_remove(Approach, "_\\d+$"))
 
 p <- ggplot(plot_data, aes(x = Approach, y = Value, fill = Method_Family)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.6) +
