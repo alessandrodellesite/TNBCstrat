@@ -7,7 +7,7 @@ library(survminer)
 dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
 
 #load clustering solutions
-rna_results   <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/rnaseq_nmf_clusters.csv")
+rna_results   <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/rna_nmf_clusters.csv")
 met_results   <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters.csv")
 cnv_results   <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/cnv_nmf_clusters.csv")
 
