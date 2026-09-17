@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=mofa_1
-#SBATCH --output=mofa%j.log
+#SBATCH --job-name=rna_anno_1
+#SBATCH --output=rna_anno%j.log
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
