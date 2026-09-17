@@ -5,7 +5,7 @@ library(circlize)
 library(ComplexHeatmap)
 library(RColorBrewer)
 library(readxl)
-library(pheatmap)
+#library(pheatmap)
 
 rna <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.rds")
 gene_mads <- apply(rna, 1, mad)
@@ -255,7 +255,7 @@ annotation_col_meth <- data.frame(
 rownames(annotation_col_meth) <- colnames(plot_matrix)
                                  
 ann_colors_meth = list(
-  RNAseq          = c("1" = "tomato3", "2" = "#0984E3", "3" = "#00B894"),
+  RNAseq          = c("1" = "#00B894", "2" = "tomato3", "3" = "#0984E3"),
   DNAm            = c("1" = "#ffb8b8", "2" = "#95afc0", "3" = "#badc58"), 
   DNAm_4          = c("1" = "#95afc0", "2" = "#ffb8b8", "3" = "#badc58", "4"= "#34495e"), 
   CNV             = c("1" = "#ff7675", "2" = "#74b9ff", "3" = "#fdcb6e"), 
