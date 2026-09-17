@@ -80,7 +80,7 @@ run_survival <- function(cluster_df, meta, method_name,
   if (nlevels(droplevels(df_crude$Cluster)) < 2) return(NULL)
   
   form_crude <- as.formula(paste0("Surv(", time_var, ", ", event_var, ") ~ Cluster"))
-  fit  <- survfit(form_crude, data = df_crude)
+  fit  <- surv_fit(form_crude, data = df_crude)
   cox_crude <- coxph(form_crude, data = df_crude)
   logrank_p <- surv_pvalue(fit)$pval
   
