@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=survival_1
-#SBATCH --output=survival%j.log
+#SBATCH --job-name=mofa_1
+#SBATCH --output=mofa%j.log
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --time=30:00      
-#SBATCH --mem=3G            
+#SBATCH --time=1:00:00      
+#SBATCH --mem=6G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/rna_annotation.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_mofa.R"
 
 # singularity execution
 srun singularity exec \
