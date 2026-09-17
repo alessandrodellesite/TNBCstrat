@@ -131,9 +131,10 @@ wss <- sapply(k_range, function(k) {
 })
 
 png(file.path(out_dir, "elbow_plot.png"), width = 10, height = 5, units = "in", res = 300)
-plot(k_range, wss, type = "b", pch = 19,
+plot(k_range, wss, type = "b", pch = 19, xaxt = "n",
      xlab = "Number of clusters k", ylab = "Total Within Sum of Square",
      main = "Optimal number of clusters")
+axis(1, at = k_range)
 dev.off()
 
 # Silhouette method
@@ -145,9 +146,10 @@ sil_width <- sapply(k_range_sil, function(k) {
 })
 
 png(file.path(out_dir, "silhouette.png"), width = 10, height = 5, units = "in", res = 300)
-plot(k_range_sil, sil_width, type = "b", pch = 19,
+plot(k_range_sil, sil_width, type = "b", pch = 19, xaxt = "n",
      xlab = "Number of clusters k", ylab = "Average silhouette width",
      main = "Optimal number of clusters")
+axis(1, at = k_range_sil)
 dev.off()
 
 # Gap Statistic method
@@ -157,10 +159,11 @@ gap_df <- as.data.frame(gap_stat$Tab)
 gap_df$k <- seq_len(nrow(gap_df))
 
 png(file.path(out_dir, "gap_stat.png"), width = 10, height = 5, units = "in", res = 300)
-plot(gap_df$k, gap_df$gap, type = "b", pch = 19,
+plot(gap_df$k, gap_df$gap, type = "b", pch = 19, xaxt = "n",
      xlab = "Number of clusters k", ylab = "Gap statistic",
      main = "Optimal number of clusters",
      ylim = range(c(gap_df$gap - gap_df$SE.sim, gap_df$gap + gap_df$SE.sim)))
+axis(1, at = gap_df$k)
 arrows(gap_df$k, gap_df$gap - gap_df$SE.sim,
        gap_df$k, gap_df$gap + gap_df$SE.sim,
        angle = 90, code = 3, length = 0.05)
@@ -222,84 +225,3 @@ export_mofa_clusters_4 <- data.frame(
 )
 write.csv(export_mofa_clusters_4, "/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_4.csv", row.names = FALSE)
 
-
-
-# Add sample metadata 
-dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
-
-# MOFA strictly requires sample column named 'sample'
-dt_metadata <- dt_metadata %>% 
-  rename(sample = PD_ID)
-
-# check if all samples in mofa object == metadata file
-mofa_samples <- unlist(samples_names(MOFAobject))
-missing_metadata <- setdiff(mofa_samples, dt_metadata$sample)
-
-# filter the metadata so it only includes the samples present in mofa model
-dt_metadata_cleaned <- dt_metadata %>% 
-  filter(sample %in% mofa_samples)
-
-# N numeric coercion for covariate columns 
-numeric_cols <- c("TMB", "TILs", "Age", "ASCAT_PLOIDY", "ASCAT_TUM_FRAC",
-                   "CibersortX.Tcell", "CibersortX.Bcell", "CibersortX.macrophage",
-                   "CibersortX.stroma", "CibersortX.endothelial", "CibersortX.epithelial")
-
-log_file <- "/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/covariate_cleaning_log.txt"
-log_lines <- c(paste("Covariate cleaning log -", Sys.time()))
-
-for (col in numeric_cols) {
-  original <- dt_metadata_cleaned[[col]]
-  na_before <- sum(is.na(original))
-
-  # if already numeric, skip cleaning but still record baseline NA count
-  if (is.numeric(original)) {
-    log_lines <- c(log_lines, sprintf("%-25s already numeric | NAs: %d", col, na_before))
-    next
-  }
-
-  cleaned <- original %>%
-    as.character() %>%
-    trimws() %>%
-    gsub(",", ".", ., fixed = TRUE) %>%        # decimal commas -> dots
-    gsub("[><]", "", .) %>%                     # strip stray '>' '<'
-    gsub("%", "", .) %>%                        # strip percent signs
-    { .[. %in% c("", "NA", "N/A", "na", "n/a", "-", "unknown", "Unknown")] <- NA; . }
-
-  numeric_version <- suppressWarnings(as.numeric(cleaned))
-  na_after <- sum(is.na(numeric_version))
-  new_nas <- na_after - na_before
-
-  if (new_nas > 0) {
-    bad_vals <- unique(original[is.na(numeric_version) & !is.na(original)])
-    log_lines <- c(log_lines,
-                    sprintf("%-25s NAs before: %d | after: %d | NEW NAs: %d | unparsed values: %s",
-                            col, na_before, na_after, new_nas, paste(bad_vals, collapse = "; ")))
-  } else {
-    log_lines <- c(log_lines,
-                    sprintf("%-25s NAs before: %d | after: %d | OK (no new NAs)", col, na_before, na_after))
-  }
-
-  dt_metadata_cleaned[[col]] <- numeric_version
-}
-
-writeLines(log_lines, log_file)
-
-# inject the metadata into the model
-samples_metadata(MOFAobject) <- as.data.frame(dt_metadata_cleaned)
-
-png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/association.png",
-    width = 10, height = 8, units = "in", res = 300)
-
-assoc_result <- tryCatch({
-  correlate_factors_with_covariates(MOFAobject,
-    covariates = numeric_cols,
-    plot = "log_pval"
-  )
-}, error = function(e) {
-  message("correlate_factors_with_covariates failed: ", conditionMessage(e))
-  plot.new()
-  text(0.5, 0.5, paste("Association plot failed:\n", conditionMessage(e)), cex = 0.8)
-  NULL
-})
-
-invisible(dev.off())
