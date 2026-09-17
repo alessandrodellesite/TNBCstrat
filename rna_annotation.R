@@ -78,18 +78,28 @@ c2_markers <- get_cluster_genes(fit2, "C2_vs_others", n_genes = 50)
 c3_markers <- get_cluster_genes(fit2, "C3_vs_others", n_genes = 50)
 ordered_genes <- c(c1_markers, c2_markers, c3_markers)
 
-# Relabel old cluster IDs so sorting gives visual order 3,1,2
-# old "3" -> new "1", old "1" -> new "2", old "2" -> new "3"
-# (kept identical to the other heatmap script for visual consistency)
-relabel_map <- c("3" = "1", "1" = "2", "2" = "3")
-cluster_data$Cluster_relabelled <- factor(relabel_map[as.character(cluster_data$Cluster)],
-                                           levels = c("1", "2", "3"))
-sample_order <- order(cluster_data$Cluster_relabelled)
+# FIX: the previous version RENAMED clusters for display ("old 3" -> "1",
+# "old 1" -> "2", "old 2" -> "3"), but the DE/GO analysis above uses the RAW
+# cluster labels throughout (design colnames, contrasts C1/C2/C3_vs_others,
+# results_1/2/3, ego1/2/3, and the GO plot titles "Cluster 1/2/3: ..."). That
+# meant "Cluster 1" in the heatmap legend and "Cluster 1" in the GO dotplot
+# were literally two different groups of patients.
+#
+# Fix: reorder the COLUMNS for the visual layout you want (old cluster
+# 3, then 1, then 2, left to right), but keep the ORIGINAL cluster numbers in
+# the annotation legend, so "1"/"2"/"3" mean the same patients here as they do
+# in the C1/C2/C3 contrasts and in the GO plots above.
+display_order <- c("3", "1", "2")  # visual left-to-right order of RAW cluster IDs
+cluster_data$Cluster_display <- factor(as.character(cluster_data$Cluster), levels = display_order)
+sample_order <- order(cluster_data$Cluster_display)
 
 plot_matrix <- dt_matrix[ordered_genes, sample_order]
 plot_matrix <- t(scale(t(plot_matrix)))
 
-annotation_col <- data.frame(RNAseq = cluster_data$Cluster_relabelled[sample_order])
+# Legend shows the TRUE (raw) cluster number for each sample -- same numbering
+# used in the DE contrasts and GO plots, just visually reordered on the page.
+annotation_col <- data.frame(RNAseq = factor(as.character(cluster_data$Cluster[sample_order]),
+                                              levels = c("1", "2", "3")))
 rownames(annotation_col) <- colnames(plot_matrix)
 
 ph <- pheatmap(plot_matrix,
