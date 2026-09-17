@@ -11,7 +11,7 @@
 #SBATCH --mem=3G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Benchmark_survival.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Benchmarking_survival.R"
 
 # singularity execution
 srun singularity exec \
