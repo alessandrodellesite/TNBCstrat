@@ -5,6 +5,7 @@ library(circlize)
 library(ComplexHeatmap)
 library(RColorBrewer)
 library(readxl)
+library(pheatmap)
 
 rna <- readRDS("/mnt/petasan_ccb/alessandro/SCANB/rna_logtransformed.rds")
 gene_mads <- apply(rna, 1, mad)
@@ -14,51 +15,69 @@ rna <- rna[top_3000_indices, ]
 dt_matrix <- as.matrix(rna)
 
 cluster_data <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/rna_nmf_clusters.csv")
-cluster_data <- cluster_data[match(colnames(dt_matrix), cluster_data$SampleID), ]
 
-groups <- factor(cluster_data$Cluster) 
+idx <- match(colnames(dt_matrix), cluster_data$SampleID)
+if (any(is.na(idx))) {
+  stop("Some samples in dt_matrix were not found in cluster_data$SampleID: ",
+       paste(colnames(dt_matrix)[is.na(idx)], collapse = ", "))
+}
+cluster_data <- cluster_data[idx, ]
+stopifnot(identical(colnames(dt_matrix), cluster_data$SampleID))
+
+# Relabel the RAW NMF cluster IDs to the desired display order 
+relabel_map <- c("3" = "1", "1" = "2", "2" = "3")
+cluster_data$Cluster <- factor(relabel_map[as.character(cluster_data$Cluster)],
+                                levels = c("1", "2", "3"))
+
+# Differential expression analysis
+groups <- cluster_data$Cluster
+stopifnot(setequal(levels(groups), c("1", "2", "3")))
 design <- model.matrix(~0 + groups)
-colnames(design) <- c("C1", "C2", "C3")
-fit <- lmFit(dt_matrix, design) 
+colnames(design) <- paste0("C", levels(groups))  # -> C1, C2, C3, matched to actual levels
+fit <- lmFit(dt_matrix, design)
+
+#to compute log2FC of each gene in each cluster compared to the average of the gene in the other 2 clusters
 cont <- makeContrasts(
-  C1_vs_others = C1 - (C2 + C3)/2,  
+  C1_vs_others = C1 - (C2 + C3)/2,
   C2_vs_others = C2 - (C1 + C3)/2,
   C3_vs_others = C3 - (C1 + C2)/2,
   levels = design
 )
 fit2 <- contrasts.fit(fit, cont)
-fit2 <- eBayes(fit2, trend = TRUE) 
+fit2 <- eBayes(fit2, trend = TRUE)
 
+#function to pull the top significant marker genes (for the heatmap only)
+# FIX: get ALL significant genes first (number = Inf), then rank by |logFC|
+# and take the top n -- this avoids the signed-logFC truncation bug above.
 get_cluster_genes <- function(fit_obj, coef_name, n_genes = 500) {
-  top_tab <- topTable(fit_obj, coef = coef_name, number = n_genes, p.value = 0.05, sort.by = "logFC")
-  return(rownames(top_tab)) 
+  top_tab <- topTable(fit_obj, coef = coef_name, number = Inf, p.value = 0.05, sort.by = "P")
+  top_tab <- top_tab[order(-abs(top_tab$logFC)), ]
+  top_tab <- head(top_tab, n_genes)
+  return(rownames(top_tab))
 }
-cluster1_genes <- get_cluster_genes(fit2, "C1_vs_others")
-cluster2_genes <- get_cluster_genes(fit2, "C2_vs_others")
-cluster3_genes <- get_cluster_genes(fit2, "C3_vs_others")
 
-library(pheatmap)
+# Heatmap
+
 c1_markers <- get_cluster_genes(fit2, "C1_vs_others", n_genes = 50)
 c2_markers <- get_cluster_genes(fit2, "C2_vs_others", n_genes = 50)
 c3_markers <- get_cluster_genes(fit2, "C3_vs_others", n_genes = 50)
 ordered_genes <- c(c1_markers, c2_markers, c3_markers)
 
-# --- NEW: relabel old cluster IDs so sorting gives visual order 3,1,2 ---
-# old "3" -> new "1", old "1" -> new "2", old "2" -> new "3"
-relabel_map <- c("3" = "1", "1" = "2", "2" = "3")
-cluster_data$Cluster_relabelled <- factor(relabel_map[as.character(cluster_data$Cluster)],
-                                           levels = c("1", "2", "3"))
-sample_order <- order(cluster_data$Cluster_relabelled)
+sample_order <- order(cluster_data$Cluster)
 
 plot_matrix <- dt_matrix[ordered_genes, sample_order]
 plot_matrix <- t(scale(t(plot_matrix)))
 
-annotation_col <- data.frame(RNAseq = cluster_data$Cluster_relabelled[sample_order])
+annotation_col <- data.frame(RNAseq = cluster_data$Cluster[sample_order])
 rownames(annotation_col) <- colnames(plot_matrix)
 
 methyl_probes      <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters.csv")
 methyl_probes_4    <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters_4.csv")
 cnv_data_clusters  <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/cnv_nmf_clusters.csv")
+
+methyl_map_probes <- setNames(methyl_probes$Cluster, methyl_probes$SampleID)
+methyl_map_probes_4 <- setNames(methyl_probes_4$Cluster, methyl_probes_4$SampleID)
+cnv_map <- setNames(cnv_data_clusters$Cluster, cnv_data_clusters$SampleID)
 
 dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx", sheet = "1a SCAN-B discovery")
 
@@ -82,9 +101,12 @@ meta_sub[cat_cols] <- lapply(meta_sub[cat_cols], factor)
 
 names(meta_sub)[names(meta_sub) == "TNBCtype4_n235_notPreCentered"] <- "TNBCtype4"
 names(meta_sub)[names(meta_sub) == "TNBCtype6_n235_notPreCentered"] <- "TNBCtype6"
-
+                                 
 annotation_col <- data.frame(
-  RNAseq = cluster_data$Cluster_relabelled[sample_order],
+  RNAseq = factor(cluster_data$Cluster[sample_order]),
+  DNAm          = factor(methyl_map_probes[colnames(plot_matrix)]),
+  DNAm_4          = factor(methyl_map_probes_4[colnames(plot_matrix)]),
+  CNV                    = factor(cnv_map[colnames(plot_matrix)]),
   meta_sub
 )
 rownames(annotation_col) <- colnames(plot_matrix)
@@ -96,10 +118,12 @@ desired_order <- c("RNAseq", "TNBCtype4", "TNBCtype6", "PAM50_NCN", "PAM50_Basal
                     "ASCAT_PLOIDY", "ASCAT_TUM_FRAC")
 annotation_col <- annotation_col[, desired_order]
 
-# --- NEW: Cluster colors follow the ORIGINAL cluster identity, keyed by the NEW label ---
-# old "1" (tomato3) is now new "2"; old "2" (#0984E3) is now new "3"; old "3" (#00B894) is now new "1"
+
 ann_colors = list(
   RNAseq = c("1" = "#00B894", "2" = "tomato3", "3" = "#0984E3"),
+  DNAm            = c("1" = "#ffb8b8", "2" = "#95afc0", "3" = "#badc58"), 
+  DNAm_4          = c("1" = "#95afc0", "2" = "#ffb8b8", "3" = "#badc58", "4"= "#34495e"), 
+  CNV             = c("1" = "#ff7675", "2" = "#74b9ff", "3" = "#fdcb6e"), 
   TNBCtype4 = c("BL1" = "#A29BFE", "BL2" = "#74B9FF", 
                 "M" = "#55E6C1", "LAR" = "#FDCB6E", "NA" = "#B2BEC3"),
   TNBCtype6 = c("BL1" = "#A29BFE", "BL2" = "#74B9FF", "M" = "#55E6C1", 
