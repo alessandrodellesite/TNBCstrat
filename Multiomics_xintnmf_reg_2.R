@@ -61,29 +61,7 @@ print(round(mean_silhouettes_km_reg, 3))
 print("CH index for kmeans at different k's:")
 print(round(ch_per_k, 1))
 
-#RSS (requires the input matrices, Reconstruction is W %*% t(H), compared against the real data)
 
-data_dir <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics/input_data/xintnmf_inputdata"
-rna_matrix <- read.csv(file.path(data_dir, "rna.tsv"), sep = "\t", row.names = 1, check.names = FALSE)
-met_matrix <- read.csv(file.path(data_dir, "methylation.tsv"), sep = "\t", row.names = 1, check.names = FALSE)
-dna_matrix <- read.csv(file.path(data_dir, "cnv.tsv"), sep = "\t", row.names = 1, check.names = FALSE)
-
-rss_per_k_reg <- numeric(length(k_range))
-names(rss_per_k_reg) <- k_range
-
-for (k in k_range) {
-  H <- h_matrices_reg[[as.character(k)]]
-  W <- w_matrices_reg[[as.character(k)]]
-
-  rss_rna  <- sum((as.matrix(rna_matrix) - (W$rna  %*% t(H)))^2)
-  rss_meth <- sum((as.matrix(met_matrix) - (W$meth %*% t(H)))^2)
-  rss_cnv  <- sum((as.matrix(dna_matrix) - (W$cnv  %*% t(H)))^2)
-
-  rss_per_k_reg[as.character(k)] <- rss_rna + rss_meth + rss_cnv
-}
-
-print("RSS values per k:")
-print(round(rss_per_k_reg, 1))
 
 png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/xintnmf/kmeans_ch_silh.png",
     width = 10, height = 5, units = "in", res = 300)
