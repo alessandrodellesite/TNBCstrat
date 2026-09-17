@@ -27,10 +27,22 @@ if (any(is.na(idx))) {
 cluster_data <- cluster_data[idx, ]
 stopifnot(identical(colnames(dt_matrix), cluster_data$SampleID))
 
+# FIX: relabel the RAW NMF cluster IDs to the desired display order ONCE,
+# here, before any DE/design/contrasts/GO code runs -- rather than relabeling
+# only the heatmap at the end. This guarantees "Cluster 1/2/3" means the same
+# patients everywhere downstream: the design matrix, the contrasts, the
+# results tables, the GO enrichment, and the heatmap all key off this single
+# relabeled Cluster column, so numbering can never drift out of sync again.
+# raw "3" -> display "1" (leftmost), raw "1" -> display "2" (center),
+# raw "2" -> display "3" (rightmost)
+relabel_map <- c("3" = "1", "1" = "2", "2" = "3")
+cluster_data$Cluster <- factor(relabel_map[as.character(cluster_data$Cluster)],
+                                levels = c("1", "2", "3"))
+
 # Differential expression analysis
 
 #create the factor and design matrix
-groups <- factor(cluster_data$Cluster)
+groups <- cluster_data$Cluster
 
 # FIX: don't blindly hardcode colnames(design) <- c("C1","C2","C3").
 # model.matrix names columns after levels(groups) in whatever order factor()
@@ -78,28 +90,16 @@ c2_markers <- get_cluster_genes(fit2, "C2_vs_others", n_genes = 50)
 c3_markers <- get_cluster_genes(fit2, "C3_vs_others", n_genes = 50)
 ordered_genes <- c(c1_markers, c2_markers, c3_markers)
 
-# FIX: the previous version RENAMED clusters for display ("old 3" -> "1",
-# "old 1" -> "2", "old 2" -> "3"), but the DE/GO analysis above uses the RAW
-# cluster labels throughout (design colnames, contrasts C1/C2/C3_vs_others,
-# results_1/2/3, ego1/2/3, and the GO plot titles "Cluster 1/2/3: ..."). That
-# meant "Cluster 1" in the heatmap legend and "Cluster 1" in the GO dotplot
-# were literally two different groups of patients.
-#
-# Fix: reorder the COLUMNS for the visual layout you want (old cluster
-# 3, then 1, then 2, left to right), but keep the ORIGINAL cluster numbers in
-# the annotation legend, so "1"/"2"/"3" mean the same patients here as they do
-# in the C1/C2/C3 contrasts and in the GO plots above.
-display_order <- c("3", "1", "2")  # visual left-to-right order of RAW cluster IDs
-cluster_data$Cluster_display <- factor(as.character(cluster_data$Cluster), levels = display_order)
-sample_order <- order(cluster_data$Cluster_display)
+# cluster_data$Cluster was already relabeled to the desired display order right
+# after loading (raw 3/1/2 -> display 1/2/3), so a plain ascending sort here
+# gives left-to-right = 1, 2, 3 -- and these are the SAME cluster identities
+# used in the C1/C2/C3 contrasts and GO plots above, so numbering matches.
+sample_order <- order(cluster_data$Cluster)
 
 plot_matrix <- dt_matrix[ordered_genes, sample_order]
 plot_matrix <- t(scale(t(plot_matrix)))
 
-# Legend shows the TRUE (raw) cluster number for each sample -- same numbering
-# used in the DE contrasts and GO plots, just visually reordered on the page.
-annotation_col <- data.frame(RNAseq = factor(as.character(cluster_data$Cluster[sample_order]),
-                                              levels = c("1", "2", "3")))
+annotation_col <- data.frame(RNAseq = cluster_data$Cluster[sample_order])
 rownames(annotation_col) <- colnames(plot_matrix)
 
 ph <- pheatmap(plot_matrix,
