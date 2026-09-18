@@ -111,7 +111,8 @@ annotation_col <- data.frame(
 )
 rownames(annotation_col) <- colnames(plot_matrix)
 
-desired_order <- c("RNAseq", "TNBCtype4", "TNBCtype6", "PAM50_NCN", "PAM50_Basal_NCN",
+desired_order <- c("RNAseq", "DNAm", "DNAm_4", "CNV",
+                    "TNBCtype4", "TNBCtype6", "PAM50_NCN", "PAM50_Basal_NCN",
                     "TMB", "TILs", 
                     "CibersortX.epithelial", "CibersortX.macrophage", "CibersortX.stroma",
                     "CibersortX.Bcell", "CibersortX.endothelial", "CibersortX.Tcell",
