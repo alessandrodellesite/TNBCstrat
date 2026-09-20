@@ -27,6 +27,12 @@ XintNMF2_results_reg <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/o
 XintNMF3_results_reg <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k3_reg.csv")
 XintNMF4_results_reg <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k4_reg.csv")
 
+
+# Relabel the RAW NMF cluster IDs to the desired display order 
+relabel_map <- c("3" = "1", "1" = "2", "2" = "3")
+rna_results$Cluster <- factor(relabel_map[as.character(rna_results$Cluster)],
+                                levels = c("1", "2", "3"))
+
 #  Organize cluster solutions 
 single_omic_list <- list(
   RNA    = rna_results,
@@ -220,3 +226,118 @@ save_significant_plots(results_single_omic, summary_single_omic, out_dir)
 save_significant_plots(results_by_k$k2,      summary_k2,         out_dir)
 save_significant_plots(results_by_k$k3,      summary_k3,         out_dir)
 save_significant_plots(results_by_k$k4,      summary_k4,         out_dir)
+
+
+
+
+
+# adjusted pairwise Cox comparisons for one method/outcome 
+pairwise_cox <- function(cluster_df, meta, method_name, time_var, event_var,
+                          id_col_cluster = "SampleID") {
+
+  df <- meta %>%
+    inner_join(cluster_df, by = c("PD_ID" = id_col_cluster)) %>%
+    mutate(Cluster = as.factor(Cluster)) %>%
+    filter(!is.na(.data[[time_var]]), !is.na(.data[[event_var]]),
+           !is.na(Age), !is.na(TumSize), !is.na(Grade))
+
+  levels_cluster <- levels(droplevels(df$Cluster))
+  if (length(levels_cluster) < 2) return(NULL)
+
+  pairs <- combn(levels_cluster, 2, simplify = FALSE)
+
+  results <- lapply(pairs, function(pair) {
+    df_pair <- df %>% filter(Cluster %in% pair) %>% mutate(Cluster = droplevels(as.factor(Cluster)))
+    df_pair$Cluster <- relevel(df_pair$Cluster, ref = pair[1])   # pair[1] = reference
+
+    form <- as.formula(paste0("Surv(", time_var, ", ", event_var, ") ~ Cluster + Age + TumSize + Grade"))
+    cox <- tryCatch(coxph(form, data = df_pair), error = function(e) NULL)
+    if (is.null(cox)) return(NULL)
+
+    s <- summary(cox)
+    cluster_row <- grep("^Cluster", rownames(s$coefficients))[1]  # the Cluster dummy row
+
+    data.frame(
+      method     = method_name,
+      outcome    = time_var,
+      group1     = pair[1],
+      group2     = pair[2],
+      n          = nrow(df_pair),
+      HR         = s$coefficients[cluster_row, "exp(coef)"],
+      lower95    = s$conf.int[cluster_row, "lower .95"],
+      upper95    = s$conf.int[cluster_row, "upper .95"],
+      p          = s$coefficients[cluster_row, "Pr(>|z|)"]
+    )
+  })
+
+  bind_rows(results)
+}
+
+#  Run for RNA across OS, RFI, DRFI 
+rna_pairwise <- bind_rows(lapply(names(outcomes), function(o) {
+  pairwise_cox(rna_results, meta, "RNA", outcomes[[o]][1], outcomes[[o]][2])
+}))
+
+# Run for SNF k=3 across OS, RFI, DRFI 
+snf_k3_pairwise <- bind_rows(lapply(names(outcomes), function(o) {
+  pairwise_cox(snf3_results, meta, "SNF_k3", outcomes[[o]][1], outcomes[[o]][2])
+}))
+
+#  Combine and apply BH correction (within each method, across pairs+outcomes, or however you prefer) 
+pairwise_all <- bind_rows(rna_pairwise, snf_k3_pairwise) %>%
+  group_by(method, outcome) %>%
+  mutate(p_adj = p.adjust(p, method = "BH")) %>%
+  ungroup()
+
+pairwise_all
+
+write.csv(pairwise_all, file.path(out_dir, "pairwise_cox_RNA_SNFk3.csv"), row.names = FALSE)
+                        
+
+# get the snf and rna curves
+
+
+#  Plot KM curves for RNA (all 3 outcomes) 
+for (outcome_name in names(outcomes)) {
+  time_var <- outcomes[[outcome_name]][1]
+  key <- paste0("RNA_", outcome_name)
+  res <- results_single_omic[[key]]
+  
+  if (is.null(res)) {
+    message("No result for ", key)
+    next
+  }
+  
+  p <- ggsurvplot(res$fit, data = res$df_crude,
+                   pval = TRUE, risk.table = TRUE, conf.int = TRUE,
+                   xlab = "Years", legend.title = "Cluster",
+                   title = paste0("RNA — ", time_var))
+  
+  fname <- file.path(out_dir, paste0("RNA_", time_var, "_KM.pdf"))
+  pdf(fname, width = 7, height = 7)
+  print(p)
+  dev.off()
+}
+
+#  Plot KM curves for SNF k=3 (all 3 outcomes) 
+for (outcome_name in names(outcomes)) {
+  time_var <- outcomes[[outcome_name]][1]
+  key <- paste0("SNF_k3_", outcome_name)
+  res <- results_by_k$k3[[key]]
+  
+  if (is.null(res)) {
+    message("No result for ", key)
+    next
+  }
+  
+  p <- ggsurvplot(res$fit, data = res$df_crude,
+                   pval = TRUE, risk.table = TRUE, conf.int = TRUE,
+                   xlab = "Years", legend.title = "Cluster",
+                   title = paste0("SNF k=3 — ", time_var))
+  
+  fname <- file.path(out_dir, paste0("SNF_k3_", time_var, "_KM.pdf"))
+  pdf(fname, width = 7, height = 7)
+  print(p)
+  dev.off()
+}
+                    
