@@ -188,6 +188,8 @@ png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/factor1_2_km2.png",
 plot(factors_to_use[,1], factors_to_use[,2], col = km2$cluster, 
      pch = 19, xlab = "Factor 1", ylab = "Factor 2", 
      main = "K-means with K=2")
+legend("topright", legend = paste("Cluster", sort(unique(km2$cluster))),
+       col = sort(unique(km2$cluster)), pch = 19, title = "Cluster")
 dev.off()
 
 png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/factor1_2_km3.png",
@@ -195,6 +197,8 @@ png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/factor1_2_km3.png",
 plot(factors_to_use[,1], factors_to_use[,2], col = km3$cluster, 
      pch = 19, xlab = "Factor 1", ylab = "Factor 2", 
      main = "K-means with K=3")
+legend("topright", legend = paste("Cluster", sort(unique(km3$cluster))),
+       col = sort(unique(km3$cluster)), pch = 19, title = "Cluster")
 dev.off()
 
 png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/factor1_2_km4.png",
@@ -202,6 +206,8 @@ png("/mnt/petasan_ccb/alessandro/SCANB/plots/multiomics/mofa/factor1_2_km4.png",
 plot(factors_to_use[,1], factors_to_use[,2], col = km4$cluster, 
      pch = 19, xlab = "Factor 1", ylab = "Factor 2", 
      main = "K-means with K=4")
+legend("topright", legend = paste("Cluster", sort(unique(km4$cluster))),
+       col = sort(unique(km4$cluster)), pch = 19, title = "Cluster")
 dev.off()
 
 
