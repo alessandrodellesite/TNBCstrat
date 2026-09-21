@@ -7,11 +7,11 @@
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --time=20:00      
-#SBATCH --mem=3G            
+#SBATCH --time=50:00      
+#SBATCH --mem=5G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Benchmarking_survival.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_mofa.R"
 
 # singularity execution
 srun singularity exec \
