@@ -243,6 +243,16 @@ tnbc6 <- dt_metadata %>%
   select(PD_ID, Cluster = TNBCtype6_n235_notPreCentered) %>%
   filter(!is.na(Cluster))
 
+cat("Samples in TNBCtype4 clusters:\n")
+tnbc4 %>%
+  count(Cluster, name = "n_samples") %>%
+  print()
+
+cat("\nSamples in TNBCtype6 clusters:\n")
+tnbc6 %>%
+  count(Cluster, name = "n_samples") %>%
+  print()     
+
 #  Group definitions: k3 group and k4 group, each incl. single-omics + TNBCtype 
 group_k3 <- list(
   RNA         = list(df = rna_results,          id_col = "SampleID"),
