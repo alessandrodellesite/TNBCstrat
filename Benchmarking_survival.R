@@ -443,48 +443,83 @@ for (outcome_name in names(outcomes)) {
 
 
 # forest plots
+library(dplyr)
+library(ggplot2)
+
+reorder_factor_desc <- function(f, x, fun = median) {
+  f <- as.factor(f)
+  ord_val <- tapply(x, f, fun, na.rm = TRUE)
+  levs <- names(sort(ord_val, decreasing = TRUE))
+  factor(f, levels = levs)
+}
 
 plot_forest_by_k <- function(lar_table, k_name, outcome_name, out_dir) {
   df_plot <- lar_table %>%
-    filter(k_group == k_name, outcome == outcome_name) %>%
-    mutate(label = paste0(method, " (", cluster_vs_lar, " vs LAR)"),
-           p_label = paste0("p=", signif(p_adj, 2)))
+    filter(k_group == k_name, outcome == outcome_name)
   
   if (nrow(df_plot) == 0) return(invisible(NULL))
   
+  method_order <- c("TNBCtype4", "TNBCtype6", "RNA", "Methyl", "CNV",
+                     "MOFA", "SNF", "iCluster", "XintNMF")
+  
   df_plot <- df_plot %>%
-    arrange(method, cluster_vs_lar) %>%
-    mutate(label = factor(label, levels = rev(label)))
+    mutate(base_method = case_when(
+      grepl("^TNBCtype4", method) ~ "TNBCtype4",
+      grepl("^TNBCtype6", method) ~ "TNBCtype6",
+      grepl("^RNA", method)       ~ "RNA",
+      grepl("^Methyl", method)    ~ "Methyl",
+      grepl("^CNV", method)       ~ "CNV",
+      grepl("^MOFA", method)      ~ "MOFA",
+      grepl("^SNF", method)       ~ "SNF",
+      grepl("^iCluster", method)  ~ "iCluster",
+      grepl("^XintNMF", method)   ~ "XintNMF",
+      TRUE ~ method
+    )) %>%
+    mutate(base_method = factor(base_method, levels = method_order)) %>%
+    arrange(base_method, cluster_vs_lar) %>%
+    mutate(p_label = paste0("p=", signif(p_adj, 2)),
+           facet_label = paste0(method, "  (ANOVA p=", signif(anova_p, 2), ")"))
   
-  # one omnibus ANOVA p-value per method, placed at the top row of that method's block
-  anova_labels <- df_plot %>%
-    group_by(method) %>%
-    slice_max(order_by = as.character(label), n = 1) %>%   # top row of each method's block
-    ungroup() %>%
-    mutate(anova_label = paste0("ANOVA p=", signif(anova_p, 2)))
+  facet_order <- df_plot %>% distinct(base_method, facet_label) %>%
+    arrange(base_method) %>% pull(facet_label)
+  df_plot <- df_plot %>% mutate(facet_label = factor(facet_label, levels = facet_order))
   
-  p <- ggplot(df_plot, aes(x = HR, y = label)) +
+  # within-facet comparison order, without forcats
+  df_plot <- df_plot %>%
+    mutate(comp_label = paste0(cluster_vs_lar, " vs LAR")) %>%
+    group_by(facet_label) %>%
+    mutate(comp_label = reorder_factor_desc(comp_label, as.numeric(as.character(cluster_vs_lar)))) %>%
+    ungroup()
+  
+  p <- ggplot(df_plot, aes(x = HR, y = comp_label)) +
     geom_point(size = 2) +
     geom_errorbarh(aes(xmin = lower95, xmax = upper95), height = 0.2) +
     geom_vline(xintercept = 1, linetype = "dashed", color = "grey40") +
     geom_text(aes(label = p_label, x = upper95), hjust = -0.15, size = 3) +
-    geom_text(data = anova_labels, aes(x = upper95, y = label, label = anova_label),
-              hjust = -0.15, vjust = -1.2, size = 3, fontface = "italic", color = "grey30") +
-    scale_x_log10(expand = expansion(mult = c(0.05, 0.4))) +
+    facet_grid(rows = vars(facet_label), scales = "free_y", space = "free_y", switch = "y") +
+    scale_x_log10(expand = expansion(mult = c(0.05, 0.35))) +
     labs(x = "Hazard Ratio (log scale, vs LAR)", y = NULL,
          title = paste0("Forest plot — ", k_name, " — ", outcome_name),
-         caption = "Per-comparison p-values BH-adjusted; ANOVA p = omnibus test for Cluster term (one per method)") +
-    theme_minimal(base_size = 11)
+         caption = "Per-comparison p-values BH-adjusted; ANOVA p = omnibus test for Cluster term") +
+    theme_minimal(base_size = 11) +
+    theme(
+      strip.text.y.left = element_text(angle = 0, hjust = 0, face = "bold"),
+      strip.placement = "outside",
+      strip.background = element_blank(),
+      panel.spacing = unit(0.6, "lines")
+    )
   
   fname <- file.path(out_dir, paste0("forest_", k_name, "_", outcome_name, ".pdf"))
-  ggsave(fname, p, width = 10, height = 0.5 * nrow(df_plot) + 2)
+  ggsave(fname, p, width = 9, height = 0.35 * nrow(df_plot) + 1.5 * length(unique(df_plot$facet_label)))
   p
 }
 
-#  Generate all 6 forest plots (k3/k4 x OS/RFI/DRFI) 
 for (k_name in c("k3", "k4")) {
   for (outcome_name in names(outcomes)) {
     plot_forest_by_k(lar_table_all, k_name, outcome_name, out_dir)
   }
 }
+
+
+                          
                         
