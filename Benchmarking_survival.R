@@ -239,11 +239,11 @@ save_significant_plots(results_by_k$k4,      summary_k4,         out_dir)
 #  Extract Lehman subtypes from metadata 
 tnbc4 <- dt_metadata %>%
   select(PD_ID, Cluster = TNBCtype4_n235_notPreCentered) %>%
-  filter(!is.na(Cluster))
+  filter(!is.na(Cluster), Cluster != "NA")   # catch both true NA and literal string "NA"
 
 tnbc6 <- dt_metadata %>%
   select(PD_ID, Cluster = TNBCtype6_n235_notPreCentered) %>%
-  filter(!is.na(Cluster))
+  filter(!is.na(Cluster), Cluster != "NA")
 
 cat("Samples in TNBCtype4 clusters:\n")
 tnbc4 %>%
@@ -442,20 +442,21 @@ for (outcome_name in names(outcomes)) {
 plot_forest_by_k <- function(lar_table, k_name, outcome_name, out_dir) {
   df_plot <- lar_table %>%
     filter(k_group == k_name, outcome == outcome_name) %>%
-    mutate(label = paste0(method, " (", cluster_vs_lar, " vs LAR)"))
+    mutate(label = paste0(method, " (", cluster_vs_lar, ")"))
   
   if (nrow(df_plot) == 0) return(invisible(NULL))
   
-  # order by HR for readability
-  df_plot <- df_plot %>% arrange(HR) %>%
-    mutate(label = factor(label, levels = label))
+  # order by method name, then by cluster within method
+  df_plot <- df_plot %>%
+    arrange(method, cluster_vs_lar) %>%
+    mutate(label = factor(label, levels = rev(label)))   # rev() so first method appears at top of plot
   
   p <- ggplot(df_plot, aes(x = HR, y = label)) +
     geom_point(size = 2) +
     geom_errorbarh(aes(xmin = lower95, xmax = upper95), height = 0.2) +
     geom_vline(xintercept = 1, linetype = "dashed", color = "grey40") +
     scale_x_log10() +
-    labs(x = "Hazard Ratio (log scale, vs LAR)", y = NULL,
+    labs(x = "Hazard Ratio", y = NULL,
          title = paste0("Forest plot — ", k_name, " — ", outcome_name)) +
     theme_minimal(base_size = 11)
   
