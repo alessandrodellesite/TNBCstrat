@@ -452,6 +452,8 @@ reorder_factor_desc <- function(f, x, fun = median) {
   levs <- names(sort(ord_val, decreasing = TRUE))
   factor(f, levels = levs)
 }
+library(dplyr)
+library(ggplot2)
 
 plot_forest_by_k <- function(lar_table, k_name, outcome_name, out_dir) {
   df_plot <- lar_table %>%
@@ -480,16 +482,23 @@ plot_forest_by_k <- function(lar_table, k_name, outcome_name, out_dir) {
     mutate(p_label = paste0("p=", signif(p_adj, 2)),
            facet_label = paste0(method, "  (ANOVA p=", signif(anova_p, 2), ")"))
   
+  # lock facet order to match base_method order (not alphabetical)
   facet_order <- df_plot %>% distinct(base_method, facet_label) %>%
     arrange(base_method) %>% pull(facet_label)
   df_plot <- df_plot %>% mutate(facet_label = factor(facet_label, levels = facet_order))
   
-  # within-facet comparison order, without forcats
+  # lock within-facet comparison order (e.g. "1 vs LAR" before "2 vs LAR" before "4 vs LAR")
+  # base R equivalent of fct_reorder: build the label, then set factor levels
+  # explicitly ordered by the numeric cluster id (descending, so "1" ends up at top of plot)
   df_plot <- df_plot %>%
-    mutate(comp_label = paste0(cluster_vs_lar, " vs LAR")) %>%
-    group_by(facet_label) %>%
-    mutate(comp_label = reorder_factor_desc(comp_label, as.numeric(as.character(cluster_vs_lar)))) %>%
-    ungroup()
+    mutate(comp_label = paste0(cluster_vs_lar, " vs LAR"))
+  
+  ordering <- df_plot %>%
+    distinct(facet_label, comp_label, cluster_vs_lar) %>%
+    arrange(facet_label, desc(as.numeric(as.character(cluster_vs_lar))))
+  
+  df_plot <- df_plot %>%
+    mutate(comp_label = factor(comp_label, levels = unique(ordering$comp_label)))
   
   p <- ggplot(df_plot, aes(x = HR, y = comp_label)) +
     geom_point(size = 2) +
