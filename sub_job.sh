@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=results_1
-#SBATCH --output=results%j.log
+#SBATCH --job-name=survival
+#SBATCH --output=survival%j.log
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
@@ -11,7 +11,7 @@
 #SBATCH --mem=5G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Multiomics_mofa.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Benchmarking_survival.R"
 
 # singularity execution
 srun singularity exec \
