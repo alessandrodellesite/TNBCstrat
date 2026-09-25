@@ -512,14 +512,15 @@ plot_forest_by_k <- function(lar_table, k_name, outcome_name, out_dir) {
          caption = "Per-comparison p-values BH-adjusted; ANOVA p = omnibus test for Cluster term") +
     theme_minimal(base_size = 11) +
     theme(
-      strip.text.y.left = element_text(angle = 0, hjust = 0, face = "bold"),
-      strip.placement = "outside",
-      strip.background = element_blank(),
-      panel.spacing = unit(0.6, "lines")
-    )
+  strip.text.y.left = element_text(angle = 0, hjust = 0, face = "bold", margin = margin(0,0,0,0)),
+  strip.placement = "outside",
+  strip.background = element_blank(),
+  panel.spacing = unit(0.15, "lines"),
+  axis.text.y = element_text(margin = margin(0,0,0,0)),
+  plot.margin = margin(4, 4, 4, 4))
   
   fname <- file.path(out_dir, paste0("forest_", k_name, "_", outcome_name, ".pdf"))
-  ggsave(fname, p, width = 9, height = 0.35 * nrow(df_plot) + 1.5 * length(unique(df_plot$facet_label)))
+  ggsave(fname, p, width = 9, height = 0.22 * nrow(df_plot) + 0.8 * length(unique(df_plot$facet_label)))
   p
 }
 
