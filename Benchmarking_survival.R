@@ -2,6 +2,7 @@ library(readxl)
 library(dplyr)
 library(survival)
 library(survminer)
+library(ggplot2)
 
 dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_cohorts_match.xlsx",
                            sheet = "1a SCAN-B discovery")
@@ -50,9 +51,10 @@ multi_omic_by_k <- list(
 
 #  Prepare metadata 
 meta <- dt_metadata %>%
-  select(PD_ID, OS, OSbin, RFI, RFIbin, DRFI, DRFIbin, Age, TumSize, Grade) %>%
+  select(PD_ID, OS, OSbin, RFI, RFIbin, DRFI, DRFIbin, Age, TumSize, Grade, LNbinary) %>%
   mutate(across(c(OS, RFI, DRFI, Age, TumSize), as.numeric),
-         Grade = as.factor(Grade))
+         Grade = as.factor(Grade),
+         LNbinary = as.factor(LNbinary))
 
 outcomes <- list(
   OS   = c("OS", "OSbin"),
@@ -86,7 +88,7 @@ run_survival <- function(cluster_df, meta, method_name,
   n_adj <- NA_integer_
   cox_adj <- NULL
   if (nlevels(droplevels(df_adj$Cluster)) >= 2) {
-    form_adj <- as.formula(paste0("Surv(", time_var, ", ", event_var, ") ~ Cluster + Age + TumSize + Grade"))
+    form_adj <- as.formula(paste0("Surv(", time_var, ", ", event_var, ") ~ Cluster + Age + TumSize + Grade + LNbinary"))
     cox_adj <- tryCatch(coxph(form_adj, data = df_adj), error = function(e) NULL)
     if (!is.null(cox_adj)) {
       cox_adj_p <- anova(cox_adj)["Cluster", "Pr(>|Chi|)"]
@@ -315,7 +317,7 @@ run_survival_LAR <- function(cluster_df, meta, method_name, lar_label,
   n_adj <- NA_integer_
   if (lar_label %in% levels(df_adj$Cluster) && nlevels(df_adj$Cluster) >= 2) {
     df_adj$Cluster <- relevel(df_adj$Cluster, ref = lar_label)
-    form_adj <- as.formula(paste0("Surv(", time_var, ", ", event_var, ") ~ Cluster + Age + TumSize + Grade"))
+    form_adj <- as.formula(paste0("Surv(", time_var, ", ", event_var, ") ~ Cluster + Age + TumSize + Grade + LNbinary"))
     cox_adj <- tryCatch(coxph(form_adj, data = df_adj), error = function(e) NULL)
     n_adj <- nrow(df_adj)
 
@@ -432,3 +434,40 @@ for (outcome_name in names(outcomes)) {
   plot_combined_KM(results_LAR_k3, "k3", outcome_name, out_dir)
   plot_combined_KM(results_LAR_k4, "k4", outcome_name, out_dir)
 }
+
+
+
+# forest plots
+
+plot_forest_by_k <- function(lar_table, k_name, outcome_name, out_dir) {
+  df_plot <- lar_table %>%
+    filter(k_group == k_name, outcome == outcome_name) %>%
+    mutate(label = paste0(method, " (", cluster_vs_lar, " vs LAR)"))
+  
+  if (nrow(df_plot) == 0) return(invisible(NULL))
+  
+  # order by HR for readability
+  df_plot <- df_plot %>% arrange(HR) %>%
+    mutate(label = factor(label, levels = label))
+  
+  p <- ggplot(df_plot, aes(x = HR, y = label)) +
+    geom_point(size = 2) +
+    geom_errorbarh(aes(xmin = lower95, xmax = upper95), height = 0.2) +
+    geom_vline(xintercept = 1, linetype = "dashed", color = "grey40") +
+    scale_x_log10() +
+    labs(x = "Hazard Ratio (log scale, vs LAR)", y = NULL,
+         title = paste0("Forest plot — ", k_name, " — ", outcome_name)) +
+    theme_minimal(base_size = 11)
+  
+  fname <- file.path(out_dir, paste0("forest_", k_name, "_", outcome_name, ".pdf"))
+  ggsave(fname, p, width = 8, height = 0.4 * nrow(df_plot) + 2)
+  p
+}
+
+#  Generate all 6 forest plots (k3/k4 x OS/RFI/DRFI) 
+for (k_name in c("k3", "k4")) {
+  for (outcome_name in names(outcomes)) {
+    plot_forest_by_k(lar_table_all, k_name, outcome_name, out_dir)
+  }
+}
+                        
