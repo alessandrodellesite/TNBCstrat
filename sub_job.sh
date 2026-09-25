@@ -7,7 +7,7 @@
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --time=50:00      
+#SBATCH --time=10:00      
 #SBATCH --mem=5G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
