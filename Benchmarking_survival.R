@@ -491,7 +491,7 @@ plot_forest_by_k <- function(lar_table, k_name, outcome_name, out_dir) {
   # base R equivalent of fct_reorder: build the label, then set factor levels
   # explicitly ordered by the numeric cluster id (descending, so "1" ends up at top of plot)
   df_plot <- df_plot %>%
-    mutate(comp_label = paste0(cluster_vs_lar, " vs LAR"))
+    mutate(comp_label = paste0(cluster_vs_lar))
   
   ordering <- df_plot %>%
     distinct(facet_label, comp_label, cluster_vs_lar) %>%
@@ -508,7 +508,7 @@ plot_forest_by_k <- function(lar_table, k_name, outcome_name, out_dir) {
     facet_grid(rows = vars(facet_label), scales = "free_y", space = "free_y", switch = "y") +
     scale_x_log10(expand = expansion(mult = c(0.05, 0.35))) +
     labs(x = "Hazard Ratio (log scale, vs LAR)", y = NULL,
-         title = paste0("Forest plot — ", k_name, " — ", outcome_name),
+         title = paste0("Forest plot", k_name, outcome_name),
          caption = "Per-comparison p-values BH-adjusted; ANOVA p = omnibus test for Cluster term") +
     theme_minimal(base_size = 11) +
     theme(
