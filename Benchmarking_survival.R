@@ -230,114 +230,183 @@ save_significant_plots(results_by_k$k4,      summary_k4,         out_dir)
 
 
 
+# LAR-referenced survival analysis (TNBCtype4/6 + all k3/k4)
 
-# adjusted pairwise Cox comparisons for one method/outcome 
-pairwise_cox <- function(cluster_df, meta, method_name, time_var, event_var,
-                          id_col_cluster = "SampleID") {
+#  Extract Lehman subtypes from metadata 
+tnbc4 <- dt_metadata %>%
+  select(PD_ID, Cluster = TNBCtype4_n235_notPreCentered) %>%
+  filter(!is.na(Cluster))
+
+tnbc6 <- dt_metadata %>%
+  select(PD_ID, Cluster = TNBCtype6_n235_notPreCentered) %>%
+  filter(!is.na(Cluster))
+
+#  Group definitions: k3 group and k4 group, each incl. single-omics + TNBCtype 
+group_k3 <- list(
+  RNA         = list(df = rna_results,          id_col = "SampleID"),
+  Methyl      = list(df = met_results,          id_col = "SampleID"),
+  CNV         = list(df = cnv_results,          id_col = "SampleID"),
+  MOFA_k3     = list(df = mofa3_results,        id_col = "SampleID"),
+  iCluster_k3 = list(df = icluster3_results,    id_col = "SampleID"),
+  SNF_k3      = list(df = snf3_results,         id_col = "SampleID"),
+  XintNMF_k3  = list(df = XintNMF3_results_reg, id_col = "SampleID"),
+  TNBCtype4   = list(df = tnbc4,                id_col = "PD_ID"),
+  TNBCtype6   = list(df = tnbc6,                id_col = "PD_ID")
+)
+
+group_k4 <- list(
+  RNA         = list(df = rna_results,          id_col = "SampleID"),
+  Methyl      = list(df = met_results,          id_col = "SampleID"),
+  CNV         = list(df = cnv_results,          id_col = "SampleID"),
+  MOFA_k4     = list(df = mofa4_results,        id_col = "SampleID"),
+  iCluster_k4 = list(df = icluster4_results,    id_col = "SampleID"),
+  SNF_k4      = list(df = snf4_results,         id_col = "SampleID"),
+  XintNMF_k4  = list(df = XintNMF4_results_reg, id_col = "SampleID"),
+  TNBCtype4   = list(df = tnbc4,                id_col = "PD_ID"),
+  TNBCtype6   = list(df = tnbc6,                id_col = "PD_ID")
+)
+
+#  Which Cluster label is LAR- matching, per method 
+lar_ref_map <- list(
+  RNA = "3", Methyl = "3", CNV = "3",
+  MOFA_k3 = "2", MOFA_k4 = "2",
+  iCluster_k3 = "2", iCluster_k4 = "4",
+  SNF_k3 = "3", SNF_k4 = "2",
+  XintNMF_k3 = "2", XintNMF_k4 = "4",
+  TNBCtype4 = "LAR", TNBCtype6 = "LAR"
+)
+
+#  Function: KM fit + Cox model with LAR forced as reference 
+run_survival_LAR <- function(cluster_df, meta, method_name, lar_label,
+                              time_var, event_var, id_col_cluster = "SampleID") {
 
   df <- meta %>%
     inner_join(cluster_df, by = c("PD_ID" = id_col_cluster)) %>%
-    mutate(Cluster = as.factor(Cluster)) %>%
-    filter(!is.na(.data[[time_var]]), !is.na(.data[[event_var]]),
-           !is.na(Age), !is.na(TumSize), !is.na(Grade))
+    mutate(Cluster = as.character(Cluster))
 
-  levels_cluster <- levels(droplevels(df$Cluster))
-  if (length(levels_cluster) < 2) return(NULL)
+  df_crude <- df %>% filter(!is.na(.data[[time_var]]), !is.na(.data[[event_var]]))
+  df_crude$Cluster <- as.factor(df_crude$Cluster)
+  if (nlevels(droplevels(df_crude$Cluster)) < 2) return(NULL)
+  if (!(lar_label %in% levels(df_crude$Cluster))) {
+    message("LAR label '", lar_label, "' not found for ", method_name)
+    return(NULL)
+  }
 
-  pairs <- combn(levels_cluster, 2, simplify = FALSE)
+  form_crude <- as.formula(paste0("Surv(", time_var, ", ", event_var, ") ~ Cluster"))
+  fit <- surv_fit(form_crude, data = df_crude)
+  logrank_p <- surv_pvalue(fit)$pval
 
-  results <- lapply(pairs, function(pair) {
-    df_pair <- df %>% filter(Cluster %in% pair) %>% mutate(Cluster = droplevels(as.factor(Cluster)))
-    df_pair$Cluster <- relevel(df_pair$Cluster, ref = pair[1])   # pair[1] = reference
+  df_adj <- df_crude %>% filter(!is.na(Age), !is.na(TumSize), !is.na(Grade))
+  df_adj$Cluster <- droplevels(df_adj$Cluster)
 
-    form <- as.formula(paste0("Surv(", time_var, ", ", event_var, ") ~ Cluster + Age + TumSize + Grade"))
-    cox <- tryCatch(coxph(form, data = df_pair), error = function(e) NULL)
-    if (is.null(cox)) return(NULL)
+  coef_table <- NULL
+  n_adj <- NA_integer_
+  if (lar_label %in% levels(df_adj$Cluster) && nlevels(df_adj$Cluster) >= 2) {
+    df_adj$Cluster <- relevel(df_adj$Cluster, ref = lar_label)
+    form_adj <- as.formula(paste0("Surv(", time_var, ", ", event_var, ") ~ Cluster + Age + TumSize + Grade"))
+    cox_adj <- tryCatch(coxph(form_adj, data = df_adj), error = function(e) NULL)
+    n_adj <- nrow(df_adj)
 
-    s <- summary(cox)
-    cluster_row <- grep("^Cluster", rownames(s$coefficients))[1]  # the Cluster dummy row
+    if (!is.null(cox_adj)) {
+      s <- summary(cox_adj)
+      rows <- grep("^Cluster", rownames(s$coefficients))
+      if (length(rows) > 0) {
+        coef_table <- data.frame(
+          method         = method_name,
+          outcome        = time_var,
+          lar_ref        = lar_label,
+          cluster_vs_lar = sub("^Cluster", "", rownames(s$coefficients)[rows]),
+          HR             = s$coefficients[rows, "exp(coef)"],
+          lower95        = s$conf.int[rows, "lower .95"],
+          upper95        = s$conf.int[rows, "upper .95"],
+          p              = s$coefficients[rows, "Pr(>|z|)"]
+        )
+      }
+    }
+  }
 
-    data.frame(
-      method     = method_name,
-      outcome    = time_var,
-      group1     = pair[1],
-      group2     = pair[2],
-      n          = nrow(df_pair),
-      HR         = s$coefficients[cluster_row, "exp(coef)"],
-      lower95    = s$conf.int[cluster_row, "lower .95"],
-      upper95    = s$conf.int[cluster_row, "upper .95"],
-      p          = s$coefficients[cluster_row, "Pr(>|z|)"]
-    )
+  list(
+    method     = method_name,
+    outcome    = time_var,
+    n_crude    = nrow(df_crude),
+    n_adj      = n_adj,
+    logrank_p  = logrank_p,
+    fit        = fit,
+    df_crude   = df_crude,
+    coef_table = coef_table
+  )
+}
+
+# Batch runner for one group (k3 or k4) 
+run_group_LAR <- function(group_list, meta, k_name) {
+  results <- list()
+  for (method_name in names(group_list)) {
+    entry <- group_list[[method_name]]
+    lar_label <- lar_ref_map[[method_name]]
+    for (outcome_name in names(outcomes)) {
+      time_var  <- outcomes[[outcome_name]][1]
+      event_var <- outcomes[[outcome_name]][2]
+      key <- paste(k_name, method_name, outcome_name, sep = "_")
+
+      res <- tryCatch(
+        run_survival_LAR(entry$df, meta, method_name, lar_label,
+                          time_var, event_var, id_col_cluster = entry$id_col),
+        error = function(e) { message("Failed for ", key, ": ", e$message); NULL }
+      )
+      results[[key]] <- res
+    }
+  }
+  results
+}
+
+results_LAR_k3 <- run_group_LAR(group_k3, meta, "k3")
+results_LAR_k4 <- run_group_LAR(group_k4, meta, "k4")
+
+#  Build combined p-value table (all methods vs LAR, both groups) 
+build_LAR_table <- function(results_list, k_name) {
+  tabs <- lapply(names(results_list), function(key) {
+    res <- results_list[[key]]
+    if (is.null(res) || is.null(res$coef_table)) return(NULL)
+    res$coef_table %>%
+      mutate(k_group = k_name, n_crude = res$n_crude, n_adj = res$n_adj, logrank_p = res$logrank_p)
   })
-
-  bind_rows(results)
+  bind_rows(tabs)
 }
 
-#  Run for RNA across OS, RFI, DRFI 
-rna_pairwise <- bind_rows(lapply(names(outcomes), function(o) {
-  pairwise_cox(rna_results, meta, "RNA", outcomes[[o]][1], outcomes[[o]][2])
-}))
+lar_table_k3 <- build_LAR_table(results_LAR_k3, "k3")
+lar_table_k4 <- build_LAR_table(results_LAR_k4, "k4")
 
-# Run for SNF k=3 across OS, RFI, DRFI 
-snf_k3_pairwise <- bind_rows(lapply(names(outcomes), function(o) {
-  pairwise_cox(snf3_results, meta, "SNF_k3", outcomes[[o]][1], outcomes[[o]][2])
-}))
-
-#  Combine and apply BH correction (within each method, across pairs+outcomes, or however you prefer) 
-pairwise_all <- bind_rows(rna_pairwise, snf_k3_pairwise) %>%
-  group_by(method, outcome) %>%
+lar_table_all <- bind_rows(lar_table_k3, lar_table_k4) %>%
+  group_by(k_group, outcome) %>%
   mutate(p_adj = p.adjust(p, method = "BH")) %>%
-  ungroup()
+  ungroup() %>%
+  arrange(k_group, outcome, p)
 
-pairwise_all
+write.csv(lar_table_all, file.path(out_dir, "LAR_reference_cox_pvalues.csv"), row.names = FALSE)
 
-write.csv(pairwise_all, file.path(out_dir, "pairwise_cox_RNA_SNFk3.csv"), row.names = FALSE)
-                        
-
-# get the snf and rna curves
-
-
-#  Plot KM curves for RNA (all 3 outcomes) 
-for (outcome_name in names(outcomes)) {
+# Combined KM plots: all methods together, per k and per outcome 
+plot_combined_KM <- function(results_list, k_name, outcome_name, out_dir) {
   time_var <- outcomes[[outcome_name]][1]
-  key <- paste0("RNA_", outcome_name)
-  res <- results_single_omic[[key]]
-  
-  if (is.null(res)) {
-    message("No result for ", key)
-    next
+  keys <- names(results_list)[grepl(paste0("_", time_var, "$"), names(results_list))]
+
+  splots <- list()
+  for (key in keys) {
+    res <- results_list[[key]]
+    if (is.null(res)) next
+    splots[[res$method]] <- ggsurvplot(res$fit, data = res$df_crude,
+                                        pval = TRUE, conf.int = FALSE,
+                                        legend.title = "Cluster",
+                                        title = res$method)
   }
-  
-  p <- ggsurvplot(res$fit, data = res$df_crude,
-                   pval = TRUE, risk.table = TRUE, conf.int = TRUE,
-                   xlab = "Years", legend.title = "Cluster",
-                   title = paste0("RNA — ", time_var))
-  
-  fname <- file.path(out_dir, paste0("RNA_", time_var, "_KM.pdf"))
-  pdf(fname, width = 7, height = 7)
-  print(p)
-  dev.off()
+  if (length(splots) == 0) return(invisible(NULL))
+
+  combined <- arrange_ggsurvplots(splots, print = FALSE,
+                                   ncol = 3, nrow = ceiling(length(splots) / 3))
+  fname <- file.path(out_dir, paste0("KM_combined_", k_name, "_", time_var, ".pdf"))
+  ggsave(fname, combined, width = 14, height = 4 * ceiling(length(splots) / 3))
 }
 
-#  Plot KM curves for SNF k=3 (all 3 outcomes) 
 for (outcome_name in names(outcomes)) {
-  time_var <- outcomes[[outcome_name]][1]
-  key <- paste0("SNF_k3_", outcome_name)
-  res <- results_by_k$k3[[key]]
-  
-  if (is.null(res)) {
-    message("No result for ", key)
-    next
-  }
-  
-  p <- ggsurvplot(res$fit, data = res$df_crude,
-                   pval = TRUE, risk.table = TRUE, conf.int = TRUE,
-                   xlab = "Years", legend.title = "Cluster",
-                   title = paste0("SNF k=3 — ", time_var))
-  
-  fname <- file.path(out_dir, paste0("SNF_k3_", time_var, "_KM.pdf"))
-  pdf(fname, width = 7, height = 7)
-  print(p)
-  dev.off()
+  plot_combined_KM(results_LAR_k3, "k3", outcome_name, out_dir)
+  plot_combined_KM(results_LAR_k4, "k4", outcome_name, out_dir)
 }
-                    
