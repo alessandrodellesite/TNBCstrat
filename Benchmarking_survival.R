@@ -315,9 +315,10 @@ run_survival_LAR <- function(cluster_df, meta, method_name, lar_label,
 
   coef_table <- NULL
   n_adj <- NA_integer_
+  anova_p <- NA_real_
   if (lar_label %in% levels(df_adj$Cluster) && nlevels(df_adj$Cluster) >= 2) {
     df_adj$Cluster <- relevel(df_adj$Cluster, ref = lar_label)
-    form_adj <- as.formula(paste0("Surv(", time_var, ", ", event_var, ") ~ Cluster + Age + TumSize + Grade + LNbinary"))
+    form_adj <- as.formula(paste0("Surv(", time_var, ", ", event_var, ") ~ Cluster + Age + TumSize + Grade"))
     cox_adj <- tryCatch(coxph(form_adj, data = df_adj), error = function(e) NULL)
     n_adj <- nrow(df_adj)
 
@@ -336,6 +337,8 @@ run_survival_LAR <- function(cluster_df, meta, method_name, lar_label,
           p              = s$coefficients[rows, "Pr(>|z|)"]
         )
       }
+      # omnibus test for the whole Cluster term (same regardless of reference level)
+      anova_p <- tryCatch(anova(cox_adj)["Cluster", "Pr(>|Chi|)"], error = function(e) NA_real_)
     }
   }
 
@@ -345,12 +348,13 @@ run_survival_LAR <- function(cluster_df, meta, method_name, lar_label,
     n_crude    = nrow(df_crude),
     n_adj      = n_adj,
     logrank_p  = logrank_p,
+    anova_p    = anova_p,
     fit        = fit,
     df_crude   = df_crude,
     coef_table = coef_table
   )
 }
-
+                          
 # Batch runner for one group (k3 or k4) 
 run_group_LAR <- function(group_list, meta, k_name) {
   results <- list()
@@ -382,7 +386,8 @@ build_LAR_table <- function(results_list, k_name) {
     res <- results_list[[key]]
     if (is.null(res) || is.null(res$coef_table)) return(NULL)
     res$coef_table %>%
-      mutate(k_group = k_name, n_crude = res$n_crude, n_adj = res$n_adj, logrank_p = res$logrank_p)
+      mutate(k_group = k_name, n_crude = res$n_crude, n_adj = res$n_adj,
+             logrank_p = res$logrank_p, anova_p = res$anova_p)
   })
   bind_rows(tabs)
 }
@@ -442,26 +447,37 @@ for (outcome_name in names(outcomes)) {
 plot_forest_by_k <- function(lar_table, k_name, outcome_name, out_dir) {
   df_plot <- lar_table %>%
     filter(k_group == k_name, outcome == outcome_name) %>%
-    mutate(label = paste0(method, " (", cluster_vs_lar, ")"))
+    mutate(label = paste0(method, " (", cluster_vs_lar, " vs LAR)"),
+           p_label = paste0("p=", signif(p_adj, 2)))
   
   if (nrow(df_plot) == 0) return(invisible(NULL))
   
-  # order by method name, then by cluster within method
   df_plot <- df_plot %>%
     arrange(method, cluster_vs_lar) %>%
-    mutate(label = factor(label, levels = rev(label)))   # rev() so first method appears at top of plot
+    mutate(label = factor(label, levels = rev(label)))
+  
+  # one omnibus ANOVA p-value per method, placed at the top row of that method's block
+  anova_labels <- df_plot %>%
+    group_by(method) %>%
+    slice_max(order_by = as.character(label), n = 1) %>%   # top row of each method's block
+    ungroup() %>%
+    mutate(anova_label = paste0("ANOVA p=", signif(anova_p, 2)))
   
   p <- ggplot(df_plot, aes(x = HR, y = label)) +
     geom_point(size = 2) +
     geom_errorbarh(aes(xmin = lower95, xmax = upper95), height = 0.2) +
     geom_vline(xintercept = 1, linetype = "dashed", color = "grey40") +
-    scale_x_log10() +
-    labs(x = "Hazard Ratio", y = NULL,
-         title = paste0("Forest plot — ", k_name, " — ", outcome_name)) +
+    geom_text(aes(label = p_label, x = upper95), hjust = -0.15, size = 3) +
+    geom_text(data = anova_labels, aes(x = upper95, y = label, label = anova_label),
+              hjust = -0.15, vjust = -1.2, size = 3, fontface = "italic", color = "grey30") +
+    scale_x_log10(expand = expansion(mult = c(0.05, 0.4))) +
+    labs(x = "Hazard Ratio (log scale, vs LAR)", y = NULL,
+         title = paste0("Forest plot — ", k_name, " — ", outcome_name),
+         caption = "Per-comparison p-values BH-adjusted; ANOVA p = omnibus test for Cluster term (one per method)") +
     theme_minimal(base_size = 11)
   
   fname <- file.path(out_dir, paste0("forest_", k_name, "_", outcome_name, ".pdf"))
-  ggsave(fname, p, width = 8, height = 0.4 * nrow(df_plot) + 2)
+  ggsave(fname, p, width = 10, height = 0.5 * nrow(df_plot) + 2)
   p
 }
 
