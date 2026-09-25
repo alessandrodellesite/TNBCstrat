@@ -9,6 +9,7 @@ dt_metadata <- read_excel("/mnt/petasan_ccb/juanra/SCANB/RNAseq/metadata/ids_coh
 # clustering solution
 rna_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_rna/rna_nmf_clusters.csv")
 met_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters.csv")
+met_results_4 <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_meth/methyl_nmf_clusters_4.csv")
 cnv_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/singleomic/nmf_cnv/cnv_nmf_clusters.csv")
 
 mofa2_results <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_mofa/mofa_km_clusters_2.csv")
@@ -36,7 +37,8 @@ rna_results$Cluster <- factor(relabel_map[as.character(rna_results$Cluster)],
 #  Organize cluster solutions 
 single_omic_list <- list(
   RNA    = rna_results,
-  Methyl = met_results,
+  Methylation_k3 = met_results,
+  Methylation_k4 = met_results_4,
   CNV    = cnv_results
 )
 
@@ -244,7 +246,7 @@ tnbc6 <- dt_metadata %>%
 #  Group definitions: k3 group and k4 group, each incl. single-omics + TNBCtype 
 group_k3 <- list(
   RNA         = list(df = rna_results,          id_col = "SampleID"),
-  Methyl      = list(df = met_results,          id_col = "SampleID"),
+  Methyl_k3      = list(df = met_results,          id_col = "SampleID"),
   CNV         = list(df = cnv_results,          id_col = "SampleID"),
   MOFA_k3     = list(df = mofa3_results,        id_col = "SampleID"),
   iCluster_k3 = list(df = icluster3_results,    id_col = "SampleID"),
@@ -256,7 +258,7 @@ group_k3 <- list(
 
 group_k4 <- list(
   RNA         = list(df = rna_results,          id_col = "SampleID"),
-  Methyl      = list(df = met_results,          id_col = "SampleID"),
+  Methyl_k4      = list(df = met_results_4,          id_col = "SampleID"),
   CNV         = list(df = cnv_results,          id_col = "SampleID"),
   MOFA_k4     = list(df = mofa4_results,        id_col = "SampleID"),
   iCluster_k4 = list(df = icluster4_results,    id_col = "SampleID"),
@@ -384,6 +386,16 @@ lar_table_all <- bind_rows(lar_table_k3, lar_table_k4) %>%
 
 write.csv(lar_table_all, file.path(out_dir, "LAR_reference_cox_pvalues.csv"), row.names = FALSE)
 
+# Filter to significant comparisons only 
+lar_table_significant <- lar_table_all %>%
+  filter(p_adj < 0.05) %>%
+  arrange(k_group, outcome, p_adj)
+
+lar_table_significant
+
+write.csv(lar_table_significant, file.path(out_dir, "LAR_reference_cox_pvalues_significant.csv"), row.names = FALSE)                        
+
+                        
 # Combined KM plots: all methods together, per k and per outcome 
 plot_combined_KM <- function(results_list, k_name, outcome_name, out_dir) {
   time_var <- outcomes[[outcome_name]][1]
