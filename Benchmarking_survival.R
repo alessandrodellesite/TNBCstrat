@@ -270,7 +270,7 @@ group_k4 <- list(
 
 #  Which Cluster label is LAR- matching, per method 
 lar_ref_map <- list(
-  RNA = "3", Methyl = "3", CNV = "3",
+  RNA = "3", Methyl_k3 = "3", Methyl_k4 = "3", CNV = "3",
   MOFA_k3 = "2", MOFA_k4 = "2",
   iCluster_k3 = "2", iCluster_k4 = "4",
   SNF_k3 = "3", SNF_k4 = "2",
