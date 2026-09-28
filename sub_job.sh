@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=benchmark_1
-#SBATCH --output=bench%j.log
+#SBATCH --job-name=check_1
+#SBATCH --output=check%j.log
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
-#SBATCH --time=10:00      
-#SBATCH --mem=5G            
+#SBATCH --cpus-per-task=1
+#SBATCH --time=1:00      
+#SBATCH --mem=1G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Benchmarking_survival_1.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/check.R"
 
 # singularity execution
 srun singularity exec \
