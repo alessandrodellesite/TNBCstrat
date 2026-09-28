@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=check_1
-#SBATCH --output=check%j.log
+#SBATCH --job-name=xint_kmeans
+#SBATCH --output=xint_kmeans%j.log
 #SBATCH --partition=short
 #SBATCH --mail-type=END,FAIL  
 #SBATCH --mail-user=alessandrodelle@vhio.net
 #SBATCH --nodes=1      
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=1:00      
-#SBATCH --mem=1G            
+#SBATCH --time=20:00      
+#SBATCH --mem=4G            
 
 IMAGE_PATH="/mnt/petasan_ccb/alessandro/SCANB/r_image.sif"
-SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/check.R"
+SCRIPT_PATH="/home/alessandrodelle@vhio.org/ondemand/TNBCstrat/Bootstrap_xintNMF_2.R.R"
 
 # singularity execution
 srun singularity exec \
