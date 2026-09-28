@@ -28,11 +28,11 @@ XintNMF2_results_reg <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/o
 XintNMF3_results_reg <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k3_reg.csv")
 XintNMF4_results_reg <- read.csv("/mnt/petasan_ccb/alessandro/SCANB/multiomics/output_xintnmf/xintNMF_clusters_k4_reg.csv")
 
-# ---- Relabel RNA clusters to desired display order ----
+#  Relabel RNA clusters to desired display order 
 relabel_map <- c("3" = "1", "1" = "2", "2" = "3")
 rna_results$Cluster <- factor(relabel_map[as.character(rna_results$Cluster)], levels = c("1", "2", "3"))
 
-# ---- Lehman subtypes from metadata ----
+# Lehman subtypes from metadata 
 tnbc4 <- dt_metadata %>%
   select(PD_ID, Cluster = TNBCtype4_n235_notPreCentered) %>%
   filter(!is.na(Cluster), Cluster != "NA")
@@ -41,7 +41,7 @@ tnbc6 <- dt_metadata %>%
   select(PD_ID, Cluster = TNBCtype6_n235_notPreCentered) %>%
   filter(!is.na(Cluster), Cluster != "NA")
 
-# ---- Metadata ----
+#metadata 
 meta <- dt_metadata %>%
   select(PD_ID, OS, OSbin, RFI, RFIbin, DRFI, DRFIbin, Age, TumSize, Grade, LNbinary) %>%
   mutate(across(c(OS, RFI, DRFI, Age, TumSize), as.numeric),
@@ -57,9 +57,8 @@ outcomes <- list(
 out_dir <- "/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/survival"
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
-# =====================================================================
-# One group definition per k, each entry: df, id_col, lar_label (NULL if not defined)
-# =====================================================================
+
+# One group definition per k, each entry: df, id_col, lar_label 
 groups <- list(
   k2 = list(
     MOFA     = list(df = mofa2_results,        id_col = "SampleID", lar_label = NULL),
@@ -91,9 +90,8 @@ groups <- list(
   )
 )
 
-# =====================================================================
-# Single function: KM + logrank + omnibus adjusted Cox ANOVA + (optional) LAR-referenced pairwise Cox
-# =====================================================================
+# Single function: KM + logrank + omnibus adjusted Cox ANOVA + pairwise Cox (reference: LAR)
+
 run_survival_full <- function(cluster_df, meta, method_name, lar_label,
                                time_var, event_var, id_col_cluster = "SampleID") {
 
@@ -120,13 +118,13 @@ run_survival_full <- function(cluster_df, meta, method_name, lar_label,
     n_adj <- nrow(df_adj)
     form_adj <- as.formula(paste0("Surv(", time_var, ", ", event_var, ") ~ Cluster + Age + TumSize + Grade + LNbinary"))
 
-    # --- Omnibus ANOVA (reference level doesn't matter for this test) ---
+    #  Omnibus ANOVA (no reference )
     cox_default <- tryCatch(coxph(form_adj, data = df_adj), error = function(e) NULL)
     if (!is.null(cox_default)) {
       anova_p <- tryCatch(anova(cox_default)["Cluster", "Pr(>|Chi|)"], error = function(e) NA_real_)
     }
 
-    # --- LAR-referenced pairwise coefficients, only if a lar_label was supplied ---
+    # LAR-referenced pairwise coefficients, only if a lar_label was supplied (so for k=3 and 4)
     if (!is.null(lar_label) && lar_label %in% levels(df_adj$Cluster)) {
       df_lar <- df_adj
       df_lar$Cluster <- relevel(df_lar$Cluster, ref = lar_label)
@@ -164,9 +162,8 @@ run_survival_full <- function(cluster_df, meta, method_name, lar_label,
   )
 }
 
-# =====================================================================
+
 # Batch runner for one k-group
-# =====================================================================
 run_group <- function(group_list, meta, k_name) {
   results <- list()
   for (method_name in names(group_list)) {
@@ -190,9 +187,9 @@ run_group <- function(group_list, meta, k_name) {
 results_by_k <- lapply(names(groups), function(k) run_group(groups[[k]], meta, k))
 names(results_by_k) <- names(groups)
 
-# =====================================================================
+
 # Table 1: ANOVA omnibus p-value per clustering solution (no correction)
-# =====================================================================
+                       
 build_anova_table <- function(results_list, k_name) {
   do.call(rbind, lapply(names(results_list), function(key) {
     res <- results_list[[key]]
@@ -215,17 +212,16 @@ anova_table_all <- bind_rows(lapply(names(results_by_k), function(k) build_anova
 
 write.csv(anova_table_all, file.path(out_dir, "anova_table_all.csv"), row.names = FALSE)
 
-# ---- Print + save which ANOVA results are significant ----
 anova_significant <- anova_table_all %>% filter(!is.na(anova_p), anova_p < 0.05)
 
-cat("\n=== Significant ANOVA results (raw p < 0.05, no correction) ===\n")
+cat("\nSignificant ANOVA results (raw p < 0.05, no correction) \n")
 print(anova_significant %>% select(k_group, method, outcome, n_adj, anova_p))
 
 write.csv(anova_significant, file.path(out_dir, "anova_table_significant.csv"), row.names = FALSE)
 
-# =====================================================================
-# Table 2: LAR vs all other clusters, per clustering solution (no correction)
-# =====================================================================
+                                    
+# Table 2: LAR vs all other clusters, per clustering solution
+
 build_lar_table <- function(results_list, k_name) {
   tabs <- lapply(names(results_list), function(key) {
     res <- results_list[[key]]
@@ -242,9 +238,10 @@ lar_table_all <- bind_rows(lapply(names(results_by_k), function(k) build_lar_tab
 
 write.csv(lar_table_all, file.path(out_dir, "LAR_reference_cox_pvalues.csv"), row.names = FALSE)
 
-# =====================================================================
-# Forest plots (raw p, raw anova_p — no BH correction anywhere)
-# =====================================================================
+
+                                  
+# Forest plots (raw p, raw anova_p)
+                                  
 plot_forest_by_k <- function(lar_table, k_name, outcome_name, out_dir) {
   df_plot <- lar_table %>% filter(k_group == k_name, outcome == outcome_name)
   if (nrow(df_plot) == 0) return(invisible(NULL))
@@ -287,9 +284,9 @@ plot_forest_by_k <- function(lar_table, k_name, outcome_name, out_dir) {
     geom_text(aes(label = p_label, x = upper95), hjust = -0.15, size = 3) +
     facet_grid(rows = vars(facet_label), scales = "free_y", space = "free_y", switch = "y") +
     scale_x_log10(expand = expansion(mult = c(0.05, 0.35))) +
-    labs(x = "Hazard Ratio (log scale, vs LAR)", y = NULL,
+    labs(x = "Hazard Ratio (vs LAR)", y = NULL,
          title = paste0("Forest plot — ", k_name, " — ", outcome_name),
-         caption = "Raw (uncorrected) p-values; ANOVA p = omnibus test for Cluster term, own reference") +
+         caption = "p: covariate-adjusted Cox model; ANOVA p: omnibus test across clusters" +
     theme_minimal(base_size = 11) +
     theme(
       strip.text.y.left = element_text(angle = 0, hjust = 0, face = "bold", margin = margin(0,0,0,0)),
@@ -311,9 +308,8 @@ for (k_name in c("k3", "k4")) {
   }
 }
 
-# =====================================================================
-# Combined KM plots: all methods together, per k and per outcome
-# =====================================================================
+
+# Combined KM plots
 plot_combined_KM <- function(results_list, k_name, outcome_name, out_dir) {
   time_var <- outcomes[[outcome_name]][1]
   keys <- names(results_list)[grepl(paste0("_", time_var, "$"), names(results_list))]
@@ -322,10 +318,30 @@ plot_combined_KM <- function(results_list, k_name, outcome_name, out_dir) {
   for (key in keys) {
     res <- results_list[[key]]
     if (is.null(res)) next
-    splots[[res$method]] <- ggsurvplot(res$fit, data = res$df_crude,
-                                        pval = TRUE, conf.int = FALSE,
-                                        legend.title = "Cluster",
-                                        title = res$method)
+    splots[[res$method]] <- {
+      n_cl <- length(res$fit$strata)
+      labs <- sub(".*=", "", names(res$fit$strata))   # "cluster=1" -> "1"
+      
+      p <- ggsurvplot(
+        res$fit, data = res$df_crude,
+        pval = TRUE, conf.int = FALSE,
+        legend.title = "",            # removes the cluster title
+        legend.labs = paste("Cluster", labs),   # or just `labs` for maximum space saving
+        legend = "top",
+        title = res$method
+      )
+      
+      p$plot <- p$plot +
+      guides(colour = guide_legend(nrow = if (n_cl >= 4) 2 else 1, byrow = TRUE)) +
+        theme(
+          legend.title = element_blank(),
+          legend.text = element_text(size = 8),
+          legend.key.size = unit(0.4, "cm"),
+          legend.spacing.x = unit(0.1, "cm")
+        )
+      p
+                                   }
+    
   }
   if (length(splots) == 0) return(invisible(NULL))
 
@@ -341,5 +357,5 @@ for (k_name in names(results_by_k)) {
   }
 }
 
-# ---- Save full result objects ----
+#save
 saveRDS(results_by_k, file.path(out_dir, "results_by_k.rds"))
