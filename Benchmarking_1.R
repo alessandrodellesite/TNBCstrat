@@ -385,46 +385,27 @@ val_dir <- "/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/internal_valida
 write.csv(round(results_table, 3), file.path(val_dir, "internal_validation.csv"), row.names = FALSE)
 
 # Plot
-                            
-metric_info <- tibble::tribble(
-  ~Metric,               ~Direction, ~Label,
-  "Avg_Silhouette",      "higher",   "Average Silhouette\n(higher is better \u2191)",
-  "Calinski_Harabasz",   "higher",   "Calinski-Harabasz\n(higher is better \u2191)",
-  "Dunn_Index",          "higher",   "Dunn Index\n(higher is better \u2191)",
-  "Davies_Bouldin",      "lower",    "Davies-Bouldin\n(lower is better \u2193)",
-  "Connectivity",        "lower",    "Connectivity\n(lower is better \u2193)"
-)
 
 plot_data <- results_table %>%
   tibble::rownames_to_column("Metric") %>%
   pivot_longer(-Metric, names_to = "Approach", values_to = "Value") %>%
-  mutate(Method_Family = str_remove(Approach, "_\\d+$")) %>%
-  left_join(metric_info, by = "Metric") %>%
   mutate(
-    Label    = factor(Label, levels = metric_info$Label),   # fixes panel order
-    Approach = factor(Approach, levels = names(approach_configs))
+    Method_Family = str_remove(Approach, "_\\d+$"),
+    Metric = factor(Metric,
+                    levels = c("Avg_Silhouette", "Calinski_Harabasz", "Dunn_Index",
+                               "Davies_Bouldin", "Connectivity"))
   )
 
-# One background rectangle per panel tinted by direction
-bg_data <- metric_info %>%
-  mutate(Label = factor(Label, levels = metric_info$Label))
-
 p <- ggplot(plot_data, aes(x = Approach, y = Value, fill = Method_Family)) +
-  geom_rect(data = bg_data, inherit.aes = FALSE,
-            aes(fill = NULL, alpha = NULL),
-            xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf,
-            fill = ifelse(bg_data$Direction == "higher", "#E8F4EA", "#FBE9E6")) +
-  geom_col(position = "dodge", width = 0.6) +
-  facet_wrap(~Label, ncol = 3, scales = "free_y") +
-  scale_fill_brewer(palette = "Set2") +
+  geom_bar(stat = "identity", position = "dodge", width = 0.6) +
+  facet_wrap(~Metric, scales = "free_y", ncol = 3) +
   theme_minimal() +
   labs(title = "Multi-omics internal validation comparison",
-       subtitle = "Top row: higher is better (\u2191)   |   Bottom row: lower is better (\u2193)",
+       subtitle = "Top row: higher is better | Bottom row: lower is better",
        x = NULL, y = "Metric Value", fill = "Method") +
-  theme(strip.text = element_text(face = "bold", size = 10),
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        panel.spacing = unit(1, "lines"),
-        legend.position = "bottom")
+  scale_fill_brewer(palette = "Set2") +
+  theme(strip.text = element_text(face = "bold", size = 11),
+        axis.text.x = element_text(angle = 45, hjust = 1))
 
 png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/internal_validation",
               "internal_validation_comparison.png"),
