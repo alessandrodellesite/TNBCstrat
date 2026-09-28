@@ -286,7 +286,7 @@ plot_forest_by_k <- function(lar_table, k_name, outcome_name, out_dir) {
     scale_x_log10(expand = expansion(mult = c(0.05, 0.35))) +
     labs(x = "Hazard Ratio (vs LAR)", y = NULL,
          title = paste0("Forest plot — ", k_name, " — ", outcome_name),
-         caption = "p: covariate-adjusted Cox model; ANOVA p: omnibus test across clusters" +
+         caption = "p: covariate-adjusted Cox model; ANOVA p: omnibus test across clusters") +
     theme_minimal(base_size = 11) +
     theme(
       strip.text.y.left = element_text(angle = 0, hjust = 0, face = "bold", margin = margin(0,0,0,0)),
