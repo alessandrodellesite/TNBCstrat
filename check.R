@@ -1,12 +1,22 @@
-K <- 2
-outdir <- sprintf("/mnt/petasan_ccb/alessandro/SCANB/multiomics/bootstrap/xintnmf/xintnmf_bootstrap_k%d", K)
-n_iter <- 1000
+ks     <- 2:4
+n_iter <- 500
+base   <- "/mnt/petasan_ccb/alessandro/SCANB/multiomics/bootstrap/xintnmf"
 
-marker <- file.path(outdir, paste0("iter_", 1:n_iter), "sample_factor.csv")
-ok <- file.exists(marker) & file.size(marker) > 0
-ok[is.na(ok)] <- FALSE   # file.size returns NA for missing files
+missing_by_k <- list()
 
-cat("Done:", sum(ok), "/", n_iter, "\n")
-missing <- which(!ok)
-cat("Missing:", length(missing), "\n")
-cat(paste(missing, collapse = ","), "\n")
+for (k in ks) {
+  outdir <- file.path(base, sprintf("xintnmf_bootstrap_k%d", k))
+  f  <- file.path(outdir, paste0("iter_", 1:n_iter), "sample_factor.csv")
+  ok <- file.exists(f) & !is.na(file.size(f)) & file.size(f) > 0
+
+  missing_by_k[[as.character(k)]] <- which(!ok)
+
+  cat(sprintf("K=%d: %d/%d completate, %d mancanti\n",
+              k, sum(ok), n_iter, sum(!ok)))
+
+  if (any(!ok)) {
+    cat(sprintf(
+      "  sbatch --job-name=xintnmf_boot_k%d --export=ALL,K=%d --array=%s%%20 xintnmf_boot.sh\n",
+      k, k, paste(which(!ok), collapse = ",")))
+  }
+}
