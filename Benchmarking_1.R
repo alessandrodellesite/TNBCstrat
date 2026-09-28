@@ -390,11 +390,12 @@ plot_data <- results_table %>%
   tibble::rownames_to_column("Metric") %>%
   pivot_longer(-Metric, names_to = "Approach", values_to = "Value") %>%
   mutate(
-    Method_Family = str_remove(Approach, "_\\d+$"),
-    Metric = factor(Metric,
-                    levels = c("Avg_Silhouette", "Calinski_Harabasz", "Dunn_Index",
-                               "Davies_Bouldin", "Connectivity"))
-  )
+  Approach = str_replace(Approach, "^iCluster\\.", "iCluster+") %>%
+             str_replace("^X\\.intNMF", "X-intNMF"),
+  Method_Family = str_remove(Approach, "_\\d+$"),
+  Metric = factor(Metric, levels = c("Avg_Silhouette", "Calinski_Harabasz", "Dunn_Index",
+                                     "Davies_Bouldin", "Connectivity"))
+  )                         
 
 p <- ggplot(plot_data, aes(x = Approach, y = Value, fill = Method_Family)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.6) +
