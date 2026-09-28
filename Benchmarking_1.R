@@ -11,7 +11,6 @@ library(clValid)
 library(clusterSim)
 library(tidyr)
 library(ggplot2)
-library(ggpattern)
 
 # load clustering results
 #mofa
@@ -130,9 +129,7 @@ for (k in k_values) {
   nmi_matrices[[as.character(k)]] <- nmi_matrix
   vi_matrices[[as.character(k)]]  <- vi_matrix
 
-  cat("\n============================\n")
   cat("k =", k, "\n")
-  cat("============================\n")
   cat("ADJUSTED RAND INDEX (ARI) \n")
   print(round(ari_matrix, 3))
   cat("\nNORMALIZED MUTUAL INFORMATION (NMI) \n")
@@ -389,18 +386,13 @@ write.csv(round(results_table, 3), file.path(val_dir, "internal_validation.csv")
 
 # Plot
 
-# install.packages("ggpattern")  # if not already installed
-library(ggpattern)
-
 plot_data <- results_table %>%
   tibble::rownames_to_column("Metric") %>%
   pivot_longer(-Metric, names_to = "Approach", values_to = "Value") %>%
-  mutate(
-    Method_Family = str_extract(Approach, "^[A-Za-z]+"),
-    k             = str_extract(Approach, "\\d+$"),
-    Approach_Clean = str_remove(Approach, "_\\d+$")
-  )
-
+  mutate(Method_Family = str_remove(Approach, "_\\d+$"))
+  
+p <- ggplot(plot_data, aes(x = Approach, y = Value, fill = Method_Family)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.6) +
 p <- ggplot(plot_data, aes(x = Approach_Clean, y = Value,
                             fill = Method_Family, pattern = k)) +
   geom_col_pattern(
@@ -423,11 +415,7 @@ p <- ggplot(plot_data, aes(x = Approach_Clean, y = Value,
        x = NULL, y = "Metric Value", fill = "Method") +
   scale_fill_brewer(palette = "Set2") +
   theme(strip.text = element_text(face = "bold", size = 11),
-        axis.text.x = element_text(angle = 45, hjust = 1)) +
-  guides(
-    fill    = guide_legend(override.aes = list(pattern = "none")),
-    pattern = guide_legend(override.aes = list(fill = "white"))
-  )
+        axis.text.x = element_text(angle = 45, hjust = 1)) 
 
 png(file.path("/mnt/petasan_ccb/alessandro/SCANB/plots/benchmarking/internal_validation",
                "internal_validation_comparison.png"),
@@ -445,6 +433,8 @@ plot_data <- results_table %>%
     Method_Family   = str_extract(Approach, "^[A-Za-z]+"),
     Cluster_Version = str_extract(Approach, "\\d+")
   )
+
+                            
 
 # one plot per cluster solution (2, 3, 4)
 plots_by_k <- plot_data %>%
