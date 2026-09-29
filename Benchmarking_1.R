@@ -143,6 +143,7 @@ for (k in k_values) {
   pheatmap(ari_matrix,
            main = paste0("Pairwise Cluster Concordance (ARI), k = ", k),
            display_numbers = TRUE,
+           fontsize_number = 14,
            color = colorRampPalette(c("white", "#E8F0FE", "#1A73E8"))(50),
            number_color = "black")
   dev.off()
@@ -153,6 +154,7 @@ for (k in k_values) {
   pheatmap(nmi_matrix,
            main = paste0("Normalized Mutual Information (NMI), k = ", k),
            display_numbers = TRUE,
+           fontsize_number = 14,
            color = colorRampPalette(c("white", "#E8F0FE", "#2E6651"))(50),
            number_color = "black")
   dev.off()
@@ -163,6 +165,7 @@ for (k in k_values) {
   pheatmap(vi_matrix,
            main = paste0("Normalized Variation of Information (VI), k = ", k),
            display_numbers = TRUE,
+           fontsize_number = 14,
            color = colorRampPalette(c("#1A7666", "#E8F0FE", "white"))(50),
            number_color = "black")
   dev.off()
