@@ -259,16 +259,17 @@ safe_merge_and_plot <- function(ego_up, ego_down, title, outfile) {
   merged_ego <- merge_result(res_list)
 
   p <- dotplot(merged_ego, x = "Cluster", showCategory = 10) +
-    ggtitle(title) +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      axis.text.y = element_text(size = 7)
-    ) +
-    scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 50))
+  ggtitle(title) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
+    axis.text.y = element_text(size = 12),   # <- bigger pathway names (was 7)
+    plot.title  = element_text(size = 14)
+  ) +
+  scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 40))
 
-  png(outfile, width = 1400, height = 1000, res = 150)
+  png(outfile, width = 1000, height = 1100, res = 150)   # narrower, a bit taller
   print(p)
-  dev.off()
+  dev.off()                   
 
   invisible(p)
 }
