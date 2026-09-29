@@ -262,7 +262,7 @@ safe_merge_and_plot <- function(ego_up, ego_down, title, outfile) {
   ggtitle(title) +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1, size = 11),
-    axis.text.y = element_text(size = 12),   # <- bigger pathway names (was 7)
+    axis.text.y = element_text(size = 10),   
     plot.title  = element_text(size = 14)
   ) +
   scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 40))
